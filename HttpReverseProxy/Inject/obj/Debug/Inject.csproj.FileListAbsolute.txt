@@ -1,0 +1,14 @@
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\bin\Debug\Inject.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\bin\Debug\Inject.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\obj\Debug\Inject.csprojResolveAssemblyReference.cache
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\obj\Debug\Inject.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Inject\obj\Debug\Inject.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\bin\Debug\Inject.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\bin\Debug\Inject.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\obj\Debug\Inject.csprojResolveAssemblyReference.cache
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\obj\Debug\Inject.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Inject\obj\Debug\Inject.pdb

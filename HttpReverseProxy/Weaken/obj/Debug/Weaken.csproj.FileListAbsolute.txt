@@ -1,0 +1,13 @@
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\bin\Debug\Weaken.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\bin\Debug\Weaken.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\obj\Debug\Weaken.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Weaken\obj\Debug\Weaken.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\bin\Debug\Weaken.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\bin\Debug\Weaken.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\obj\Debug\Weaken.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\obj\Debug\Weaken.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\Weaken\obj\Debug\Weaken.csprojResolveAssemblyReference.cache

@@ -1,0 +1,6 @@
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\bin\Debug\SSLStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\bin\Debug\SSLStrip.pdb
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\obj\Mixed Platforms\Debug\SSLStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Simsang\SSLStrip\obj\Mixed Platforms\Debug\SSLStrip.pdb
