@@ -1,0 +1,64 @@
+﻿  SLRE.c
+  RequestSpoofingPacketCrafter.c
+  PacketProxy.c
+  PacketCrafter.c
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(100): warning C4047: 'function': 'unsigned char *' differs in levels of indirection from 'int'
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(100): warning C4024: 'GenerateDnsPacket': different types for formal and actual parameter 2
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(100): warning C4047: 'function': 'unsigned short' differs in levels of indirection from 'unsigned char [512]'
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(100): warning C4024: 'GenerateDnsPacket': different types for formal and actual parameter 3
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(159): warning C4028: formal parameter 2 different from declaration
+c:\users\runtereg\data\ruben\code\minary\tools\ape\packetcrafter.c(159): warning C4028: formal parameter 3 different from declaration
+  NetworkFunctions.c
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 5 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 6 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 5 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 6 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(53): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(77): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\ape\networkfunctions.c(148): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+  LinkedListSystems.c
+  LinkedListHttpInjections.c
+  LinkedListSpoofedDnsHosts.c
+  LinkedListFirewallRules.c
+  Interface.c
+  HttpInjection.c
+  getopt.c
+  DnsResponsePoisoning.c
+  DnsPoisoning.c
+  DnsParser.c
+  ArpPoisoning.c
+  APE.c
+c:\users\runtereg\data\ruben\code\minary\tools\ape\ape.c(134): warning C4013: 'getopt' undefined; assuming extern returning int
+  ArpDepoisoning.c
+c:\users\runtereg\data\ruben\code\minary\tools\ape\arpdepoisoning.c(82): warning C4133: 'function': incompatible types - from 'unsigned int [6]' to 'unsigned char *'
+c:\users\runtereg\data\ruben\code\minary\tools\ape\arpdepoisoning.c(83): warning C4133: 'function': incompatible types - from 'unsigned int [4]' to 'unsigned char *'
+  Generating Code...
+ArpDepoisoning.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:LBR' specification
+  Ape.vcxproj -> C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\Ape\Debug\bin\Ape.exe
+  Ape.vcxproj -> C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\Ape\Debug\bin\Ape.pdb (Full PDB)

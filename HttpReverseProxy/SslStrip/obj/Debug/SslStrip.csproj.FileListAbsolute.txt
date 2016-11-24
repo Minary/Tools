@@ -1,0 +1,14 @@
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\bin\Debug\SslStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\bin\Debug\SslStrip.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\obj\Debug\SslStrip.csprojResolveAssemblyReference.cache
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\obj\Debug\SslStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\SSLStrip\obj\Debug\SslStrip.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\bin\Debug\SslStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\bin\Debug\SslStrip.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\bin\Debug\HttpReverseProxyLib.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\bin\Debug\HttpReverseProxyLib.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\obj\Debug\SslStrip.csprojResolveAssemblyReference.cache
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\obj\Debug\SslStrip.dll
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\SslStrip\obj\Debug\SslStrip.pdb

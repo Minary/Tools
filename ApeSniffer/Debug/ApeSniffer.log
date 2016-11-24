@@ -1,0 +1,65 @@
+﻿  SniffAndEvaluate.c
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\sniffandevaluate.c(206): warning C4013: 'Mac2String' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\sniffandevaluate.c(340): warning C4013: 'GetReqHostName' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\sniffandevaluate.c(416): warning C4047: '==': 'int' differs in levels of indirection from 'void *'
+  NetworkFunctions.c
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 5 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 6 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(51): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 5 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): warning C4477: 'sscanf' : format string '%02X' requires an argument of type 'unsigned int *', but variadic argument 6 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(52): note: consider using '%hhX' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 1 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 2 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 3 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): warning C4477: 'sscanf' : format string '%d' requires an argument of type 'int *', but variadic argument 4 has type 'unsigned char *'
+  c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(76): note: consider using '%hhd' in the format string
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\networkfunctions.c(133): warning C4047: '!=': 'int' differs in levels of indirection from 'void *'
+  LinkedListSystems.c
+  LinkedListConnections.c
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\linkedlistconnections.c(69): warning C4133: '-': incompatible types - from 'char *' to 'PCONNODE'
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\linkedlistconnections.c(69): warning C4047: 'function': 'char *' differs in levels of indirection from 'int'
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\linkedlistconnections.c(69): warning C4024: 'strncpy': different types for formal and actual parameter 1
+  Interface.c
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\interface.c(215): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\interface.c(219): warning C4996: 'inet_addr': Use inet_pton() or InetPton() instead or define _WINSOCK_DEPRECATED_NO_WARNINGS to disable deprecated API warnings
+  c:\program files (x86)\windows kits\8.1\include\um\winsock2.h(1850): note: see declaration of 'inet_addr'
+  getopt.c
+  GenericSniffer.c
+  DnsParser.c
+  ApeSniffer.c
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(64): warning C4013: 'getopt' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(80): warning C4013: 'GetInterfaceName' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(81): warning C4013: 'GetInterfaceDetails' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(93): warning C4013: 'ListInterfaceDetails' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(111): warning C4013: 'GenericSniffer' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(124): warning C4013: 'StartSniffAndEvaluate' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(216): warning C4013: '_strtime' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(217): warning C4013: '_strdate' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(291): warning C4013: 'pcap_lib_version' undefined; assuming extern returning int
+c:\users\runtereg\data\ruben\code\minary\tools\apesniffer\apesniffer.c(291): warning C4477: 'printf' : format string '%s' requires an argument of type 'char *', but variadic argument 1 has type 'int'
+  Generating Code...
+  ApeSniffer.vcxproj -> C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\ApeSniffer\Debug\bin\ApeSniffer.exe
+  ApeSniffer.vcxproj -> C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\ApeSniffer\Debug\bin\ApeSniffer.pdb (Full PDB)

@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\LinkedLists">
+      <UniqueIdentifier>{598c9442-fd29-47b7-8edf-b7ceee9b8f94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Packets">
+      <UniqueIdentifier>{3a7ac0df-9736-442c-b447-9ceead60954f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{6234c296-34fc-44ab-ae91-fbb02331a05c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\getopt">
+      <UniqueIdentifier>{c47c9c11-69b9-488f-bdc1-53e6af7ee111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DnsPoisoning">
+      <UniqueIdentifier>{dee3c1f8-c10d-4469-9b22-cd84aceed010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DnsRequestPoisoning">
+      <UniqueIdentifier>{79853e09-b2ca-4e0d-9d7f-4bc44be99838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DnsResponsePoisoning">
+      <UniqueIdentifier>{1df0af04-17bd-4952-ae77-131e279b0fda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HttpInjection">
+      <UniqueIdentifier>{1376ac80-6f3b-4299-809b-c0843009e9a4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LinkedListSystems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="APE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Packets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DNSResponsePoisoning.h">
+      <Filter>Source Files\DnsResponsePoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketCrafter.h">
+      <Filter>Source Files\DnsResponsePoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestSpoofingPacketCrafter.h">
+      <Filter>Source Files\DnsRequestPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="NetBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SLRE.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DNSPoisoning.h">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Source Files\getopt</Filter>
+    </ClInclude>
+    <ClInclude Include="NetDns.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpInjection.h">
+      <Filter>Source Files\HttpInjection</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListHttpInjections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListSpoofedDnsHosts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListFirewallRules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="APE.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkFunctions.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DNSPoisoning.c">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="RequestSpoofingPacketCrafter.c">
+      <Filter>Source Files\DnsRequestPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="DNSResponsePoisoning.c">
+      <Filter>Source Files\DnsResponsePoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketCrafter.c">
+      <Filter>Source Files\DnsResponsePoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListSystems.c">
+      <Filter>Source Files\LinkedLists</Filter>
+    </ClCompile>
+    <ClCompile Include="ARPDepoisoning.c">
+      <Filter>Source Files\Packets</Filter>
+    </ClCompile>
+    <ClCompile Include="ARPPoisoning.c">
+      <Filter>Source Files\Packets</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketProxy.c">
+      <Filter>Source Files\Packets</Filter>
+    </ClCompile>
+    <ClCompile Include="SLRE.c">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>Source Files\getopt</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsParser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpInjection.c">
+      <Filter>Source Files\HttpInjection</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListHttpInjections.c">
+      <Filter>Source Files\LinkedLists</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListSpoofedDnsHosts.c">
+      <Filter>Source Files\LinkedLists</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListFirewallRules.c">
+      <Filter>Source Files\LinkedLists</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
