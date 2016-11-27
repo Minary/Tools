@@ -1,9 +1,0 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(368,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  LinkedListSystems.c
-  ArpScan.c
-c:\users\runtereg\data\ruben\code\minary\tools\arpscan\arpscan.c(132): warning C4047: 'function': 'bpf_u_int32' differs in levels of indirection from 'void *'
-c:\users\runtereg\data\ruben\code\minary\tools\arpscan\arpscan.c(132): warning C4024: 'pcap_compile': different types for formal and actual parameter 5
-c:\users\runtereg\data\ruben\code\minary\tools\arpscan\arpscan.c(68): warning C4101: 'lNetMask': unreferenced local variable
-  Generating Code...
-  ArpScan.vcxproj -> C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\ArpScan\Debug\bin\ArpScan.exe
-  ArpScan.vcxproj -> Debug\bin\ArpScan.pdb (Full PDB)
