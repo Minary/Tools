@@ -28,8 +28,6 @@
 **/*.cd
 **/StyleCop.Cache
 
-.gitignore
-
 
 #
 # Gitignore nuget 
