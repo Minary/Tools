@@ -17,7 +17,6 @@
 **/*.buildstate
 **/*.unsuccessfulbuild
 **/*.idb
-**/*.ilk
 **/*.rc
 **/*.user
 **/*.sdf
@@ -27,6 +26,8 @@
 **/*.suo
 **/*.cd
 **/StyleCop.Cache
+
+.gitignore
 
 
 #
@@ -46,7 +47,6 @@
 #
 Winpcap/
 ipch/
-DhcPoison/
 
 **/bin/Release/*
 **/bin/Debug/*
@@ -55,7 +55,7 @@ DhcPoison/
 **/Release/
 **/x64/
 BUILDS/
-
+DhcPoison/
 
 
 !Plugin**/app.config
