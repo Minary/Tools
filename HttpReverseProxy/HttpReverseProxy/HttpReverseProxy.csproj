@@ -52,7 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NConsoler, Version=2.0.0.0, Culture=neutral, PublicKeyToken=652faff55808657c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NConsoler.2.0.0.0\lib\NConsoler.dll</HintPath>
+      <HintPath>..\..\..\packages\NConsoler.2.0.0.0\lib\NConsoler.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

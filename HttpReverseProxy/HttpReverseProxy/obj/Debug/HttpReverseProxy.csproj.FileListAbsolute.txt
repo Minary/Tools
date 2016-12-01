@@ -15,3 +15,4 @@ C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\HttpReverseProxy
 C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\HttpReverseProxy\obj\Debug\HttpReverseProxy.csprojResolveAssemblyReference.cache
 C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\HttpReverseProxy\obj\Debug\HttpReverseProxy.exe
 C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\HttpReverseProxy\obj\Debug\HttpReverseProxy.pdb
+C:\Users\runtereg\Data\Ruben\Code\Minary\Tools\HttpReverseProxy\HttpReverseProxy\bin\Debug\NConsoler.dll

@@ -97,19 +97,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PcapDotNet.Base">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Base.dll</HintPath>
+      <HintPath>..\..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Base.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PcapDotNet.Core">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.dll</HintPath>
+      <HintPath>..\..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PcapDotNet.Core.Extensions">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.Extensions.dll</HintPath>
+      <HintPath>..\..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.Extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PcapDotNet.Packets">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Packets.dll</HintPath>
+      <HintPath>..\..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Packets.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
