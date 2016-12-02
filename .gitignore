@@ -25,9 +25,8 @@
 **/*.opensdf
 **/*.suo
 **/*.cd
-**/StyleCop.Cache
+**/*.Cache
 
-.gitignore
 
 
 #
