@@ -1,8 +1,8 @@
 ﻿namespace HttpReverseProxy
 {
-  using HttpReverseProxy.Lib;
-  using HttpReverseProxy.ToClient;
-  using HttpReverseProxy.ToServer;
+//  using global::HttpReverseProxy.Lib;
+//  using global::HttpReverseProxy.ToClient;
+//  using global::HttpReverseProxy.ToServer;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.Exceptions;
@@ -11,6 +11,7 @@
   using System.Net;
   using System.Net.Sockets;
 
+
   public class RequestHandler
   {
 
@@ -18,7 +19,7 @@
 
     private RequestObj requestObj;
     private ClientErrorHandler clientErrorHandler;
-    private InstructionHandler clientInstructionHandler;
+    private ToClient.InstructionHandler clientInstructionHandler;
     private int dataDownloadUpperLimit = 5 * 1000 * 1000; // Limit 5 mb
     // private int dataUploadUpperLimit = 5 * 1000 * 1000;   // Limit 5 mb
     private Dictionary<string, bool> supportedContentTypes = new Dictionary<string, bool>()
@@ -35,7 +36,9 @@
     #region PROPERTIES
 
     public int DataDownloadUpperLimit { get { return this.dataDownloadUpperLimit; } set { } }
+
     public Dictionary<string, bool> SupportedContentTypes { get { return this.supportedContentTypes; } set { } }
+
     public RequestObj RequestObj { get { return this.requestObj; } set { this.requestObj = value; } }
 
     #endregion
@@ -52,7 +55,7 @@
     {
       this.requestObj = requestObj;
       this.clientErrorHandler = new ClientErrorHandler();
-      this.clientInstructionHandler = new InstructionHandler();
+      this.clientInstructionHandler = new ToClient.InstructionHandler();
     }
 
     /// <summary>
@@ -78,7 +81,7 @@
           // 2. Call post tcp-client request methodString of each loaded plugin
           try
           {
-            pluginInstr = PluginCalls.PostClientHeadersRequest(this.requestObj);
+            pluginInstr = Lib.PluginCalls.PostClientHeadersRequest(this.requestObj);
 
             if (pluginInstr.Instruction == Instruction.RedirectToNewUrl)
             {
@@ -112,7 +115,7 @@
             this.ForwardClientRequestToServer();
 
             // 5. Call post remoteSocket response methodString of each loaded plugin
-            pluginInstr = PluginCalls.PostServerHeadersResponse(this.requestObj);
+            pluginInstr = Lib.PluginCalls.PostServerHeadersResponse(this.requestObj);
 
             // 6. Determine data transmission mode S2C
             this.DetermineDataTransmissionModeS2C(this.requestObj);
@@ -290,12 +293,12 @@
       //           Plugin.SslStripn: SslStrip cache record
       if (this.requestObj.ClientRequestObj.Scheme == "https")
       {
-        this.requestObj.ServerRequestHandler = new TcpClientSsl(this.requestObj, this.requestObj.TcpClientConnection.GetStream());
+        this.requestObj.ServerRequestHandler = new ToServer.TcpClientSsl(this.requestObj, this.requestObj.TcpClientConnection.GetStream());
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ForwardClientRequestToServer(): Create HTTPS socket connection to {0}", this.requestObj.ClientRequestObj.Host);
       }
       else
       {
-        this.requestObj.ServerRequestHandler = new TcpClientPlainText(this.requestObj, this.requestObj.TcpClientConnection.GetStream());
+        this.requestObj.ServerRequestHandler = new ToServer.TcpClientPlainText(this.requestObj, this.requestObj.TcpClientConnection.GetStream());
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ForwardClientRequestToServer(): Create HTTP socket connection to {0}", this.requestObj.ClientRequestObj.Host);
       }
 

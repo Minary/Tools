@@ -80,7 +80,7 @@
 
         message = message.Trim();
 
-        lock (syncObj)
+        lock (this.syncObj)
         {
           logFileStreamWriter.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
           logFileStreamWriter.Flush();
@@ -113,11 +113,13 @@ Console.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
     {
       List<string> foundLogRecords = new List<string>();
 
-      foreach (string tmpLogRecord in logs)
+      foreach (string tmpLogRecord in this.logs)
+      {
         if (Regex.Match(tmpLogRecord, searchPattern, RegexOptions.IgnoreCase).Success)
         {
           foundLogRecords.Add(tmpLogRecord);
         }
+      }
 
       return foundLogRecords;
     }
@@ -125,7 +127,7 @@ Console.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
 
     public void DumpLogRecords()
     {
-      foreach (string tmpLogRecord in logs)
+      foreach (string tmpLogRecord in this.logs)
       {
         Console.WriteLine("LOG: {0}", tmpLogRecord.Trim());
       }
@@ -137,7 +139,7 @@ Console.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
     /// </summary>
     public void ResetLogging()
     {
-      logs.Clear();
+      this.logs.Clear();
     }
 
     #endregion
@@ -154,7 +156,6 @@ Console.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
     {
       this.logLevel = logLevel;
     }
-
 
 
     private static Logging GetInstance()

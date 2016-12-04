@@ -7,6 +7,7 @@
   using System.Net.NetworkInformation;
   using System.Net.Sockets;
 
+
   public class Common
   {
 
@@ -31,7 +32,7 @@
     ///
     /// </summary>
     /// <returns></returns>
-    public static string GetLocalIPAddress()
+    public static string GetLocalIpAddress()
     {
       string retVal = string.Empty;
 
@@ -59,15 +60,14 @@
 
       return retVal;
     }
-
-
+ 
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="ipAddr"></param>
     /// <returns></returns>
-    public static Int32 ConvertIPToInt32(IPAddress ipAddr)
+    public static Int32 ConvertIpToInt32(IPAddress ipAddr)
     {
       byte[] byteAddress = ipAddr.GetAddressBytes();
       return BitConverter.ToInt32(byteAddress, 0);
@@ -91,7 +91,7 @@
       // First check the local cache if IP/MAC entry exists.
       if (targetMacAddresses.ContainsKey(clientIp))
       {
-        return (targetMacAddresses[clientIp].ToString());
+        return targetMacAddresses[clientIp].ToString();
       }
 
       // Target MAC is not in local cache. Send ARP request.
@@ -102,7 +102,7 @@
         throw new ArgumentException("The remote system only supports IPv4 addresses");
       }
 
-      convertedIpAddr = Common.ConvertIPToInt32(ipAddress);
+      convertedIpAddr = Common.ConvertIpToInt32(ipAddress);
       macArray = new byte[6]; // 48 bit
       byteArrayLen = macArray.Length;
 
@@ -115,13 +115,13 @@
       for (int i = 0; i < macArray.Length; i++)
       {
         retVal += string.Format("{0}", macArray[i].ToString("X2"));
-        retVal += (i != macArray.Length - 1) ? "-" : "";
+        retVal += (i != macArray.Length - 1) ? "-" : string.Empty;
       }
 
       // Add IP/MAC to cache.
       targetMacAddresses.Add(clientIp, retVal);
 
-      return (retVal);
+      return retVal;
     }
 
     #endregion

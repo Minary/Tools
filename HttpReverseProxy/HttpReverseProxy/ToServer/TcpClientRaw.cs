@@ -1,6 +1,5 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
-  using HttpReverseProxy.Lib;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using System;
@@ -279,7 +278,7 @@
       int preProcessingPacketSize = dataPacket.Length;
       string dataBlockString = this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding.GetString(dataPacket);
       DataPacket serverDataPacket = new DataPacket(dataPacket, this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding);
-      PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
+      Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
 
       // Send data packet to recipient
       dataRecipientStream.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
