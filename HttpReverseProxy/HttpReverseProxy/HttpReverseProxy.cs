@@ -1,11 +1,9 @@
 ﻿namespace HttpReverseProxy
 {
-  using HttpReverseProxy.Lib;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.Interface;
   using System;
-  using System.Collections.Concurrent;
   using System.Collections.Generic;
   using System.IO;
   using System.Net;
@@ -14,34 +12,35 @@
   using System.Text;
   using System.Threading;
 
-  public sealed class ProxyServer : IPluginHost
+
+  public sealed class HttpReverseProxy : IPluginHost
   {
 
     #region MEMBERS
 
-    private static readonly ProxyServer ReverseProxyServer = new ProxyServer();
+    private static readonly HttpReverseProxy ReverseProxyServer = new HttpReverseProxy();
     private TcpListener tcpListener;
     private Thread tcpListenerThread;
-    private PluginCalls pluginCalls;
+    private Lib.PluginCalls pluginCalls;
 
     #endregion
 
 
     #region PROPERTIES
 
-    public static ProxyServer Server
+    public static HttpReverseProxy Server
     {
       get { return ReverseProxyServer; }
     }
 
-    public IPAddress ListeningIPInterface
+    public IPAddress ListeningIpInterface
     {
       get { return IPAddress.Any; }
     }
 
     public int ListeningPort
     {
-      get { return Config.LocalServerPort; }
+      get { return Config.LocalHttpServerPort; }
     }
 
     public List<IPlugin> LoadedPlugins
@@ -62,13 +61,13 @@
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
-      this.pluginCalls = new PluginCalls();
+      this.pluginCalls = new Lib.PluginCalls();
 
       // Load all plugins
       this.LoadAllPlugins();
 
       // Start listener
-      this.tcpListener = new TcpListener(this.ListeningIPInterface, localServerPort);
+      this.tcpListener = new TcpListener(this.ListeningIpInterface, localServerPort);
 
       try
       {
@@ -121,7 +120,7 @@
           TcpClient tcpClient = tcpListener.AcceptTcpClient();
           tcpClient.NoDelay = true;
 
-          while (!ThreadPool.QueueUserWorkItem(new WaitCallback(ProxyServer.InitiateClientRequestProcessing), tcpClient))
+          while (!ThreadPool.QueueUserWorkItem(new WaitCallback(HttpReverseProxy.InitiateClientRequestProcessing), tcpClient))
           {
             ;
           }
@@ -169,7 +168,7 @@
 
       try
       {
-        clientMac = Common.GetMacFromNetworkComputer(clientIp);
+        clientMac = Lib.Common.GetMacFromNetworkComputer(clientIp);
       }
       catch (Exception)
       {
@@ -191,20 +190,20 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION) : {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}", ex.Message);
       }
       finally
       {
         if (requestObj.ClientRequestObj.ClientBinaryReader != null)
         {
           requestObj.ClientRequestObj.ClientBinaryReader.Close();
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing() : ClientBinaryReader.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryReader.Close()");
         }
 
         if (requestObj.ClientRequestObj.ClientBinaryWriter != null)
         {
           requestObj.ClientRequestObj.ClientBinaryWriter.Close();
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing() : ClientBinaryWriter.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
         }
 
         if (requestObj.TcpClientConnection != null)

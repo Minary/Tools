@@ -4,13 +4,10 @@
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.Exceptions;
 
+
   public partial class ClientRequestSniffer
   {
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="pluginHost"></param>
     public PluginInstruction OnPostServerHeadersResponse(RequestObj requestObj)
     {
       if (requestObj == null)
