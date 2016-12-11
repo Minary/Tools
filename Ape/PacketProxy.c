@@ -51,7 +51,7 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
   // Open interface.
   if ((scanParams.interfaceReadHandle = pcap_open_live((char *) scanParams.interfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL|PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "CaptureIncomingPackets() : Unable to open the adapter");
+    LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to open the adapter");
     retVal = 5;
     goto END;
   }
@@ -66,14 +66,14 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
 
   if (pcap_compile((pcap_t *)scanParams.interfaceWriteHandle, &ifcCode, (const char *) filter, 1, netMask) < 0)
   {
-    LogMsg(DBG_ERROR, "CaptureIncomingPackets() : Unable to compile the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
   if (pcap_setfilter((pcap_t *) scanParams.interfaceWriteHandle, &ifcCode) < 0)
   {
-    LogMsg(DBG_ERROR, "CaptureIncomingPackets() : Unable to set the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
     goto END;
   }
@@ -82,11 +82,11 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
     if (funcRetVal == 1)
       PacketForwarding_handler((unsigned char *) &scanParams, packetHeader, packetData);
 
-  LogMsg(DBG_INFO, "CaptureIncomingPackets() : Listener started. Waiting for replies ...");
+  LogMsg(DBG_INFO, "CaptureIncomingPackets(): Listener started. Waiting for replies ...");
 
 END:
 
-  LogMsg(DBG_ERROR, "CaptureIncomingPackets() : Exit");
+  LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Exit");
 
   return retVal;
 }

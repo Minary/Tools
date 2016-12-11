@@ -5,6 +5,7 @@
   using System.Net.Sockets;
   using System.Text;
 
+
   public class TcpClientPlainText : TcpClientBase
   {
 
@@ -18,11 +19,11 @@
 
     #region PUBLIC
 
-    public TcpClientPlainText(RequestObj requestObj, NetworkStream clientStream) :
+    public TcpClientPlainText(RequestObj requestObj, MyBinaryReader clientStreamReader, BinaryWriter clientStreamWriter) :
       base(requestObj, TcpPortHttp)
     {
-      base.clientStreamReader = new MyBinaryReader(clientStream, 8192, Encoding.UTF8, base.requestObj.Id);
-      base.clientStreamWriter = new BinaryWriter(clientStream);
+      base.clientStreamReader = clientStreamReader;
+      base.clientStreamWriter = clientStreamWriter;
     }
 
     #endregion

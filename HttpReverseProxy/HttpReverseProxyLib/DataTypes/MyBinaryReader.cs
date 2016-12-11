@@ -99,7 +99,6 @@ Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpR
     }
 
 
-
     public byte[] ReadBinaryLine()
     {
       MemoryStream memStream = new MemoryStream();

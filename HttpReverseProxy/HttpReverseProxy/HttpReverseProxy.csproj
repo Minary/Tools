@@ -51,8 +51,8 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NConsoler, Version=2.0.0.0, Culture=neutral, PublicKeyToken=652faff55808657c, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\NConsoler.2.0.0.0\lib\NConsoler.dll</HintPath>
+    <Reference Include="FluentCommandLineParser, Version=1.4.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\FluentCommandLineParser.1.4.3\lib\net35\FluentCommandLineParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -71,10 +71,12 @@
     <Compile Include="HttpReverseProxy.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="HttpsReverseProxy.cs" />
     <Compile Include="Lib\Common.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Lib\PluginCalls.cs" />
+    <Compile Include="RequestHandlerHttps.cs" />
     <Compile Include="ToClient\Header\Redirect.cs" />
     <Compile Include="ToClient\Header\SendFile.cs" />
     <Compile Include="ToClient\InstructionHandler.cs" />

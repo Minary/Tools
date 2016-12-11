@@ -56,7 +56,7 @@ int main(int argc, char **argv)
   /*
    * Initialisation
    */
-  LogMsg(DBG_LOW, "main() : Starting %s", argv[0]);
+  LogMsg(DBG_LOW, "main(): Starting %s", argv[0]);
   ZeroMemory(&gScanParams, sizeof(gScanParams));
   gARGV = argv;
   gHosts = InitHostsList();
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
     {
       if ((gVisualisationThreadHandle = CreateThread(NULL, 0, ThreadFunctionPtr, 0, 0, &gVisualisationThreadID)) == NULL)
   	   {
-        LogMsg(DBG_ERROR, "main() : Can't start ARP Replies thread : %d", GetLastError());
+        LogMsg(DBG_ERROR, "main(): Can't start ARP Replies thread : %d", GetLastError());
         goto END;
    	  }
       Sleep(1000);
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 
 END:
 
-  LogMsg(DBG_LOW, "main() : Stopping %s", argv[0]);
+  LogMsg(DBG_LOW, "main(): Stopping %s", argv[0]);
 
   return lRetVal;
 }

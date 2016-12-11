@@ -9,6 +9,7 @@
   using System.Security.Cryptography.X509Certificates;
   using System.Text;
 
+
   public class TcpClientSsl : TcpClientBase
   {
 
@@ -24,11 +25,11 @@
 
     #region PUBLIC
 
-    public TcpClientSsl(RequestObj requestObj, NetworkStream clientStream) :
+    public TcpClientSsl(RequestObj requestObj, MyBinaryReader clientStreamReader, BinaryWriter clientStreamWriter) :
       base(requestObj, TcpPortHttps)
     {
-      base.clientStreamReader = new MyBinaryReader(clientStream, 8192, Encoding.UTF8, base.requestObj.Id);
-      base.clientStreamWriter = new BinaryWriter(clientStream);
+      base.clientStreamReader = clientStreamReader;
+      base.clientStreamWriter = clientStreamWriter;
     }
 
     #endregion
@@ -54,22 +55,22 @@
     /// <returns></returns>
     public override void OpenServerConnection(string host)
     {
-      Logging.Instance.LogMessage(base.requestObj.Id, Logging.Level.DEBUG, "TcpClientSsl.OpenServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientSsl.OpenServerConnection()");
 
       if (string.IsNullOrEmpty(host))
       {
         throw new Exception("Host is invalid");
       }
 
-      base.httpWebServerSocket = new TcpClient();
-      base.httpWebServerSocket.NoDelay = true;
-      base.httpWebServerSocket.Connect(host, TcpPortHttps);
+      this.httpWebServerSocket = new TcpClient();
+      this.httpWebServerSocket.NoDelay = true;
+      this.httpWebServerSocket.Connect(host, TcpPortHttps);
 
-      this.serverConnectionSslStream = new SslStream(base.httpWebServerSocket.GetStream(), false, new RemoteCertificateValidationCallback(this.ValidateCert));
+      this.serverConnectionSslStream = new SslStream(this.httpWebServerSocket.GetStream(), false, new RemoteCertificateValidationCallback(this.ValidateCert));
       this.serverConnectionSslStream.AuthenticateAsClient(host);
 
-      base.webServerStreamReader = new MyBinaryReader(this.serverConnectionSslStream, 8192, Encoding.UTF8, base.requestObj.Id);
-      base.webServerStreamWriter = new BinaryWriter(this.serverConnectionSslStream);
+      this.webServerStreamReader = new MyBinaryReader(this.serverConnectionSslStream, 8192, Encoding.UTF8, this.requestObj.Id);
+      this.webServerStreamWriter = new BinaryWriter(this.serverConnectionSslStream);
     }
 
 

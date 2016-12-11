@@ -1,6 +1,0 @@
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\bin\Debug\Weaken.dll
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\bin\Debug\Weaken.pdb
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\bin\Debug\HttpReverseProxyLib.dll
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\bin\Debug\HttpReverseProxyLib.pdb
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\obj\Mixed Platforms\Debug\Weaken.dll
-C:\Users\runtereg\Data\Ruben\Code\Simsang\Weaken\obj\Mixed Platforms\Debug\Weaken.pdb

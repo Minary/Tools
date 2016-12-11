@@ -104,7 +104,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.DetermineRedirectType(EXCEPTION) : Parsing the requested URI \"{0}\" causes the following exception: {1}\nStacktrace: {2}", redirectHeader, ex.Message, ex.StackTrace);
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.DetermineRedirectType(EXCEPTION): Parsing the requested URI \"{0}\" causes the following exception: {1}\nStacktrace: {2}", redirectHeader, ex.Message, ex.StackTrace);
         return RedirectType.Error;
       }
 
@@ -113,7 +113,7 @@
       string redirectUrl = hasRedirectHeader ? (string.Format("{0}{1}", tmpUri.Host, tmpUri.PathAndQuery)) : string.Empty;
       string redirectScheme = hasRedirectHeader ? tmpUri.Scheme.ToLower() : string.Empty;
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.DetermineRedirectType() : {0}://{1} -> Redirected:{2} to {3}://{4}", requestScheme, requestUrl, hasRedirectHeader, redirectScheme, redirectUrl);
+      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.DetermineRedirectType(): {0}://{1} -> Redirected:{2} to {3}://{4}", requestScheme, requestUrl, hasRedirectHeader, redirectScheme, redirectUrl);
 
       if (requestScheme == "http" && hasRedirectHeader == false)
       {
@@ -163,7 +163,7 @@
       // 2. Change scheme from http to https
       requestObj.ClientRequestObj.Scheme = "https";
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ProcessHeadersSameRedirectLocation() : Redirecting from {0} to {1}", requestedLocation, redirectLocationHttps);
+      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ProcessHeadersSameRedirectLocation(): Redirecting from {0} to {1}", requestedLocation, redirectLocationHttps);
 
       //string refreshHeader = string.Format("{0}; Url={1}", 1, requestObj.ClientRequestObj.GetRequestedUrl());
       //if (requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Refresh"))
@@ -185,7 +185,7 @@
       string redirectLocationHttp = requestObj.ServerResponseMetaDataObj.ResponseHeaders["Location"].ToString();
       string requestedLocation = requestObj.ClientRequestObj.GetRequestedUrl();
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ProcessHeadersDifferentRedirectLocation() : TYPE Http2Https3XXSameUrl {0} -> {1}", requestedLocation, redirectLocationHttps);
+      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ProcessHeadersDifferentRedirectLocation(): TYPE Http2Https3XXSameUrl {0} -> {1}", requestedLocation, redirectLocationHttps);
 
       if (redirectLocationHttp.StartsWith("https:"))
       {
@@ -232,11 +232,11 @@
       {
         if (Regex.Match(inputData, tmpKey).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ReplaceRelevantTags() : Match found:     |{0}|{1}|", tmpKey, tagList[tmpKey]);
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ReplaceRelevantTags(): Match found:     |{0}|{1}|", tmpKey, tagList[tmpKey]);
         }
         else
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ReplaceRelevantTags() : No match found:  |{0}|{1}|", tmpKey, tagList[tmpKey]);
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.ReplaceRelevantTags(): No match found:  |{0}|{1}|", tmpKey, tagList[tmpKey]);
         }
 
         inputData = Regex.Replace(inputData, Regex.Escape(tmpKey), tagList[tmpKey], RegexOptions.Singleline | RegexOptions.Multiline | RegexOptions.IgnoreCase);

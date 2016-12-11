@@ -108,7 +108,7 @@ void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC
     }
     else if ((tmpNode = (PSYSNODE) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(SYSNODE))) != NULL)
     {
-      printf("AddToSystemsList() :  New system found  %s/%s\n", lSMAC, sysIpParam);
+      printf("AddToSystemsList():  New system found  %s/%s\n", lSMAC, sysIpParam);
 
       CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);
       CopyMemory(tmpNode->data.sysMacBin, sysMacParam, BIN_MAC_LEN);

@@ -65,7 +65,6 @@ namespace HttpReverseProxy.ToClient
         throw new ProxyWarningException("Inject file is invalid");
       }
 
-
       byte[] fileData = File.ReadAllBytes(injectFilePath);
       string redirectData = Header.SendFile.GetHeader(injectFilePath, fileData.Count());
       byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectData);

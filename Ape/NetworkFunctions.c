@@ -134,7 +134,7 @@ void SetMacStatic(char *ifcAliasParam, char *ipAddrParam, char *macAddrParam)
   char gatewayIpAddrString[MAX_BUF_SIZE + 1];
   char *tempPtr = NULL;
 
-  printf("SetMacStatic(0) : arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
+  printf("SetMacStatic(0): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
 
   //Set IP static
   if (ifcAliasParam != NULL && ipAddrParam != NULL && macAddrParam != NULL)
@@ -154,7 +154,7 @@ void SetMacStatic(char *ifcAliasParam, char *ipAddrParam, char *macAddrParam)
       }
     }
 
-    printf("SetMACStatic(1) : arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
+    printf("SetMACStatic(1): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
 
     snprintf(temp, sizeof(temp) - 1, "arp -d %s & netsh interface ip add neighbors \"%s\" %s %s", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
     ExecCommand(temp);

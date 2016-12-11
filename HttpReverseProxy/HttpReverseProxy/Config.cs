@@ -3,16 +3,19 @@
   using HttpReverseProxyLib.Interface;
   using System.Collections.Generic;
 
+
   public class Config
   {
 
     #region MEMBERS
 
     private static string localIp = string.Empty;
-    private static string defaultRemoteHost = "www.buglist.io";
+private static string defaultRemoteHost = "www.buglist.io";
     private static string remoteHostIp = string.Empty;
     private static int remoteHostPort = 80;
-    private static int localServerPort = 80;
+    private static int localHttpServerPort = 80;
+    private static int localHttpsServerPort = 443;
+    private static string certificatePath = string.Empty;
     private static string httpServer = "Apache";
     private static int maxSniffedClientDataSize = 4096;
     private static List<IPlugin> loadedPlugins = new List<IPlugin>();
@@ -30,8 +33,13 @@
 
     public static int RemoteHostPort { get { return remoteHostPort; } set { remoteHostPort = value; } }
 
-    public static int LocalServerPort { get { return localServerPort; } set { localServerPort = value; } }
+    public static int LocalHttpServerPort { get { return localHttpServerPort; } set { localHttpServerPort = value; } }
 
+    public static int LocalHttpsServerPort { get { return localHttpsServerPort; } set { localHttpsServerPort = value; } }
+
+    public static string CertificatePath { get { return certificatePath; } set { certificatePath = value; } }
+    
+    
     public static string Server { get { return httpServer; } set { httpServer = value; } }
     
     public static List<IPlugin> LoadedPlugins { get { return loadedPlugins; } set { } }
