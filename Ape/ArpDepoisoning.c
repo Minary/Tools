@@ -37,7 +37,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
   int i = 0;
 
 
-  LogMsg(DBG_LOW, "ArpDePoisoning() : Starting");
+  LogMsg(DBG_LOW, "ArpDePoisoning(): Starting");
 
   ZeroMemory(&scanParams, sizeof(scanParams));
   CopyMemory(&scanParams, lTmpParams, sizeof(scanParams));
@@ -98,8 +98,8 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
               // layer 2 : (Attacker-MAC) 00-16-ea-e0-77-b2    ->   (GW-MAC) 00-40-77-bb-55-10
               // layer 3 : (Victim-MAC) 00-1b-77-53-5c-f8/192.168.100.117    ->   00-00-00-00-00-00/192.168.100.1
 
-			  LogMsg(DBG_INFO, "ArpDepoisoning() : %s/%s", remoteIpString, remoteMacStr);
-			  LogMsg(DBG_INFO, "ArpDepoisoning() : %d.%d.%d.%d/%02x-%02x-%02x-%02x-%02x-%02x", 
+			  LogMsg(DBG_INFO, "ArpDepoisoning(): %s/%s", remoteIpString, remoteMacStr);
+			  LogMsg(DBG_INFO, "ArpDepoisoning(): %d.%d.%d.%d/%02x-%02x-%02x-%02x-%02x-%02x", 
 				  remoteIpString, remoteMacStr);
               /*
               * Send 3 ARP depoisoning packets.
@@ -107,7 +107,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
               for (i = 0; i < 3; i++)
               {
                 if (SendArpPacket(interfaceHandle, &arpPacket) != 0)
-                  LogMsg(DBG_ERROR, "ArpDepoisoning() : Unable to send ARP packet.");
+                  LogMsg(DBG_ERROR, "ArpDepoisoning(): Unable to send ARP packet.");
 
                 Sleep(SLEEP_BETWEEN_ARPS);
               } 
@@ -126,7 +126,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
     }
   }
 
-  LogMsg(DBG_LOW, "ArpDepoisoning() : exit");
+  LogMsg(DBG_LOW, "ArpDepoisoning(): exit");
 
   return retVal;
 }

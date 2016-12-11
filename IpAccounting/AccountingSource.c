@@ -162,7 +162,7 @@ void SourceStartAccounting(PSCANPARAMS pScanParams)
       {
         if (pcap_setfilter((pcap_t *) lScanParams.IfcReadHandle, &lFCode) >= 0)
         {
-          LogMsg(DBG_INFO, "startSniffer() : Scanner started. Waiting for replies on device \"%s\" ...", lAdapter);
+          LogMsg(DBG_INFO, "startSniffer(): Scanner started. Waiting for replies on device \"%s\" ...", lAdapter);
           // Start intercepting data packets.
           pcap_loop((pcap_t *) lScanParams.IfcReadHandle, 0, (pcap_handler) SourceAccountingCallback, (unsigned char *) &lScanParams);
         }
@@ -170,12 +170,12 @@ void SourceStartAccounting(PSCANPARAMS pScanParams)
    	}
    	else
 	   {
-      LogMsg(DBG_ERROR, "startSniffer() : Unable to open the adapter \"%s\"", lScanParams.IFCName);
+      LogMsg(DBG_ERROR, "startSniffer(): Unable to open the adapter \"%s\"", lScanParams.IFCName);
     }
   }
   else
   {
-    LogMsg(DBG_ERROR, "startSniffer() : Error in pcap_findalldevs_ex() : %s", lTemp);
+    LogMsg(DBG_ERROR, "startSniffer(): Error in pcap_findalldevs_ex(): %s", lTemp);
   }
 }
 
@@ -328,7 +328,7 @@ void ProcessSourceIPTraffic(PSCANPARAMS pScanParams, char *pProtocol, IPADDRESS 
   }
   else
   {
-//    printf("ProcessSourceIPTraffic(2) : (%s) Unknown  %s:%d->%s:%d   %d\n", pProtocol, lSrcIP, pSrcPort, lDstIP, pDstPort, pDataLen);
+//    printf("ProcessSourceIPTraffic(2): (%s) Unknown  %s:%d->%s:%d   %d\n", pProtocol, lSrcIP, pSrcPort, lDstIP, pDstPort, pDataLen);
   }
 }
 

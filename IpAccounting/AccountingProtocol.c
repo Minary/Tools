@@ -83,7 +83,7 @@ void StartAccounting(PSCANPARAMS pScanParams)
       {
         if (pcap_setfilter((pcap_t *)lScanParams.IfcReadHandle, &lFCode) >= 0)
         {
-          LogMsg(DBG_INFO, "startSniffer() : Scanner started. Waiting for replies on device \"%s\" ...", lAdapter);
+          LogMsg(DBG_INFO, "startSniffer(): Scanner started. Waiting for replies on device \"%s\" ...", lAdapter);
           // Start intercepting data packets.
           pcap_loop((pcap_t *)lScanParams.IfcReadHandle, 0, (pcap_handler)AccountingCallback, (unsigned char *)&lScanParams);
         }
@@ -91,12 +91,12 @@ void StartAccounting(PSCANPARAMS pScanParams)
     }
     else
     {
-      LogMsg(DBG_ERROR, "startSniffer() : Unable to open the adapter \"%s\"", lScanParams.IFCName);
+      LogMsg(DBG_ERROR, "startSniffer(): Unable to open the adapter \"%s\"", lScanParams.IFCName);
     }
   }
   else
   {
-    LogMsg(DBG_ERROR, "startSniffer() : Error in pcap_findalldevs_ex() : %s", lTemp);
+    LogMsg(DBG_ERROR, "startSniffer(): Error in pcap_findalldevs_ex(): %s", lTemp);
   }
 }
 

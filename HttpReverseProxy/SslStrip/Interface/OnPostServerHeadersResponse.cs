@@ -58,7 +58,7 @@
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
-                                    "SslStrip.ProcessServerResponseHeaders() : TYPE Http2http2XX, {0} \"{1}\" -> \"-\", host:{2}, MimeType:{3}",
+                                    "SslStrip.ProcessServerResponseHeaders(): TYPE Http2http2XX, {0} \"{1}\" -> \"-\", host:{2}, MimeType:{3}",
                                     requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType,
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ClientRequestObj.Host,
@@ -79,7 +79,7 @@
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
-                                    "SslStrip.ProcessServerResponseHeaders() : TYPE Http2Http3XX \"{0}\" -> \"{1}\"",
+                                    "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Http3XX \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"]);
 
@@ -102,7 +102,7 @@
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
-                                    "SslStrip.ProcessServerResponseHeaders() : TYPE Http2Https3XXDifferentUrl \"{0}\" -> \"{1}\"",
+                                    "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXDifferentUrl \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"]);
 
@@ -121,7 +121,7 @@
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
-                                    "SslStrip.ProcessServerResponseHeaders() : TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
+                                    "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"],
                                     requestObj.ClientRequestObj.Scheme);
@@ -138,7 +138,7 @@
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
-                                    "SslStrip.DoClientRequestProcessing() : TYPE definition error for Url \"{0}\" ",
+                                    "SslStrip.DoClientRequestProcessing(): TYPE definition error for Url \"{0}\" ",
                                     requestObj.ClientRequestObj.GetRequestedUrl());
       }
 

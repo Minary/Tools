@@ -1,5 +1,0 @@
-C:\Users\runtereg\Data\Ruben\Code\Simsang\HttpReverseProxyLib\bin\Debug\HttpReverseProxyLib.dll
-C:\Users\runtereg\Data\Ruben\Code\Simsang\HttpReverseProxyLib\bin\Debug\HttpReverseProxyLib.pdb
-C:\Users\runtereg\Data\Ruben\Code\Simsang\HttpReverseProxyLib\obj\Mixed Platforms\Debug\HttpReverseProxyLib.csprojResolveAssemblyReference.cache
-C:\Users\runtereg\Data\Ruben\Code\Simsang\HttpReverseProxyLib\obj\Mixed Platforms\Debug\HttpReverseProxyLib.dll
-C:\Users\runtereg\Data\Ruben\Code\Simsang\HttpReverseProxyLib\obj\Mixed Platforms\Debug\HttpReverseProxyLib.pdb

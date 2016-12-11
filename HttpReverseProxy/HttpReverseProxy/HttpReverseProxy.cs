@@ -57,7 +57,7 @@
     ///
     /// </summary>
     /// <returns></returns>
-    public bool Start(int localServerPort = 80)
+    public bool Start(int localServerPort)
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
@@ -75,7 +75,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage("TcpListener", Logging.Level.ERROR, "ProxyServer.Start(EXCEPTION) : {0}", ex.Message);
+        Logging.Instance.LogMessage("TcpListener", Logging.Level.ERROR, "ProxyServer.Start(EXCEPTION): {0}", ex.Message);
         return false;
       }
 
@@ -85,17 +85,17 @@
       return true;
     }
 
-
-    /// <summary>
-    ///
-    /// </summary>
+ 
     public void Stop()
     {
       this.tcpListener.Stop();
 
       // Wait for cRemoteSocket to finish processing current connections...
-      this.tcpListenerThread.Abort();
-      this.tcpListenerThread.Join();
+      if (this.tcpListenerThread != null && this.tcpListenerThread.IsAlive)
+      {
+        this.tcpListenerThread.Abort();
+        this.tcpListenerThread.Join();
+      }
 
       // Unload loaded plugins
       this.UnloadAllPlugins();
@@ -105,11 +105,7 @@
 
 
     #region PRIVATE METHODS
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="obj"></param>
+    
     private static void HandleHttpClient(object tcpListenerObj)
     {
       TcpListener tcpListener = (TcpListener)tcpListenerObj;
@@ -140,12 +136,7 @@
       }
     }
 
-
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="requestObj"></param>
+    
     private static void InitiateClientRequestProcessing(object clientTcpObj)
     {
       TcpClient tcpClient = (TcpClient)clientTcpObj;
@@ -209,7 +200,7 @@
         if (requestObj.TcpClientConnection != null)
         {
           requestObj.TcpClientConnection.Close();
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing() : TcpClientConnection.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): TcpClientConnection.Close()");
         }
       }
     }

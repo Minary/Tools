@@ -38,7 +38,7 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
   char tempBuffer[PCAP_ERRBUF_SIZE];
   SYSTEMNODE systemList[MAX_SYSTEMS_COUNT];
 
-  LogMsg(DBG_LOW, "StartArpPoisoning() : Starting");
+  LogMsg(DBG_LOW, "StartArpPoisoning(): Starting");
 
   ZeroMemory(&scanParams, sizeof(scanParams));
   CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
@@ -50,13 +50,13 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
     // Send poisoned packets to all systems in the "victim list"
     while (1)
     {
-      LogMsg(DBG_LOW, "StartArpPoisoning() : Poisoning round %d", roundCounter);
+      LogMsg(DBG_LOW, "StartArpPoisoning(): Poisoning round %d", roundCounter);
       ZeroMemory(systemList, sizeof(systemList));
 
 
       if ((numberSystems = GetListCopy(gSystemsList, systemList)) > 0)
       {
-        LogMsg(DBG_LOW, "StartArpPoisoning() : New Round with %d systems", numberSystems);
+        LogMsg(DBG_LOW, "StartArpPoisoning(): New Round with %d systems", numberSystems);
 
         // Iterate through all systems
         for (counter = 0; counter < numberSystems && counter < MAX_SYSTEMS_COUNT; counter++)
@@ -94,7 +94,7 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
           }
           else
           {
-            LogMsg(DBG_ERROR, "StartArpPoisoning() : Target array issue.");
+            LogMsg(DBG_ERROR, "StartArpPoisoning(): Target array issue.");
             break;
           }
         }
@@ -105,10 +105,10 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
   }
   else
   {
-    LogMsg(DBG_ERROR, "StartArpPoisoning() : pcap_open() failed (%s)", tempBuffer);
+    LogMsg(DBG_ERROR, "StartArpPoisoning(): pcap_open() failed (%s)", tempBuffer);
   }
 
-  LogMsg(DBG_LOW, "StartArpPoisoning() : exit");
+  LogMsg(DBG_LOW, "StartArpPoisoning(): exit");
 
   return retVal;
 }
@@ -246,7 +246,7 @@ int SendArpPacket(pcap_t *interfaceHandleParam, PArpPacket arpPacketParam)
   }
   else
   {
-    LogMsg(DBG_ERROR, "SendARPPacket() : Error occured while sending the packet: %s", pcap_geterr(interfaceHandleParam));
+    LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet: %s", pcap_geterr(interfaceHandleParam));
   }
 
   return retVal;

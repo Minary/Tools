@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 	}
 
 
-	LogMsg(DBG_LOW, "main() : Starting %s", argv[0]);
+	LogMsg(DBG_LOW, "main(): Starting %s", argv[0]);
 	ZeroMemory(&gScanParams, sizeof(gScanParams));
 	gARGV = argv;
 
@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 		RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
 		Sleep(500);
 		RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
-		LogMsg(2, "main() : %s\n", gScanParams.interfaceName);
+		LogMsg(2, "main(): %s\n", gScanParams.interfaceName);
 
 
 		/*
@@ -264,7 +264,7 @@ int main(int argc, char **argv)
 					IpString2Bin(ipBin, ipStr, strnlen((char *)ipStr, sizeof(ipStr) - 1));
 
 					AddToSystemsList(&gSystemsList, macBin, (char *)ipStr, ipBin);
-					LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile() : New system added :  %s/%s", macStr, ipStr);
+					LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile(): New system added :  %s/%s", macStr, ipStr);
 
 					SetMacStatic((char *)gScanParams.interfaceAlias, (char *)ipStr, (char *)macStr);
 				}
@@ -300,7 +300,7 @@ int main(int argc, char **argv)
 
 		if ((fileHandle = fopen(FILE_FIREWALL_RULES1, "r")) != NULL || (fileHandle = fopen(FILE_FIREWALL_RULES2, "r")) != NULL)
 		{
-			printf("main() : Parsing firewall rules file \"%s\"\n", FILE_FIREWALL_RULES1);
+			printf("main(): Parsing firewall rules file \"%s\"\n", FILE_FIREWALL_RULES1);
 			while (!feof(fileHandle))
 			{
 				fgets(tempBuffer, sizeof(tempBuffer), fileHandle);
@@ -344,14 +344,14 @@ int main(int argc, char **argv)
 		// 1. Start Ethernet FORWARDING thread
 		if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL)
 		{
-			LogMsg(DBG_ERROR, "main() : Can't start Listener thread : %d", GetLastError());
+			LogMsg(DBG_ERROR, "main(): Can't start Listener thread : %d", GetLastError());
 			goto END;
 		}
 
 		// 2. Start POISONING the ARP caches.
 		if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, StartArpPoisoning, &gScanParams, 0, &gPOISONINGThreadID)) == NULL)
 		{
-			LogMsg(DBG_ERROR, "main() : Can't start NetworkScanner thread : %d", GetLastError());
+			LogMsg(DBG_ERROR, "main(): Can't start NetworkScanner thread : %d", GetLastError());
 			goto END;
 		}
 
@@ -383,7 +383,7 @@ END:
 	DeleteCriticalSection(&gCSOutputPipe);
 	DeleteCriticalSection(&gCSConnectionsList);
 
-	LogMsg(DBG_LOW, "main() : Stopping %s", argv[0]);
+	LogMsg(DBG_LOW, "main(): Stopping %s", argv[0]);
 
 	return retVal;
 }
@@ -572,7 +572,7 @@ void WriteDepoisoningFile(void)
 	{
 		ZeroMemory(srcMacStr, sizeof(srcMacStr));
 		MacBin2String(systemListPtr->data.sysMacBin, (unsigned char *)srcMacStr, sizeof(srcMacStr));
-		LogMsg(DBG_INFO, "writeDepoisoningFile() : %s/%s", systemListPtr->data.sysIpStr, srcMacStr);
+		LogMsg(DBG_INFO, "writeDepoisoningFile(): %s/%s", systemListPtr->data.sysIpStr, srcMacStr);
 
 		if (strnlen((char *)systemListPtr->data.sysIpStr, MAX_IP_LEN) > 0)
 		{
@@ -587,7 +587,7 @@ void WriteDepoisoningFile(void)
 	// Depoison the victim systems
 	if (numberSystems > 0)
 	{
-		LogMsg(DBG_INFO, "writeDepoisoningFile() : Depoison  %d systems", numberSystems);
+		LogMsg(DBG_INFO, "writeDepoisoningFile(): Depoison  %d systems", numberSystems);
 
 		if ((fileHandle = fopen(FILE_UNPOISON, "w")) != NULL)
 		{
@@ -628,7 +628,7 @@ void StartUnpoisoningProcess()
 	// Start unpoison process.
 	ZeroMemory(tempBuffer, sizeof(tempBuffer));
 	snprintf(tempBuffer, sizeof(tempBuffer) - 1, "\"%s\" -d %s", gARGV[0], gARGV[2]);
-	LogMsg(DBG_INFO, "startUnpoisoningProcess() : Starting Depoison child process");
+	LogMsg(DBG_INFO, "startUnpoisoningProcess(): Starting Depoison child process");
 	ExecCommand(tempBuffer);
 
 	// Remove GW ARP entry.
@@ -667,7 +667,7 @@ void ExecCommand(char *commandParam)
 		startupInfo.wShowWindow = SW_HIDE;
 
 		snprintf(tempBuffer, sizeof(tempBuffer) - 1, "%s /c %s", comspec, commandParam);
-		LogMsg(DBG_INFO, "ExecCommand() : %s", tempBuffer);
+		LogMsg(DBG_INFO, "ExecCommand(): %s", tempBuffer);
 
 		CreateProcess(NULL, tempBuffer, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &startupInfo, &processInfo);
 	}
@@ -786,7 +786,7 @@ void ParseTargetHostsConfigFile(char *targetsFileParam)
 				IpString2Bin(ipBin, ipStr, strnlen((char *)ipStr, sizeof(ipStr) - 1));
 
 				AddToSystemsList(&gSystemsList, macBin, (char *)ipStr, ipBin);
-				LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile() : New system added :  %s/%s", macStr, ipStr);
+				LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile(): New system added :  %s/%s", macStr, ipStr);
 			}
 
 			ZeroMemory(tempLine, sizeof(tempLine));
