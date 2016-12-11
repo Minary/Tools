@@ -105,7 +105,7 @@
 
 
     #region PRIVATE METHODS
-    
+
     private static void HandleHttpClient(object tcpListenerObj)
     {
       TcpListener tcpListener = (TcpListener)tcpListenerObj;
@@ -177,7 +177,8 @@
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(requestObj.TcpClientConnection.GetStream(), 8192, Encoding.UTF8, requestObj.Id);
         requestObj.ClientRequestObj.ClientBinaryWriter = new BinaryWriter(requestObj.TcpClientConnection.GetStream());
 
-        (new RequestHandlerHttp(requestObj)).ProcessClientRequest();
+        RequestHandlerHttp requestHandler = new RequestHandlerHttp(requestObj);
+        requestHandler.ProcessClientRequest();
       }
       catch (Exception ex)
       {
@@ -195,6 +196,12 @@
         {
           requestObj.ClientRequestObj.ClientBinaryWriter.Close();
           Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
+        }
+
+        if (requestObj.ServerRequestHandler != null)
+        {
+          requestObj.ServerRequestHandler.CloseServerConnection();
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
         }
 
         if (requestObj.TcpClientConnection != null)
@@ -276,7 +283,7 @@
     #endregion
 
 
-    #region INTERFACE IMPLEMENTATION
+    #region INTERFACE: IPluginHost
 
     /// <summary>
     ///

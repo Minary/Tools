@@ -166,8 +166,8 @@
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(sslStream, 8192, Encoding.UTF8, requestObj.Id);
         requestObj.ClientRequestObj.ClientBinaryWriter = new BinaryWriter(sslStream);
 
-        RequestHandlerHttps reqHandler = new RequestHandlerHttps(requestObj);
-        reqHandler.ProcessClientRequest();
+        RequestHandlerHttps requestHandler = new RequestHandlerHttps(requestObj);
+        requestHandler.ProcessClientRequest();
       }
       catch (Exception ex)
       {
@@ -190,6 +190,12 @@
         {
           requestObj.ClientRequestObj.ClientBinaryWriter.Close();
           Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
+        }
+
+        if (requestObj.ServerRequestHandler != null)
+        {
+          requestObj.ServerRequestHandler.CloseServerConnection();
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
         }
 
         if (requestObj.TcpClientConnection != null)
