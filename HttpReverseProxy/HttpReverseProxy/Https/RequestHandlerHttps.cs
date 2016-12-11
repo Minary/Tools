@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy
+﻿namespace HttpReverseProxy.Https
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
@@ -44,7 +44,7 @@
     #region PUBLIC
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequestHandler"/> class.
+    /// Initializes a new instance of the <see cref="RequestHandlerHttp"/> class.
     ///
     /// </summary>
     /// <param name="requestObj"></param>

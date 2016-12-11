@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy
+﻿namespace HttpReverseProxy.Http
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
@@ -177,7 +177,7 @@
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(requestObj.TcpClientConnection.GetStream(), 8192, Encoding.UTF8, requestObj.Id);
         requestObj.ClientRequestObj.ClientBinaryWriter = new BinaryWriter(requestObj.TcpClientConnection.GetStream());
 
-        (new RequestHandler(requestObj)).ProcessClientRequest();
+        (new RequestHandlerHttp(requestObj)).ProcessClientRequest();
       }
       catch (Exception ex)
       {

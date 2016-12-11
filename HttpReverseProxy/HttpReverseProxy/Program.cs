@@ -1,6 +1,8 @@
 ﻿namespace HttpReverseProxy
 {
   using Fclp;
+  using global::HttpReverseProxy.Http;
+  using global::HttpReverseProxy.Https;
   using System;
   using System.IO;
   using System.Net.NetworkInformation;

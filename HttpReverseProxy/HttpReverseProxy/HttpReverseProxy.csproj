@@ -68,15 +68,15 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="ErrorHandler.cs" />
-    <Compile Include="HttpReverseProxy.cs">
+    <Compile Include="Http\HttpReverseProxy.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="HttpsReverseProxy.cs" />
+    <Compile Include="Https\HttpsReverseProxy.cs" />
     <Compile Include="Lib\Common.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Lib\PluginCalls.cs" />
-    <Compile Include="RequestHandlerHttps.cs" />
+    <Compile Include="Https\RequestHandlerHttps.cs" />
     <Compile Include="ToClient\Header\Redirect.cs" />
     <Compile Include="ToClient\Header\SendFile.cs" />
     <Compile Include="ToClient\InstructionHandler.cs" />
@@ -89,7 +89,7 @@
     <Compile Include="ToServer\TcpClientSsl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestHandler.cs" />
+    <Compile Include="Http\RequestHandlerHttp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

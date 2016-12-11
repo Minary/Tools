@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy
+﻿namespace HttpReverseProxy.Http
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
@@ -9,7 +9,7 @@
   using System.Net.Sockets;
 
 
-  public class RequestHandler
+  public class RequestHandlerHttp
   {
 
     #region MEMBERS
@@ -44,11 +44,11 @@
     #region PUBLIC
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RequestHandler"/> class.
+    /// Initializes a new instance of the <see cref="RequestHandlerHttp"/> class.
     ///
     /// </summary>
     /// <param name="requestObj"></param>
-    public RequestHandler(RequestObj requestObj)
+    public RequestHandlerHttp(RequestObj requestObj)
     {
       this.requestObj = requestObj;
       this.clientErrorHandler = new ClientErrorHandler();
@@ -144,7 +144,7 @@
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           string innerException = (cnex.InnerException != null) ? cnex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.WARNING, "HTTPReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.WARNING, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
           break;
         }
         catch (ProxyErrorException peex)
@@ -154,7 +154,7 @@
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           string innerException = (peex.InnerException != null) ? peex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HTTPReverseProxy.ProcessClientRequest(ProxyErrorException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, peex.Message, peex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HttpReverseProxy.ProcessClientRequest(ProxyErrorException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, peex.Message, peex.StackTrace);
           break;
         }
         catch (WebException wex)
