@@ -170,13 +170,13 @@
 //// this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           string innerException = (ioex.InnerException != null) ? ioex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HTTPReverseProxy.ProcessClientRequest(IOException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ioex.Message, ioex.StackTrace);
-//          break;
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HttpReverseProxy.ProcessClientRequest(IOException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ioex.Message, ioex.StackTrace);
+          break;
         }
         catch (ObjectDisposedException odex)
         {
           string innerException = (odex.InnerException != null) ? odex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HTTPReverseProxy.ProcessClientRequest(ObjectDisposedException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, odex.Message, odex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HttpReverseProxy.ProcessClientRequest(ObjectDisposedException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, odex.Message, odex.StackTrace);
           break;
         }
         catch (SocketException sex)
@@ -192,7 +192,7 @@
         catch (Exception ex)
         {
           string innerException = (ex.InnerException != null) ? ex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HTTPReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "HttpReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
           break;
         }
 
@@ -201,6 +201,11 @@
         if (this.CloseClientServerConnection(this.requestObj))
         {
           break;
+
+        // Set keep-alive value
+        }
+        else
+        {
         }
       }
     }
