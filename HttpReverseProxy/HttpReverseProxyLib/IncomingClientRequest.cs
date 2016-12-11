@@ -117,7 +117,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
         throw exception;
       }
 
-      if (!Regex.Match(requestSplitBuffer[0].ToLower(), @"^\s*(get|put|post|head|delete|trace|options|connect)\s*$").Success)
+      if (!Regex.Match(requestSplitBuffer[0].ToLower(), @"^\s*(get|put|post|head|trace|delete|options|connect)\s*$").Success)
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.MethodNotAllowed);

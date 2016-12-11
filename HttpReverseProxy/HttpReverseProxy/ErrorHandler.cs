@@ -46,7 +46,6 @@
         message = this.statusDescription[code].Description;
       }
 
-
       string[] serverHeaders = new string[] { httpServerResponseStatus, "Content-Type: text/html", "Connection: close", string.Format("Content-Length: {0}", message.Length) };
 
       // Send headers to client
