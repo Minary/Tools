@@ -27,6 +27,7 @@
 **/*.cd
 **/*.Cache
 **/*.tlog
+**/*.lastbuildstate
 
 
 
