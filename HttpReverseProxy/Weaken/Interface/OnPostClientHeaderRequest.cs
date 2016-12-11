@@ -35,14 +35,14 @@
       //  if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Connection") &&
       //      requestObj.ClientRequestObj.ClientRequestHeaders["Connection"].ToString() == "keep-alive")
       //  {
-      //    Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest() : Replace  \"Connection: keep-alive\" by \"Connection: close\"");
+      //    Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest(): Replace  \"Connection: keep-alive\" by \"Connection: close\"");
       //    requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Connection");
       //    requestObj.ClientRequestObj.ClientRequestHeaders.Add("Connection", "close");
       //  }
       //}
       //catch (Exception ex)
       //{
-      //  Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"Weaken.OnPostClientHeaderRequest(EXCEPTION) : {0}", ex.Message);
+      //  Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"Weaken.OnPostClientHeaderRequest(EXCEPTION): {0}", ex.Message);
       //}
 
       // Accept-Encoding: gzip, deflate
@@ -52,13 +52,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Accept-Encoding") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Accept-Encoding"].ToString(), @"(gzip|deflate|compress)", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest() : Remove  \"Accept -Encoding: gzip|deflate|compress\"");
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Accept-Encoding");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION) : {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
       // Upgrade: TLS/1.0
@@ -69,13 +69,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Upgrade") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Upgrade"].ToString(), "^TLS.*", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest() : Remove  \"Upgrade: TLS.*\"");
+          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Upgrade");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION) : {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
       return instruction;

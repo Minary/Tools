@@ -40,11 +40,11 @@ void AddItemToList(PPHTTPINJECTIONNODE httpInjectionNodesParam, unsigned char *r
 
   if ((tmpNode = (PHTTPINJECTIONNODE) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HTTPINJECTIONNODE))) != NULL)
   {
-    //printf("AddHostToList(1) :  /%s/%s/\n", pHostName, pSpoofedIP);
+    //printf("AddHostToList(1):  /%s/%s/\n", pHostName, pSpoofedIP);
     CopyMemory(tmpNode->sData.RequestedHost, requestedHostParam, sizeof(tmpNode->sData.RequestedHost)-1);
     CopyMemory(tmpNode->sData.RequestedURL, requestedUrlParam, sizeof(tmpNode->sData.RequestedURL)-1);
     CopyMemory(tmpNode->sData.RedirectedURL, redirectedUrlParam, sizeof(tmpNode->sData.RedirectedURL)-1);
-    //LogMsg(DBG_INFO, "AddSpoofedIPToList() : Add spoofed system to list : %s/%s", pHostName, pSpoofedIP);
+    //LogMsg(DBG_INFO, "AddSpoofedIPToList(): Add spoofed system to list : %s/%s", pHostName, pSpoofedIP);
     tmpNode->prev = NULL;
     tmpNode->first = 0;
     tmpNode->next = *httpInjectionNodesParam;

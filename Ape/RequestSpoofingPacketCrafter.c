@@ -136,7 +136,7 @@ void InjectDNSPacket(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoo
 
   if ((dnsUrlA = (unsigned char *) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, MAX_BUF_SIZE*2)) == NULL)
   {
-    LogMsg(DBG_ERROR, "InjectDNSPacket() : HeapAlloc(%d) failed (Error code: %d)", MAX_BUF_SIZE*2, GetLastError());
+    LogMsg(DBG_ERROR, "InjectDNSPacket(): HeapAlloc(%d) failed (Error code: %d)", MAX_BUF_SIZE*2, GetLastError());
     goto END;
   } 
 
@@ -159,7 +159,7 @@ void InjectDNSPacket(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoo
   // Allocate memory for the DNS response packet		
   if ((dnsPacket = (unsigned char *) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, packetsize+1)) == NULL)  
   {
-    LogMsg(DBG_ERROR, "InjectDNSPacket() : HeapAlloc(%d) failed (Error code: %d)", packetsize+1, GetLastError());
+    LogMsg(DBG_ERROR, "InjectDNSPacket(): HeapAlloc(%d) failed (Error code: %d)", packetsize+1, GetLastError());
     goto END;
   }
 

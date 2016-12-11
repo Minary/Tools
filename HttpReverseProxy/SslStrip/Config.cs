@@ -78,12 +78,12 @@
         }
         catch (ProxyWarningException pwex)
         {
-          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
+          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION): {0}", pwex.Message);
           continue;
         }
         catch (ProxyErrorException peex)
         {
-          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
+          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION): {0}", peex.Message);
           continue;
         }
 

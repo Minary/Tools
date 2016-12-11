@@ -139,7 +139,7 @@ int GetInterfaceName(char *pIFCName, char *pRealIFCName, int pBufLen)
   // Open device list
   if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &lAllDevs, lTemp) == -1)
   {
-    LogMsg(DBG_ERROR, "getIFCName() : Error in pcap_findalldevs_ex() : %s", lTemp);
+    LogMsg(DBG_ERROR, "getIFCName(): Error in pcap_findalldevs_ex(): %s", lTemp);
     lRetVal = 1;
     goto END;
   }
@@ -190,7 +190,7 @@ int GetInterfaceDetails(char *pIFCName, PSCANPARAMS pScanParams)
 
   if ((lAdapterInfoPtr = (IP_ADAPTER_INFO *) HeapAlloc(GetProcessHeap(), 0, sizeof (IP_ADAPTER_INFO))) == NULL)
   {
-    LogMsg(DBG_ERROR, "GetIFCDetails() : Error allocating memory needed to call GetAdaptersinfo");
+    LogMsg(DBG_ERROR, "GetIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
     lRetVal = 1;
     goto END;
   }
@@ -200,7 +200,7 @@ int GetInterfaceDetails(char *pIFCName, PSCANPARAMS pScanParams)
     HeapFree(GetProcessHeap(), 0, lAdapterInfoPtr);
     if ((lAdapterInfoPtr = (IP_ADAPTER_INFO *) HeapAlloc(GetProcessHeap(), 0, lOutBufLen)) == NULL)
     {
-      LogMsg(DBG_ERROR, "GetIFCDetails() : Error allocating memory needed to call GetAdaptersinfo");
+      LogMsg(DBG_ERROR, "GetIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
       lRetVal = 2;
       goto END;
     }
@@ -301,7 +301,7 @@ int ListInterfaceDetails()
 
   if ((lAdapterInfoPtr = (IP_ADAPTER_INFO *) HeapAlloc(GetProcessHeap(), 0, sizeof (IP_ADAPTER_INFO))) == NULL)
   {
-    LogMsg(DBG_ERROR, "listIFCDetails() : Error allocating memory needed to call GetAdaptersinfo");
+    LogMsg(DBG_ERROR, "listIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
     lRetVal = 1;
     goto END;
   }
@@ -311,7 +311,7 @@ int ListInterfaceDetails()
     HeapFree(GetProcessHeap(), 0, lAdapterInfoPtr);
     if ((lAdapterInfoPtr = (IP_ADAPTER_INFO *) HeapAlloc(GetProcessHeap(), 0, lOutBufLen)) == NULL)
     {
-      LogMsg(DBG_ERROR, "listIFCDetails() : Error allocating memory needed to call GetAdaptersinfo");
+      LogMsg(DBG_ERROR, "listIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
       lRetVal = 2;
 
       goto END;
@@ -410,7 +410,7 @@ int ListInterfaceDetails()
     }
   }
   else
-    LogMsg(DBG_ERROR, "listIFCDetails() : GetAdaptersInfo failed with error: %d\n", lFuncRetVal);
+    LogMsg(DBG_ERROR, "listIFCDetails(): GetAdaptersInfo failed with error: %d\n", lFuncRetVal);
 
 
 END:

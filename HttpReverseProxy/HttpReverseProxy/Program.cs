@@ -1,8 +1,11 @@
 ﻿namespace HttpReverseProxy
 {
-  using HttpReverseProxy.Lib;
-  using NConsoler;
+  using Fclp;
   using System;
+  using System.IO;
+  using System.Net.NetworkInformation;
+  using System.Security.Cryptography.X509Certificates;
+
 
   public class Program
   {
@@ -15,64 +18,160 @@
     /// <param name="args"></param>
     public static void Main(string[] args)
     {
-      Console.Clear();
-      Console.WriteLine("HttpReverseProxy 0.9 (www.buglist.io)");
-      Console.WriteLine("-------------------------------------\n\n");
+      var parser = new FluentCommandLineParser();
+      parser.IsCaseSensitive = false;
 
-      Initialize();
-      Consolery.Run(typeof(Program), args);
+      parser.Setup<int>("httpPort")
+       .Callback(item => { Config.LocalHttpServerPort = item; })
+       .SetDefault(80)
+       .WithDescription("Define TCP port for incoming HTTP requests");
+
+      parser.Setup<int>("httpsPort")
+       .Callback(item => { Config.LocalHttpsServerPort = item; })
+       .SetDefault(443)
+       .WithDescription("Define TCP port for incoming HTTPS requests");
+
+      parser.Setup<string>("certificate")
+       .Callback(item => { Config.CertificatePath = item; })
+       .Required()
+       .WithDescription("Define certificate file path");
+
+      // sets up the parser to execute the callback when -? or --help is detected
+      parser.SetupHelp("?", "help")
+       .Callback(text => Console.WriteLine(text));
+
+      ICommandLineParserResult result = parser.Parse(args);
+      if (result.HasErrors == true)
+      {
+        Console.WriteLine("{0}\r\n\r\n", result.ErrorText);
+      }
+      else
+      {
+        StartProxyServer();
+      }
     }
 
 
-    /// <summary>
-    ///
-    /// </summary>
-    public static void Initialize()
+    private static void StartProxyServer()
     {
-      // Initialize program
-      Config.LocalIp = Common.GetLocalIPAddress();
-    }
+      Config.LocalIp = Lib.Common.GetLocalIpAddress();
 
-
-    /*
-     * HTTPReverseProxyServer.exe 80 /ru:www.test.ch/www/adsf /d
-     * HTTPReverseProxyServer.exe 80 /rhp:www.blick.ch;80 /d
-     */
-    [Action]
-    public static void StartServer(
-            [Required(Description = "Local port")] string localPortParam,
-            [Optional("", "c", Description = "")] string configurationFileParam,
-            [Optional(false, "d")] bool debugParam,
-            [Optional("", "p", Description = "")] string outputNamedPipeParam)
-    {
+      // Parse HTTP port parameter
       try
       {
-        Config.LocalServerPort = int.Parse(localPortParam);
+        if (IsPortAvailable(Config.LocalHttpServerPort) == false)
+        {
+          Console.WriteLine("The HTTP port ({0}) is used by another proces", Config.LocalHttpServerPort);
+          return;
+        }
+
+        // Initialize TLS/SSL parameters for HTTPS connections
+        if (IsPortAvailable(Config.LocalHttpsServerPort) == false)
+        {
+          Console.WriteLine("The HTTPS port ({0}) is used by another proces", Config.LocalHttpsServerPort);
+          return;
+        }
+
+        // Check if certificate is valid
+        if (VerifyCertificateValidity(Config.CertificatePath) == false)
+        {
+          Console.WriteLine("The certificate \"{0}\" is invalid", Config.CertificatePath);
+          return;
+        }
       }
       catch (Exception ex)
       {
-        Console.WriteLine("Exception : {0}", ex.Message);
+        Console.WriteLine("Exception occurred: {0}", ex.Message);
         return;
       }
 
-      // Start proxy cRemoteSocket
+      // Start HTTP proxy server
       try
       {
-        if (ProxyServer.Server.Start())
+        if (HttpReverseProxy.Server.Start(Config.LocalHttpServerPort) == false)
         {
-          Console.WriteLine("Press enter to exit");
-          Console.ReadLine();
-          ProxyServer.Server.Stop();
+          throw new Exception("HTTP reverse proxy server could be started");
         }
-        else
+
+        if (HttpsReverseProxy.Server.Start(Config.LocalHttpsServerPort, Config.CertificatePath) == false)
         {
-          Console.WriteLine("Something went wrong");
+          throw new Exception("HTTPS reverse proxy server could be started");
         }
+
+        Console.WriteLine("Press enter to exit");
+        Console.ReadLine();
       }
       catch (Exception ex)
       {
-        Console.WriteLine("Something went wrong : {0}", ex.ToString());
+        Console.WriteLine("Something went wrong: {0}", ex.ToString());
       }
+
+      HttpReverseProxy.Server.Stop();
+      HttpsReverseProxy.Server.Stop();
+    }
+
+    #endregion
+
+
+    #region PRIVATE
+
+    public static bool VerifyCertificateValidity(string certificateFilePath)
+    {
+      if (string.IsNullOrEmpty(certificateFilePath))
+      {
+        throw new Exception("The certificate file parameter is invalid");
+      }
+
+      if (!File.Exists(certificateFilePath))
+      {
+        throw new Exception("The certificate file does not exist");
+      }
+
+      X509Certificate2Collection collection = new X509Certificate2Collection();
+      try
+      {
+        collection.Import(certificateFilePath, string.Empty, X509KeyStorageFlags.PersistKeySet);
+      }
+      catch (Exception ex)
+      {
+        throw new Exception(string.Format("The following error occurred while loading certificate file: {0}", ex.Message));
+      }
+
+      if (collection.Count < 1)
+      {
+        throw new Exception("No valid certificate data found");
+      }
+
+      if (collection.Count > 1)
+      {
+        throw new Exception("No valid certificate data found");
+      }
+
+      return true;
+    }
+
+
+    public static bool IsPortAvailable(int portNo)
+    {
+      if (portNo <= 0 || portNo > 65535)
+      {
+        throw new Exception("The port is invalid");
+      }
+
+      bool isPortAvailable = true;
+      IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+      System.Net.IPEndPoint[] ipEndPoints = ipGlobalProperties.GetActiveTcpListeners();
+
+      foreach (System.Net.IPEndPoint endPoint in ipEndPoints)
+      {
+        if (endPoint.Port == portNo)
+        {
+          isPortAvailable = false;
+          break;
+        }
+      }
+
+      return isPortAvailable;
     }
 
     #endregion

@@ -249,8 +249,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
             }
 
             break;
-
-
+            
           // Ignore these
           case "proxy-connection":
           case "keep-alive":
@@ -393,7 +392,9 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
           requestObj.ClientRequestObj.ClientRequestContentLength = -1;
         }
         else
+        {
           requestObj.ClientRequestObj.ClientRequestContentLength = 0;
+        }
       }
       catch (Exception ex)
       {

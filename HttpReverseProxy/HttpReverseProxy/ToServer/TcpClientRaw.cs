@@ -43,17 +43,17 @@
         // Break out of the loop if it is the last data packet
         if (string.IsNullOrEmpty(chunkLenStr))
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer() : chunkLenStr isNullOrEmpty!!!");
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): chunkLenStr isNullOrEmpty!!!");
           break;
         }
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer() : ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
         blockSize = int.Parse(chunkLenStr, System.Globalization.NumberStyles.HexNumber);
 
         if (blockSize > 0)
         {
           this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, sniffedDataChunk);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer() : blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
         }
         else if (blockSize == 0 || chunkLenStr == "0")
         {
@@ -61,12 +61,12 @@
           byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
           outputStreamWriter.Write(newLine, 0, newLine.Length);
           outputStreamWriter.Flush();
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer() : blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
           break;
         }
         else
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer() : WOOPS!");
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): WOOPS!");
         }
 
         chunkCounter++;
@@ -74,50 +74,38 @@
     }
 
 
-    public void ForwardNonchunkedNonprocessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int contentLength, SniffedDataChunk sniffedDataChunk = null)
+    public void ForwardNonchunkedNonprocessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int transferredContentLength, SniffedDataChunk sniffedDataChunk = null)
     {
-      byte[] buffer = new byte[MaxBufferSize];
-      int dataVolume = 0;
+      byte[] buffer = new byte[transferredContentLength];
+      int totalTransferredBytes = 0;
       int bytesRead = 0;
 
-      while (dataVolume < contentLength &&
-             (bytesRead = dataSenderStream.Read(buffer, 0, buffer.Length)) > 0)
+      while (totalTransferredBytes < transferredContentLength)
       {
-        if (dataVolume + bytesRead > contentLength)
+        // Read data from peer 1
+        int maxDataToTransfer = transferredContentLength - totalTransferredBytes;
+        bytesRead = dataSenderStream.Read(buffer, 0, maxDataToTransfer);
+
+        if (bytesRead <= 0)
         {
-          int newPacketSize = bytesRead - ((dataVolume + bytesRead) - contentLength);
-          dataVolume += newPacketSize;
-
-          // Forward received data packets to peer
-          dataRecipientStream.Write(buffer, 0, newPacketSize);
-          dataRecipientStream.Flush();
-
-          // If a sniffer data chunk object is defined write application data to it
-          if (sniffedDataChunk != null)
-          {
-            sniffedDataChunk.AppendData(buffer, bytesRead);
-          }
-
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA, buffer.Length:{0}) : Relaying data from: Client -> Server (bytesRead:{1} dataVolume:{2})", buffer.Length, bytesRead, dataVolume);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA), No data to transfer");
           break;
         }
-        else
+
+        // Write data to peer 2
+        dataRecipientStream.Write(buffer, 0, bytesRead);
+        dataRecipientStream.Flush();
+
+        if (sniffedDataChunk != null)
         {
-          dataVolume += bytesRead;
-
-          // Relay processed data block to client
-          dataRecipientStream.Write(buffer, 0, bytesRead);
-          dataRecipientStream.Flush();
-
-          // If a sniffer data chunk object is defined write application data to it
-          if (sniffedDataChunk != null)
-          {
-            sniffedDataChunk.AppendData(buffer, bytesRead);
-          }
-
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA, buffer.Length:{0}) : Relaying data from: Client -> Server (bytesRead:{1}, dataVolume:{2})", buffer.Length, bytesRead, dataVolume);
+          sniffedDataChunk.AppendData(buffer, bytesRead);
         }
+
+        totalTransferredBytes += bytesRead;
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA, TodalDataToTransfer:{0}): Relaying data from: Client -> Server (bytesRead:{1} totalTransferredBytes:{2})", buffer.Length, bytesRead, totalTransferredBytes);
       }
+
+      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA): Total amount of transferred data={0}", totalTransferredBytes);
     }
 
 
@@ -135,11 +123,11 @@
           sniffedDataChunk.AppendData(clientData, clientData.Length);
         }
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer() : clientData.Length:{0}", clientData.Length);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer(): clientData.Length:{0}", clientData.Length);
       }
       else
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer() : clientData:NULL");
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer(): clientData:NULL");
       }
     }
 
@@ -187,7 +175,7 @@
         // Break out of the loop if it is the last data packet
         if (string.IsNullOrEmpty(chunkLenStr))
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks() : chunkLenStr isNullOrEmpty!!!");
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): chunkLenStr isNullOrEmpty!!!");
           break;
         }
 
@@ -197,7 +185,7 @@
         if (blockSize > 0)
         {
           this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks() : blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
         }
         else if (blockSize == 0 || chunkLenStr == "0")
         {
@@ -205,13 +193,13 @@
           byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
           outputStreamWriter.Write(newLine, 0, newLine.Length);
           outputStreamWriter.Flush();
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks() : blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
 
           break;
         }
         else
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks() : WOOPS!");
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): WOOPS!");
         }
 
         previousChunkLen = chunkLenStr;
@@ -219,57 +207,41 @@
     }
 
 
-    public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int contentLength, SniffedDataChunk sniffedDataChunk = null)
+//    public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int contentLength, SniffedDataChunk sniffedDataChunk = null)
+    public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int transferredContentLength, SniffedDataChunk sniffedDataChunk = null)
     {
-      byte[] buffer = new byte[MaxBufferSize];
-      byte[] serverData = new byte[contentLength];
       MemoryStream memStream = new MemoryStream();
-      int dataPacketVolume = 0;
+      byte[] buffer = new byte[transferredContentLength];
+      int totalTransferredBytes = 0;
       int bytesRead = 0;
-      int roundCount = 0;
 
-      // 1. Read data sent from server
-      while (dataPacketVolume < contentLength &&
-             (bytesRead = dataSenderStream.Read(buffer, 0, buffer.Length)) > 0)
+      while (totalTransferredBytes < transferredContentLength)
       {
-        if (dataPacketVolume + bytesRead >= contentLength)
+        // Read data from peer 1
+        int maxDataToTransfer = transferredContentLength - totalTransferredBytes;
+        bytesRead = dataSenderStream.Read(buffer, 0, maxDataToTransfer);
+
+        if (bytesRead <= 0)
         {
-          int newPacketSize = bytesRead - ((dataPacketVolume + bytesRead) - contentLength);
-          dataPacketVolume += newPacketSize;
-
-          // Save received data in memory stream data buffer
-          memStream.Write(buffer, 0, newPacketSize);
-
-          // If a sniffer data chunk object is defined write application data to it
-          if (sniffedDataChunk != null)
-          {
-            sniffedDataChunk.AppendData(buffer, bytesRead);
-          }
-
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(0): RoundNo:{0}, ReceivedDataBlockSize:{1} TotalBytesReceived:{2}, MaxLen:{3}", roundCount, bytesRead, dataPacketVolume, contentLength);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(2:DATA), No data to transfer");
           break;
         }
-        else
+
+        // Write data to memory stream
+        memStream.Write(buffer, 0, bytesRead);
+
+        if (sniffedDataChunk != null)
         {
-          dataPacketVolume += bytesRead;
-          memStream.Write(buffer, 0, bytesRead);
-
-          // If a sniffer data chunk object is defined write application data to it
-          if (sniffedDataChunk != null)
-          {
-            sniffedDataChunk.AppendData(buffer, bytesRead);
-          }
-
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(1): RoundNo:{0}, ReceivedDataBlockSize:{1} TotalBytesReceived:{2}, MaxLen:{3}", roundCount, bytesRead, dataPacketVolume, contentLength);
+          sniffedDataChunk.AppendData(buffer, bytesRead);
         }
 
-        roundCount++;
+        totalTransferredBytes += bytesRead;
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(2:DATA, TodalDataToTransfer:{0}): Relaying data from: Client -> Server (bytesRead:{1} totalTransferredBytes:{2})", buffer.Length, bytesRead, totalTransferredBytes);
       }
 
       // SSL strip server data packet
       byte[] dataPacket = memStream.ToArray();
-
-      if (dataPacket.Length != contentLength)
+      if (dataPacket.Length != transferredContentLength)
       {
         throw new Exception("The announced content length and the amount of received data are not the same");
       }
@@ -286,8 +258,77 @@
       Logging.Instance.LogMessage(
                                   this.requestObj.Id,
                                   Logging.Level.DEBUG,
-                                  "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer() : Data successfully relayed to client. ContentDataSize:{0})",
+                                  "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(): Data successfully relayed to client. ContentDataSize:{0})",
                                   serverDataPacket.ContentData.Length);
+
+
+      //      byte[] buffer = new byte[MaxBufferSize];
+      //      byte[] serverData = new byte[contentLength];
+      //      MemoryStream memStream = new MemoryStream();
+      //      int dataPacketVolume = 0;
+      //      int bytesRead = 0;
+      //      int roundCount = 0;
+
+      // 1. Read data sent from server
+      //while (dataPacketVolume < contentLength &&
+      //       (bytesRead = dataSenderStream.Read(buffer, 0, buffer.Length)) > 0)
+      //{
+      //  if (dataPacketVolume + bytesRead >= contentLength)
+      //  {
+      //    int newPacketSize = bytesRead - ((dataPacketVolume + bytesRead) - contentLength);
+      //    dataPacketVolume += newPacketSize;
+
+      //    // Save received data in memory stream data buffer
+      //    memStream.Write(buffer, 0, newPacketSize);
+
+      //    // If a sniffer data chunk object is defined write application data to it
+      //    if (sniffedDataChunk != null)
+      //    {
+      //      sniffedDataChunk.AppendData(buffer, bytesRead);
+      //    }
+
+      //    Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(0): RoundNo:{0}, ReceivedDataBlockSize:{1} TotalBytesReceived:{2}, MaxLen:{3}", roundCount, bytesRead, dataPacketVolume, contentLength);
+      //    break;
+      //  }
+      //  else
+      //  {
+      //    dataPacketVolume += bytesRead;
+      //    memStream.Write(buffer, 0, bytesRead);
+
+      //    // If a sniffer data chunk object is defined write application data to it
+      //    if (sniffedDataChunk != null)
+      //    {
+      //      sniffedDataChunk.AppendData(buffer, bytesRead);
+      //    }
+
+      //    Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(1): RoundNo:{0}, ReceivedDataBlockSize:{1} TotalBytesReceived:{2}, MaxLen:{3}", roundCount, bytesRead, dataPacketVolume, contentLength);
+      //  }
+
+      //  roundCount++;
+      //}
+
+      //// SSL strip server data packet
+      //byte[] dataPacket = memStream.ToArray();
+
+      //if (dataPacket.Length != contentLength)
+      //{
+      //  throw new Exception("The announced content length and the amount of received data are not the same");
+      //}
+
+      //// Encode received bytes to the announced format
+      //int preProcessingPacketSize = dataPacket.Length;
+      //string dataBlockString = this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding.GetString(dataPacket);
+      //DataPacket serverDataPacket = new DataPacket(dataPacket, this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding);
+      //Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
+
+      //// Send data packet to recipient
+      //dataRecipientStream.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
+      //dataRecipientStream.Flush();
+      //Logging.Instance.LogMessage(
+      //                            this.requestObj.Id,
+      //                            Logging.Level.DEBUG,
+      //                            "TcpClientRaw.ForwardNonchunkedProcessedDataToPeer(): Data successfully relayed to client. ContentDataSize:{0})",
+      //                            serverDataPacket.ContentData.Length);
     }
 
 
@@ -306,11 +347,11 @@
           sniffedDataChunk.AppendData(clientData, clientData.Length);
         }
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer() : clientData.Length:{0}", clientData.Length);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer(): clientData.Length:{0}", clientData.Length);
       }
       else
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer() : clientData:NULL");
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardSingleLineNonprocessedDataToPeer(): clientData:NULL");
       }
     }
 
@@ -336,14 +377,14 @@
           int newPacketSize = bytesRead - ((totalBytesReceived + bytesRead) - totalBytesToRead);
           totalBytesReceived += newPacketSize;
           memStream.Write(buffer, 0, newPacketSize);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "Chunked.ReceiveChunk(0:MaxLen:{0}) : Receiving fragment {1} from: Client -> Server ({2} buffer, totalBytesReceived:{3}, totalBytesToRead:{4})", buffer.Length, chunkFragmentCounter, bytesRead, totalBytesReceived, totalBytesToRead);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "Chunked.ReceiveChunk(0:MaxLen:{0}): Receiving fragment {1} from: Client -> Server ({2} buffer, totalBytesReceived:{3}, totalBytesToRead:{4})", buffer.Length, chunkFragmentCounter, bytesRead, totalBytesReceived, totalBytesToRead);
           break;
         }
         else
         {
           totalBytesReceived += bytesRead;
           memStream.Write(buffer, 0, bytesRead);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "Chunked.ReceiveChunk(1:MaxLen:{0}) : Receiving fragment {1} from: Client -> Server ({2} buffer, totalBytesReceived:{3}, totalBytesToRead:{4})", buffer.Length, chunkFragmentCounter, bytesRead, totalBytesReceived, totalBytesToRead);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "Chunked.ReceiveChunk(1:MaxLen:{0}): Receiving fragment {1} from: Client -> Server ({2} buffer, totalBytesReceived:{3}, totalBytesToRead:{4})", buffer.Length, chunkFragmentCounter, bytesRead, totalBytesReceived, totalBytesToRead);
         }
 
         maxInputLen -= bytesRead;

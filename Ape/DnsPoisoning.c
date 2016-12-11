@@ -69,7 +69,7 @@ int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
     // 1. Send DNS requests
     for (hostTmp = gHostsList; hostTmp != NULL && hostTmp->next != NULL; hostTmp = (PHOSTNODE)hostTmp->next)
     {
-      printf("DetermineSpoofingResponseData() : %s -> %s\n", hostTmp->sData.HostName, hostTmp->sData.SpoofedIP);
+      printf("DetermineSpoofingResponseData(): %s -> %s\n", hostTmp->sData.HostName, hostTmp->sData.SpoofedIP);
       Sleep(400);
     }
   }
@@ -115,7 +115,7 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
   // 0. Initialize sniffer
   if ((ifcReadHandle = pcap_open_live((char *)scanParams->interfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData() : Unable to open the adapter: %s", pcapErrorBuffer);
+    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to open the adapter: %s", pcapErrorBuffer);
     retVal = 1;
     goto END;
   }
@@ -125,14 +125,14 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
 
   if (pcap_compile((pcap_t *)ifcReadHandle, &filterCode, (const char *)filter, 1, netMask) < 0)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData() : Unable to compile the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
   if (pcap_setfilter((pcap_t *)ifcReadHandle, &filterCode) < 0)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData() : Unable to set the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
     goto END;
   }
