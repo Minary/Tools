@@ -4,7 +4,7 @@
   using HttpReverseProxyLib.Interface;
 
 
-  public partial class Inject : HttpReverseProxyLib.Interface.IPlugin
+  public partial class Inject : IPlugin
   {
 
     #region MEMBERS

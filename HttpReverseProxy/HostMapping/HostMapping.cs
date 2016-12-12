@@ -1,15 +1,9 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
-  using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.Interface;
-  using System;
-  using System.Collections.Concurrent;
-  using System.Collections.Generic;
-  using System.Text.RegularExpressions;
 
 
-  public partial class HostMapping : HttpReverseProxyLib.Interface.IPlugin
+  public partial class HostMapping : IPlugin
   {
 
     #region MEMBERS
