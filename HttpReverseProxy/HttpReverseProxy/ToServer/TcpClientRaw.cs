@@ -207,8 +207,8 @@
       }
     }
 
+    
 
-//    public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int contentLength, SniffedDataChunk sniffedDataChunk = null)
     public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int transferredContentLength, SniffedDataChunk sniffedDataChunk = null)
     {
       MemoryStream memStream = new MemoryStream();

@@ -2,7 +2,7 @@
 {
   using HttpReverseProxyLib.Interface;
 
-  public partial class Weaken : HttpReverseProxyLib.Interface.IPlugin
+  public partial class Weaken : IPlugin
   {
 
     #region MEMBERS

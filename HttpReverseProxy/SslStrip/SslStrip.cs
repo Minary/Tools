@@ -11,7 +11,7 @@
   using System.Text.RegularExpressions;
 
 
-  public partial class SslStrip : HttpReverseProxyLib.Interface.IPlugin
+  public partial class SslStrip : IPlugin
   {
 
     #region MEMBERS
