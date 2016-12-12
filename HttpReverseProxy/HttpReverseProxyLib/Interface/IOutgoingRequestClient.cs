@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxyLib.Interface
 {
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using System.Collections;
   using System.Net.Sockets;
 

@@ -1,5 +1,6 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System.Collections;
   using System.IO;
 
@@ -28,6 +29,8 @@
 
     private int clientRequestContentLength;
     private string clientRequestData;
+
+    private byte[] serverNewLine;
 
     #endregion
 
@@ -63,6 +66,8 @@
     public int ClientRequestContentLength { get { return this.clientRequestContentLength; } set { this.clientRequestContentLength = value; } }
 
     public string ClientRequestData { get { return this.clientRequestData; } set { this.clientRequestData = value; } }
+
+    public byte[] ServerNewLine { get { return this.serverNewLine; } set { this.serverNewLine = value; } }
 
     #endregion
 

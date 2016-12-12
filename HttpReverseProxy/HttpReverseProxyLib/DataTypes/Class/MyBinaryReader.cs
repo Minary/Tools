@@ -1,8 +1,10 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;
   using System.Text;
+
 
   public class MyBinaryReader : BinaryReader
   {
@@ -32,8 +34,10 @@
     }
 
 
-    public string ReadLine(bool keepTrailingNewline = false)
+    public StatusLine ReadStatusLine(bool keepTrailingNewline = false)
     {
+      bool carriageReturnDetected = false;
+      StatusLine serverStatusLine = new StatusLine();
       StringBuilder result = new StringBuilder();
       bool foundEndOfLine = false;
       char currentChar;
@@ -46,7 +50,6 @@
         }
         catch (EndOfStreamException ex)
         {
-Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): TIMEOUT IS={0} ", base.BaseStream.ReadTimeout);
           Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (result.Length == 0)
@@ -63,20 +66,63 @@ Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpR
         {
           case '\r':
             result.Append(currentChar);
-            //try
-            //{
-            //  int peekChar;
-            //  if ((peekChar = base.PeekChar()) == '\n')
-            //  {
-            //    currentChar = base.ReadChar();
-            //    result.Append(currentChar);
-            //  }
-            //}
-            //catch (Exception ex)
-            //{
-            //  Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, string.Format("HttpReverseProxyLib.MyBinaryReader.ReadLine(Exception): {0}", ex.Message), Logging.Level.DEBUG);
-            //}
-            //foundEndOfLine = true;
+            carriageReturnDetected = true;
+            break;
+          case '\n':
+            result.Append(currentChar);
+            foundEndOfLine = true;
+            break;
+          default:
+            result.Append(currentChar);
+            break;
+        }
+      }
+
+      // Populate status line object
+      serverStatusLine.ServerStatusLine = result.ToString();
+      serverStatusLine.NewlineType = carriageReturnDetected?Newline.CRLF:Newline.LF;
+      serverStatusLine.NewlineRepresentation = carriageReturnDetected ? new byte[] { 0x0D, 0x0A } : new byte[] { 0x0A };
+
+      // Remove trailing newlines if required.
+      if (!keepTrailingNewline)
+      {
+        serverStatusLine.ServerStatusLine = serverStatusLine.ServerStatusLine.TrimEnd();
+      }
+
+      return serverStatusLine;
+    }
+
+
+    public string ReadLine(bool keepTrailingNewline = false)
+    {
+      StringBuilder result = new StringBuilder();
+      bool foundEndOfLine = false;
+      char currentChar;
+
+      while (!foundEndOfLine)
+      {
+        try
+        {
+          currentChar = base.ReadChar();
+        }
+        catch (EndOfStreamException ex)
+        {
+          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): Client request header: {0}", ex.Message);
+
+          if (result.Length == 0)
+          {
+            return null;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        switch (currentChar)
+        {
+          case '\r':
+            result.Append(currentChar);
             break;
           case '\n':
             result.Append(currentChar);
@@ -105,7 +151,6 @@ Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpR
       bool foundEndOfLine = false;
       byte ch;
 
-
       while (!foundEndOfLine)
       {
         try
@@ -125,7 +170,6 @@ Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpR
             break;
           }
         }
-
 
         switch (ch)
         {

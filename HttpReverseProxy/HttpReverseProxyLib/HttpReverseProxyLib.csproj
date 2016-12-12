@@ -42,23 +42,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTypes\ClientRequest.cs" />
-    <Compile Include="DataTypes\DataContentTypeEncoding.cs" />
-    <Compile Include="DataTypes\DataPacket.cs" />
-    <Compile Include="DataTypes\DataTransmissionMode.cs" />
-    <Compile Include="DataTypes\HttpStatusDetails.cs" />
-    <Compile Include="DataTypes\Instruction.cs" />
-    <Compile Include="DataTypes\InstructionParameters.cs" />
-    <Compile Include="DataTypes\MyBinaryReader.cs">
+    <Compile Include="DataTypes\Class\ClientRequest.cs" />
+    <Compile Include="DataTypes\Class\DataContentTypeEncoding.cs" />
+    <Compile Include="DataTypes\Class\DataPacket.cs" />
+    <Compile Include="DataTypes\Enum\DataTransmissionMode.cs" />
+    <Compile Include="DataTypes\Class\HttpStatusDetails.cs" />
+    <Compile Include="DataTypes\Enum\Instruction.cs" />
+    <Compile Include="DataTypes\Class\InstructionParameters.cs" />
+    <Compile Include="DataTypes\Class\MyBinaryReader.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="DataTypes\PluginInstruction.cs" />
-    <Compile Include="DataTypes\RedirectType.cs" />
-    <Compile Include="DataTypes\RequestMethod.cs" />
-    <Compile Include="DataTypes\RequestObj.cs" />
-    <Compile Include="DataTypes\ServerResponseMetaData.cs" />
-    <Compile Include="DataTypes\ServerStatusResponse.cs" />
-    <Compile Include="DataTypes\SniffedDataChunk.cs" />
+    <Compile Include="DataTypes\Enum\Newline.cs" />
+    <Compile Include="DataTypes\Class\StatusLine.cs" />
+    <Compile Include="DataTypes\Class\PluginInstruction.cs" />
+    <Compile Include="DataTypes\Enum\RedirectType.cs" />
+    <Compile Include="DataTypes\Class\RequestMethod.cs" />
+    <Compile Include="DataTypes\Class\RequestObj.cs" />
+    <Compile Include="DataTypes\Class\ServerResponseMetaData.cs" />
+    <Compile Include="DataTypes\Class\ServerStatusResponse.cs" />
+    <Compile Include="DataTypes\Class\SniffedDataChunk.cs" />
     <Compile Include="Exceptions\ClientNotificationException.cs" />
     <Compile Include="Exceptions\ProxyErrorException.cs" />
     <Compile Include="Exceptions\ProxyWarningException.cs" />
@@ -77,6 +79,7 @@
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

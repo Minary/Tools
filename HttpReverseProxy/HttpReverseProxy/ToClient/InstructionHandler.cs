@@ -1,4 +1,4 @@
-﻿using HttpReverseProxyLib.DataTypes;
+﻿using HttpReverseProxyLib.DataTypes.Class;
 using HttpReverseProxyLib.Exceptions;
 using System.IO;
 using System.Linq;

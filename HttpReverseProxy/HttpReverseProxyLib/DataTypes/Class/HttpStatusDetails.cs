@@ -1,5 +1,6 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+
   public class HttpStatusDetails
   {
 
@@ -15,7 +16,9 @@
     #region PROPERTIES
 
     public int Code { get { return this.code; } set { } }
+
     public string Title { get { return this.title; } set { } }
+
     public string Description { get { return this.description; } set { } }
 
     #endregion

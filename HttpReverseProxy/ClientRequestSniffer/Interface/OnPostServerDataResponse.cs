@@ -1,7 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.ClientRequestSniffer
 {
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class ClientRequestSniffer
