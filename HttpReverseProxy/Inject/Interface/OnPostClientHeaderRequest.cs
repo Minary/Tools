@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.Inject
 {
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
   using System.Text.RegularExpressions;
 

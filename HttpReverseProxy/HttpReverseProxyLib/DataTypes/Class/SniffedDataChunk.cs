@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
   using System;
   using System.IO;

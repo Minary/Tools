@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.Inject
 {
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class Inject
@@ -19,8 +20,7 @@
 
       PluginInstruction instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
-
-
+      
       return instruction;
     }
   }

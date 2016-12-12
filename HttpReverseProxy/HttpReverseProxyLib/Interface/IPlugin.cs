@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxyLib.Interface
 {
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
 
 
   public class PluginProperties

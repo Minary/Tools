@@ -1,6 +1,6 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
-  using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using System.IO;
   using System.Net.Sockets;
   using System.Text;

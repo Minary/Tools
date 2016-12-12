@@ -1,9 +1,10 @@
 ﻿namespace HttpReverseProxy.Plugin.SslStrip
 {
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
   using System.Collections.Concurrent;
+
 
   public partial class SslStrip
   {

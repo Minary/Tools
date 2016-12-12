@@ -2,6 +2,8 @@
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class SslStrip

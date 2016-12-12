@@ -1,6 +1,7 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
   using System.Text;
+
 
   public class DataPacket
   {
@@ -16,6 +17,7 @@
     #region PROPERTIES
 
     public byte[] ContentData { get { return this.contentData; } set { this.contentData = value; } }
+
     public Encoding DataEncoding { get { return this.dataEncoding; } set { this.dataEncoding = value; } }
 
     #endregion

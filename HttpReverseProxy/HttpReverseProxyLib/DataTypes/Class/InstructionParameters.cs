@@ -1,6 +1,7 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
   using System.Collections.Generic;
+
 
   public class InstructionParams
   {

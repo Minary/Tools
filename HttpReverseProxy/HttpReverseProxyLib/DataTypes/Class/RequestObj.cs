@@ -1,5 +1,6 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
   using System.Collections;
@@ -28,7 +29,6 @@
     private ServerResponseMetaData serverResponseMetaDataObj;
 
     private string serverResponseData;
-    //// private Encoding serverEncoding;
     private DataTransmissionMode proxyDataTransmissionModeS2C;
     private DataTransmissionMode proxyDataTransmissionModeC2S;
 
@@ -36,6 +36,8 @@
     private int counter;
     private string id;
     private string httpLogData;
+
+    private StatusLine serverStatusLine;
 
     #endregion
 
@@ -79,6 +81,9 @@
     public string Id { get { return this.id; } set { this.id = value; } }
 
     public string HttpLogData { get { return this.httpLogData; } set { this.httpLogData = value; } }
+
+
+    public StatusLine ServerStatusLine { get { return this.serverStatusLine; } set { this.serverStatusLine = value; } }
 
     #endregion
 

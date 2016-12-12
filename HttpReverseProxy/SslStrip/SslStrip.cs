@@ -2,7 +2,8 @@
 {
   using HttpReverseProxy.Plugin.SslStrip.Cache;
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
   using System.Collections.Concurrent;

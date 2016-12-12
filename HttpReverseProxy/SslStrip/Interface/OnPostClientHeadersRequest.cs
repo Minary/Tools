@@ -4,6 +4,7 @@
   using HttpReverseProxy.Plugin.SslStrip.DataTypes;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
+  using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class SslStrip

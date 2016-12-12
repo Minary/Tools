@@ -1,6 +1,8 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Class;
   using System.Collections;
+
 
   public class ServerResponseMetaData
   {
