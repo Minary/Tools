@@ -1,7 +1,6 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using System;
   using System.IO;
@@ -31,7 +30,7 @@
 
     #region NonProcessed
 
-    public void ForwardChunkedNonprocessedDataToPeer(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, SniffedDataChunk sniffedDataChunk = null)
+    public void ForwardChunkedNonprocessedDataToPeer(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, byte[] serverNewlineBytes, SniffedDataChunk sniffedDataChunk = null)
     {
       int blockSize = 0;
       int chunkCounter = 0;
@@ -53,14 +52,13 @@
 
         if (blockSize > 0)
         {
-          this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, sniffedDataChunk);
+          this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, serverNewlineBytes, sniffedDataChunk);
           Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
         }
         else if (blockSize == 0 || chunkLenStr == "0")
         {
-          this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, sniffedDataChunk);
-          byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
-          outputStreamWriter.Write(newLine, 0, newLine.Length);
+          this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, serverNewlineBytes, sniffedDataChunk);
+          outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
           outputStreamWriter.Flush();
           Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedNonprocessedDataToPeer(): blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
           break;
@@ -160,7 +158,7 @@
 
     #region Processed
 
-    public void ForwardChunkedProcessedDataChunks(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, Encoding contentCharsetEncoding, SniffedDataChunk sniffedDataChunk = null)
+    public void ForwardChunkedProcessedDataChunks(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, Encoding contentCharsetEncoding, byte[] serverNewlineBytes, SniffedDataChunk sniffedDataChunk = null)
     {
       int blockSize = 0;
       int chunkCounter = 0;
@@ -180,21 +178,18 @@
           break;
         }
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): ChunkNo={0}: previousChunkLen=0x{1} ChunkLength=0x{2}", chunkCounter, previousChunkLen, chunkLenStr);
         blockSize = int.Parse(chunkLenStr, System.Globalization.NumberStyles.HexNumber);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): ChunkNo={0}: previousChunkLen=0x{1} ChunkLength=0x{2}", chunkCounter, previousChunkLen, chunkLenStr);
 
         if (blockSize > 0)
         {
-          this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding, serverNewlineBytes);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize > 0: ChunkNo={0} chunkLenStr.Length={1}, Content=|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
         }
         else if (blockSize == 0 || chunkLenStr == "0")
         {
-          this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding);
-          byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
-          outputStreamWriter.Write(newLine, 0, newLine.Length);
-          outputStreamWriter.Flush();
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding, serverNewlineBytes);
+          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize == 0: ChunkNo={0} chunkLenStr.Length={1}, Content=|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
 
           break;
         }
@@ -207,7 +202,6 @@
       }
     }
 
-    
 
     public void ForwardNonchunkedProcessedDataToPeer(MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int transferredContentLength, SniffedDataChunk sniffedDataChunk = null)
     {
@@ -398,16 +392,15 @@
     }
 
 
-    private void RelayChunk(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, int chunkSize, string chunkSizeHexString, SniffedDataChunk sniffedDataChunk = null)
+    private void RelayChunk(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, int chunkSize, string chunkSizeHexString, byte[] serverNewlineBytes, SniffedDataChunk sniffedDataChunk = null)
     {
       int bytesRead = 0;
       int dataVolume = 0;
-      int newLineLength = System.Environment.NewLine.Length;
 
       // Write packet size to server data stream
-      string chunkSizeHexStringTmp = chunkSizeHexString + Environment.NewLine;
-      byte[] chunkSizeDeclaration = Encoding.UTF8.GetBytes(chunkSizeHexStringTmp);
+      byte[] chunkSizeDeclaration = Encoding.UTF8.GetBytes(chunkSizeHexString);
       outputStreamWriter.Write(chunkSizeDeclaration, 0, chunkSizeDeclaration.Length);
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
 
       byte[] dataBlock = this.ReceiveChunk(chunkSize, inputStreamReader);
       Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.RelayChunk(): ChunkSize:{0}, binaryDataBlock.Length:{1}", chunkSize, dataBlock.Length);
@@ -427,19 +420,16 @@
       }
 
       // Send trailing CRLF to finish chunk transmission
-      string trailingNewLine = inputStreamReader.ReadLine(true);
-      byte[] newLine = Encoding.UTF8.GetBytes(trailingNewLine);
-      outputStreamWriter.Write(newLine, 0, newLine.Length);
+      inputStreamReader.ReadLine();
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
 
       outputStreamWriter.Flush();
       dataVolume += bytesRead;
     }
 
 
-    private void ProcessAndRelayChunk(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, int chunkSize, string chunkSizeHexString, Encoding contentCharsetEncoding)
+    private void ProcessAndRelayChunk(MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, int chunkSize, string chunkSizeHexString, Encoding contentCharsetEncoding, byte[] serverNewlineBytes)
     {
-      int newLineLength = System.Environment.NewLine.Length;
-
       // Read all bytes from server stream
       byte[] binaryDataBlock = this.ReceiveChunk(chunkSize, inputStreamReader);
       Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ProcessAndRelayChunk(): ChunkSize:{0}, binaryDataBlock.Length:{1}", chunkSize, binaryDataBlock.Length);
@@ -454,17 +444,17 @@
       DataPacket serverDataPacket = new DataPacket(binaryDataBlock, contentCharsetEncoding);
 
       // Send chunk size to recepient
-      string chunkSizeHexStringTmp = serverDataPacket.ContentData.Length.ToString("x") + Environment.NewLine;
+      string chunkSizeHexStringTmp = serverDataPacket.ContentData.Length.ToString("x");
       byte[] chunkSizeDeclaration = contentCharsetEncoding.GetBytes(chunkSizeHexStringTmp);
       outputStreamWriter.Write(chunkSizeDeclaration, 0, chunkSizeDeclaration.Length);
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
 
       // Send data packet to recipient
       outputStreamWriter.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
 
-      // Send trailing CRLF to finish chunk transmission
-      string trailingNewLine = inputStreamReader.ReadLine(true);
-      byte[] newLine = Encoding.UTF8.GetBytes(trailingNewLine);
-      outputStreamWriter.Write(newLine, 0, newLine.Length);
+      // Send trailing newline to finish chunk transmission
+      inputStreamReader.ReadLine();
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
       outputStreamWriter.Flush();
 
       Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientRaw.ProcessAndRelayChunk(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", chunkSize, serverDataPacket.ContentData.Length);

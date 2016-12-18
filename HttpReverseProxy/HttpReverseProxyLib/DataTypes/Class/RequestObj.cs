@@ -28,7 +28,7 @@
     private ServerStatusResponse serverStatusResponseObj;
     private ServerResponseMetaData serverResponseMetaDataObj;
 
-    private string serverResponseData;
+//private string serverResponseData;
     private DataTransmissionMode proxyDataTransmissionModeS2C;
     private DataTransmissionMode proxyDataTransmissionModeC2S;
 
@@ -37,7 +37,8 @@
     private string id;
     private string httpLogData;
 
-    private StatusLine serverStatusLine;
+    private ServerStatusLine serverStatusLine;
+    private ClientRequestLine clientRequestLine;
 
     #endregion
 
@@ -56,6 +57,7 @@
 
     // Client HTTP connection
     public ClientRequest ClientRequestObj { get { return this.clientRequestObj; } set { } }
+//    public ClientRequestLine ClientRequestLine { get { return this.clientRequestLine; } set { this.clientRequestLine = value; } }
 
 
     // Server HTTP connection
@@ -63,12 +65,13 @@
 
     public IOutgoingRequestClient ServerRequestHandler { get { return this.serverRequestHandler; } set { this.serverRequestHandler = value; } }
 
+
     public ServerStatusResponse ServerStatusResponseObj { get { return this.serverStatusResponseObj; } set { this.serverStatusResponseObj = value; } }
-
     public ServerResponseMetaData ServerResponseMetaDataObj { get { return this.serverResponseMetaDataObj; } set { this.serverResponseMetaDataObj = value; } }
+    public ServerStatusLine ServerStatusLine { get { return this.serverStatusLine; } set { this.serverStatusLine = value; } }
 
 
-    public string ServerResponseData { get { return this.serverResponseData; } set { this.serverResponseData = value; } }
+    //public string ServerResponseData { get { return this.serverResponseData; } set { this.serverResponseData = value; } }
 
     public DataTransmissionMode ProxyDataTransmissionModeS2C { get { return this.proxyDataTransmissionModeS2C; } set { this.proxyDataTransmissionModeS2C = value; } }
 
@@ -83,7 +86,7 @@
     public string HttpLogData { get { return this.httpLogData; } set { this.httpLogData = value; } }
 
 
-    public StatusLine ServerStatusLine { get { return this.serverStatusLine; } set { this.serverStatusLine = value; } }
+
 
     #endregion
 
@@ -117,7 +120,7 @@
       {
         this.Id = this.Id.Replace(".", string.Empty); // Remove period.
       }
-      catch (Exception ex)
+      catch (Exception)
       {
         this.Id = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff");
       }
@@ -133,18 +136,17 @@
       this.ClientRequestObj.ClientRequestContentLength = 0;
       this.ClientRequestObj.ClientRequestData = string.Empty;
       this.clientRequestObj.ClientRequestHeaders.Clear();
-      this.ClientRequestObj.ClientRequestLine = string.Empty;
 
       this.ClientRequestObj.ContentTypeEncoding.ContentCharSet = "UTF-8";
       this.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.UTF8;
       this.ClientRequestObj.ContentTypeEncoding.ContentType = "text/html";
 
-      this.ClientRequestObj.Host = string.Empty;
-      this.ClientRequestObj.HttpVersion = string.Empty;
+      this.ClientRequestObj.RequestLine.MethodString = string.Empty;
+      this.ClientRequestObj.RequestLine.Path = string.Empty;
+      this.ClientRequestObj.RequestLine.HttpVersion = string.Empty;
+      this.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.Undefined;
       this.ClientRequestObj.IsClientKeepAlive = false;
-      this.ClientRequestObj.MethodString = string.Empty;
-      this.ClientRequestObj.Path = string.Empty;
-      this.ClientRequestObj.RequestMethod = RequestMethod.Undefined;
+      this.ClientRequestObj.Host = string.Empty;
       this.ClientRequestObj.Scheme = string.Empty;
 
       // Reset server settings

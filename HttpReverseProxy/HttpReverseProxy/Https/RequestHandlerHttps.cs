@@ -71,21 +71,23 @@
 
         try
         {
-          // 1. Read Client request and pass request, headers and data to plugins
+          // 0. Read Client request line
+          this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestLine(this.requestObj);
+
+          // 1. Read Client request headers 
           this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestHeaders(this.requestObj);
           Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpsReverseProxy.ProcessClientRequest(): Data transmission mode C2S is: {0}", this.requestObj.ProxyDataTransmissionModeC2S.ToString());
 
-          // 4. Forward client request data to the server
+          // 2. Forward client request data to the server
           this.ForwardClientRequestToServer();
 
-          // 6. Determine data transmission mode S2C
+          // 3. Determine data transmission mode S2C
           this.DetermineDataTransmissionModeS2C(this.requestObj);
           Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpsReverseProxy.ProcessClientRequest(): Data transmission mode S2C is: {0}", this.requestObj.ProxyDataTransmissionModeS2C);
 
           bool mustBeProcessed = false;
-          this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerStatusResponseObj);
-
-          this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseMetaDataObj.ResponseHeaders);
+          this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerStatusResponseObj, this.requestObj.ServerStatusLine.NewlineBytes);
+          this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseMetaDataObj.ResponseHeaders, this.requestObj.ServerStatusLine.NewlineBytes);
           this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
 
           Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpsReverseProxy.ProcessClientRequest(): DONE! All data transferred to client");
@@ -240,16 +242,13 @@
       // Reasons : Plugin.SslStripn: Http redirect cache record
       //           Plugin.SslStripn: Hsts cache record
       //           Plugin.SslStripn: SslStrip cache record
-      
       this.requestObj.ServerRequestHandler = new ToServer.TcpClientSsl(this.requestObj, this.requestObj.ClientRequestObj.ClientBinaryReader, this.requestObj.ClientRequestObj.ClientBinaryWriter);
       Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpsReverseProxy.ForwardClientRequestToServer(): Create HTTPS socket connection to {0}", this.requestObj.ClientRequestObj.Host);
 
-
-
       // 4. Send tcp-client request headers to remoteSocket
       this.requestObj.ServerRequestHandler.OpenServerConnection(this.requestObj.ClientRequestObj.Host);
-      this.requestObj.ServerRequestHandler.ForwardRequestC2S(this.requestObj.ClientRequestObj.MethodString, this.requestObj.ClientRequestObj.Path, this.requestObj.ClientRequestObj.HttpVersion);
-      this.requestObj.ServerRequestHandler.ForwardHeadersC2S(this.requestObj.ClientRequestObj.ClientRequestHeaders);
+      this.requestObj.ServerRequestHandler.ForwardRequestC2S(this.requestObj.ClientRequestObj.RequestLine.MethodString, this.requestObj.ClientRequestObj.RequestLine.Path, this.requestObj.ClientRequestObj.RequestLine.HttpVersion, this.requestObj.ClientRequestObj.RequestLine.NewlineBytes);
+      this.requestObj.ServerRequestHandler.ForwardHeadersC2S(this.requestObj.ClientRequestObj.ClientRequestHeaders, this.requestObj.ServerStatusLine.NewlineBytes); //, this.requestObj.ServerStatusLine.NewlineBytes);
 
       // 5. Send tcp-client request data to remoteSocket
       SniffedDataChunk sniffedDataChunk = new SniffedDataChunk(Config.MaxSniffedClientDataSize);
@@ -257,7 +256,7 @@
       this.EditClientRequestData(this.requestObj, sniffedDataChunk);
 
       // 6 Read remotesocket response headers
-      this.requestObj.ServerRequestHandler.ReadServerStatusLine(this.requestObj.ServerStatusResponseObj);
+      this.requestObj.ServerStatusLine = this.requestObj.ServerRequestHandler.ReadServerStatusLine(this.requestObj.ServerStatusResponseObj);
       this.requestObj.ServerRequestHandler.ReadServerResponseHeaders(this.requestObj.ServerResponseMetaDataObj);
     }
 
