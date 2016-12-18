@@ -14,9 +14,11 @@
 
     #region PROPERTIES
 
-    public string HttpVersion { get { return httpVersion; } set { httpVersion = value; } }
-    public string StatusCode { get { return statusCode; } set { statusCode = value; } }
-    public string StatusDescription { get { return statusDescription; } set { statusDescription = value; } }
+    public string HttpVersion { get { return this.httpVersion; } set { this.httpVersion = value; } }
+
+    public string StatusCode { get { return this.statusCode; } set { this.statusCode = value; } }
+
+    public string StatusDescription { get { return this.statusDescription; } set { this.statusDescription = value; } }
 
     #endregion
 
