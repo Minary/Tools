@@ -15,18 +15,18 @@
     void CloseServerConnection();
 
     // Server header transfer
-    void ForwardRequestC2S(string requestMethod, string path, string httpVersion);
+    void ForwardRequestC2S(string requestMethod, string path, string httpVersion, byte[] newlineBytes);
 
-    void ForwardHeadersC2S(Hashtable requestHeaders);
+    void ForwardHeadersC2S(Hashtable requestHeaders, byte[] clientNewlineBytes);
 
-    void ReadServerStatusLine(ServerStatusResponse serverStatusResponse);
+    ServerStatusLine ReadServerStatusLine(ServerStatusResponse serverStatusResponse);
 
     void ReadServerResponseHeaders(ServerResponseMetaData serverResponseMetaDataObj);
 
     // Client header transfer
-    void ForwardStatusLineS2C(ServerStatusResponse serverStdatusResponseObj);
+    void ForwardStatusLineS2C(ServerStatusResponse serverStdatusResponseObj, byte[] serverNewlineBytes);
 
-    void ForwardHeadersS2C(Hashtable serverResponseHeaders);
+    void ForwardHeadersS2C(Hashtable serverResponseHeaders, byte[] clientNewlineBytes);
 
     // Client/Server data transfer
     void RelayDataC2S(bool mustBeProcessed, SniffedDataChunk dataChunk);

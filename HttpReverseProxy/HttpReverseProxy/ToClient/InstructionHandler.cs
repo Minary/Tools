@@ -42,7 +42,7 @@ namespace HttpReverseProxy.ToClient
         throw new ProxyWarningException("Redirect URL is invalid");
       }
 
-      string redirectData = Header.Redirect.GetHeader(redirectUrl);
+      string redirectData = Header.Redirect.GetHeader(redirectUrl, requestObj.ServerStatusLine.NewlineString);
       byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectData);
       this.tcpClientConnection.SendToClient(redirectDataByteArray, requestObj.ClientRequestObj.ClientBinaryWriter);
     }
@@ -66,7 +66,7 @@ namespace HttpReverseProxy.ToClient
       }
 
       byte[] fileData = File.ReadAllBytes(injectFilePath);
-      string redirectData = Header.SendFile.GetHeader(injectFilePath, fileData.Count());
+      string redirectData = Header.SendFile.GetHeader(injectFilePath, fileData.Count(), requestObj.ServerStatusLine.NewlineString);
       byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectData);
 
       this.tcpClientConnection.SendToClient(redirectDataByteArray, requestObj.ClientRequestObj.ClientBinaryWriter);

@@ -34,10 +34,10 @@
     }
 
 
-    public StatusLine ReadStatusLine(bool keepTrailingNewline = false)
+    public ClientRequestLine ReadClientRequestLine(bool keepTrailingNewline = false)
     {
       bool carriageReturnDetected = false;
-      StatusLine serverStatusLine = new StatusLine();
+      ClientRequestLine clientRequestLine = new ClientRequestLine();
       StringBuilder result = new StringBuilder();
       bool foundEndOfLine = false;
       char currentChar;
@@ -50,7 +50,7 @@
         }
         catch (EndOfStreamException ex)
         {
-          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): Client request header: {0}", ex.Message);
+          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadClientRequestLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (result.Length == 0)
           {
@@ -79,14 +79,75 @@
       }
 
       // Populate status line object
-      serverStatusLine.ServerStatusLine = result.ToString();
-      serverStatusLine.NewlineType = carriageReturnDetected?Newline.CRLF:Newline.LF;
-      serverStatusLine.NewlineRepresentation = carriageReturnDetected ? new byte[] { 0x0D, 0x0A } : new byte[] { 0x0A };
+      clientRequestLine.RequestLine = result.ToString();
+      clientRequestLine.NewlineType = carriageReturnDetected ? Newline.CRLF : Newline.LF;
+      clientRequestLine.NewlineBytes = carriageReturnDetected ? new byte[] { 0x0D, 0x0A } : new byte[] { 0x0A };
+      clientRequestLine.NewlineString = Encoding.UTF8.GetString(clientRequestLine.NewlineBytes);
 
       // Remove trailing newlines if required.
       if (!keepTrailingNewline)
       {
-        serverStatusLine.ServerStatusLine = serverStatusLine.ServerStatusLine.TrimEnd();
+        clientRequestLine.RequestLine = clientRequestLine.RequestLine.TrimEnd();
+      }
+
+      return clientRequestLine;
+    }
+
+
+    public ServerStatusLine ReadServerStatusLine(bool keepTrailingNewline = false)
+    {
+      bool carriageReturnDetected = false;
+      ServerStatusLine serverStatusLine = new ServerStatusLine();
+      StringBuilder result = new StringBuilder();
+      bool foundEndOfLine = false;
+      char currentChar;
+
+      while (!foundEndOfLine)
+      {
+        try
+        {
+          currentChar = base.ReadChar();
+        }
+        catch (EndOfStreamException ex)
+        {
+          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadServerStatusLine(EndOfStreamException): Client request header: {0}", ex.Message);
+
+          if (result.Length == 0)
+          {
+            return null;
+          }
+          else
+          {
+            break;
+          }
+        }
+
+        switch (currentChar)
+        {
+          case '\r':
+            result.Append(currentChar);
+            carriageReturnDetected = true;
+            break;
+          case '\n':
+            result.Append(currentChar);
+            foundEndOfLine = true;
+            break;
+          default:
+            result.Append(currentChar);
+            break;
+        }
+      }
+
+      // Populate status line object
+      serverStatusLine.StatusLine = result.ToString();
+      serverStatusLine.NewlineType = carriageReturnDetected?Newline.CRLF:Newline.LF;
+      serverStatusLine.NewlineBytes = carriageReturnDetected ? new byte[] { 0x0D, 0x0A } : new byte[] { 0x0A };
+      serverStatusLine.NewlineString = Encoding.UTF8.GetString(serverStatusLine.NewlineBytes);
+
+      // Remove trailing newlines if required.
+      if (!keepTrailingNewline)
+      {
+        serverStatusLine.StatusLine = serverStatusLine.StatusLine.TrimEnd();
       }
 
       return serverStatusLine;

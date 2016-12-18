@@ -22,18 +22,19 @@ namespace HttpReverseProxy.ToClient.Header
 
     #region PUBLIC
 
-    public static string GetHeader(string locationParam)
+    public static string GetHeader(string locationParam, string serverNewLine)
     {
       location = string.Format("Location: {0}", locationParam);
       date = string.Format("Date: {0}", DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture));
-      string header = string.Join(Environment.NewLine,
+      string header = string.Join(
+                                  serverNewLine,
                                   statusLine,
                                   server,
                                   date,
                                   contentLength,
                                   location,
                                   connection,
-                                  Environment.NewLine);
+                                  serverNewLine);
 
       return header;
     }

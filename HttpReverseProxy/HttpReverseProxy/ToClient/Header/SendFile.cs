@@ -24,13 +24,14 @@ namespace HttpReverseProxy.ToClient.Header
 
     #region PUBLIC
 
-    public static string GetHeader(string injectFilePath, int fileContentLength)
+    public static string GetHeader(string injectFilePath, int fileContentLength, string serverNewLine)
     {
       date = string.Format("Date: {0}", DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture));
       contentLength = string.Format("Content-Length: {0}", fileContentLength);
       contentDisposition = string.Format(@"Content-Disposition: attachment; filename=""{0}""", Path.GetFileName(injectFilePath));
-      
-      string header = string.Join(Environment.NewLine,
+
+      string header = string.Join(
+                                  serverNewLine,
                                   statusLine,
                                   server,
                                   date,
@@ -38,7 +39,7 @@ namespace HttpReverseProxy.ToClient.Header
                                   contentType,
                                   contentDisposition,
                                   connection,
-                                  Environment.NewLine);
+                                  serverNewLine);
 
       return header;
     }

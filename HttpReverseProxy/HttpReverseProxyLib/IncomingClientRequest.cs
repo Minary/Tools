@@ -29,20 +29,28 @@
     }
 
 
+    public void ReceiveClientRequestLine(RequestObj requestObj)
+    {
+      // 1. Read client HTTP request line (the GET/POST/PUT/... line)
+      requestObj.ClientRequestObj.RequestLine = requestObj.ClientRequestObj.ClientBinaryReader.ReadClientRequestLine(false);
+      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : StatusLine={0}", requestObj.ClientRequestObj.RequestLine.RequestLine);
+      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : NewlineType={0}", requestObj.ClientRequestObj.RequestLine.NewlineType);
+
+
+      // 2. Parse and verify request line parameters
+      this.ParseRequestString(requestObj);
+    }
+
     /// <summary>
     ///
     /// </summary>
     /// <param name="requestObj"></param>
     public void ReceiveClientRequestHeaders(RequestObj requestObj)
     {
-      // 1. Read client HTTP request line (the GET/POST/PUT/... line)
-      requestObj.ClientRequestObj.ClientRequestLine = requestObj.ClientRequestObj.ClientBinaryReader.ReadLine(false);
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : HTTP Request string: {0} {1}", requestObj.ClientRequestObj.MethodString, requestObj.ClientRequestObj.ClientRequestLine);
-
-      // 2. Read the client request headers
+      // 1. Read the client request headers
       this.ParseClientRequestHeaders(requestObj);
 
-      // 3. Handle the Host header
+      // 2. Handle the Host header
       if (!requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
       {
         ClientNotificationException exception = new ClientNotificationException();
@@ -52,9 +60,6 @@
 
       requestObj.ClientRequestObj.Host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"].ToString();
       requestObj.ClientRequestObj.Scheme = "http";
-
-      // Verify if request parameters are correct.
-      this.ParseRequestString(requestObj);
 
 //// Parse Client request content type
 // this.DetermineClientRequestContentType(requestObj);
@@ -97,21 +102,21 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
         throw new Exception("Request object is invalid");
       }
 
-      if (string.IsNullOrEmpty(requestObj.ClientRequestObj.ClientRequestLine))
+      if (string.IsNullOrEmpty(requestObj.ClientRequestObj.RequestLine.RequestLine))
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
 
-      if (!requestObj.ClientRequestObj.ClientRequestLine.Contains(' '))
+      if (!requestObj.ClientRequestObj.RequestLine.RequestLine.Contains(' '))
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
 
-      string[] requestSplitBuffer = requestObj.ClientRequestObj.ClientRequestLine.Split(new char[] { ' ' }, 3);
+      string[] requestSplitBuffer = requestObj.ClientRequestObj.RequestLine.RequestLine.Split(new char[] { ' ' }, 3);
       if (requestSplitBuffer.Count() != 3)
       {
         ClientNotificationException exception = new ClientNotificationException();
@@ -141,54 +146,54 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
       }
 
       // Evaluate request method
-      requestObj.ClientRequestObj.MethodString = requestSplitBuffer[0];
-      requestObj.ClientRequestObj.Path = requestSplitBuffer[1];
-      requestObj.ClientRequestObj.HttpVersion = requestSplitBuffer[2];
+      requestObj.ClientRequestObj.RequestLine.MethodString = requestSplitBuffer[0];
+      requestObj.ClientRequestObj.RequestLine.Path = requestSplitBuffer[1];
+      requestObj.ClientRequestObj.RequestLine.HttpVersion = requestSplitBuffer[2];
 
-      if (requestObj.ClientRequestObj.MethodString == "GET")
+      if (requestObj.ClientRequestObj.RequestLine.MethodString == "GET")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.GET;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.GET;
       }
-      else if (requestObj.ClientRequestObj.MethodString == "POST")
+      else if (requestObj.ClientRequestObj.RequestLine.MethodString == "POST")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.POST;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.POST;
       }
-      else if (requestObj.ClientRequestObj.MethodString == "HEAD")
+      else if (requestObj.ClientRequestObj.RequestLine.MethodString == "HEAD")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.HEAD;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.HEAD;
       }
-      else if (requestObj.ClientRequestObj.MethodString == "PUT")
+      else if (requestObj.ClientRequestObj.RequestLine.MethodString == "PUT")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.PUT;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.PUT;
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.MethodNotAllowed);
         throw exception;
       }
-      else if (requestObj.ClientRequestObj.MethodString == "DELETE")
+      else if (requestObj.ClientRequestObj.RequestLine.MethodString == "DELETE")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.DELETE;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.DELETE;
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.MethodNotAllowed);
         throw exception;
       }
-      else if (requestObj.ClientRequestObj.MethodString == "OPTIONS")
+      else if (requestObj.ClientRequestObj.RequestLine.MethodString == "OPTIONS")
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.OPTIONS;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.OPTIONS;
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.MethodNotAllowed);
         throw exception;
       }
       else
       {
-        requestObj.ClientRequestObj.RequestMethod = RequestMethod.Undefined;
+        requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.Undefined;
       }
 
-      if (!requestObj.ClientRequestObj.Path.StartsWith("/"))
+      if (!requestObj.ClientRequestObj.RequestLine.Path.StartsWith("/"))
       {
-        requestObj.ClientRequestObj.Path = string.Format("/{0}", requestObj.ClientRequestObj.Path);
+        requestObj.ClientRequestObj.RequestLine.Path = string.Format("/{0}", requestObj.ClientRequestObj.RequestLine.Path);
       }
 
-      requestObj.HttpLogData = requestObj.ClientRequestObj.ClientRequestLine.Trim();
+      requestObj.HttpLogData = requestObj.ClientRequestObj.RequestLine.RequestLine.Trim();
     }
 
 
@@ -441,7 +446,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientR
 
       // Transfer behavior is "Relay blindly"
       }
-      else if (requestObj.ClientRequestObj.RequestMethod == RequestMethod.POST)
+      else if (requestObj.ClientRequestObj.RequestLine.RequestMethod == RequestMethod.POST)
       {
         Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ReadOneLine");
         return DataTransmissionMode.ReadOneLine;
