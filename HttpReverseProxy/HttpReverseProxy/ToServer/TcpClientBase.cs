@@ -43,7 +43,7 @@
 
     virtual public void OpenServerConnection(string host)
     {
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.OpenServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.OpenServerConnection()");
 
       if (string.IsNullOrEmpty(host))
       {
@@ -54,7 +54,7 @@
       this.httpWebServerSocket.NoDelay = true;
       this.httpWebServerSocket.Connect(host, this.remoteTcpPort);
 
-      this.webServerStreamReader = new MyBinaryReader(this.httpWebServerSocket.GetStream(), 8192, Encoding.UTF8, this.requestObj.Id);
+      this.webServerStreamReader = new MyBinaryReader(this.requestObj.ProxyProtocol, this.httpWebServerSocket.GetStream(), 8192, Encoding.UTF8, this.requestObj.Id);
       this.webServerStreamWriter = new BinaryWriter(this.httpWebServerSocket.GetStream());
     }
 
@@ -65,7 +65,7 @@
     /// <param name="pNetworkStream"></param>
     public virtual void CloseServerConnection()
     {
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.CloseServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.CloseServerConnection()");
 
       if (this.webServerStreamReader != null)
       {
@@ -134,7 +134,7 @@
         headerString = string.Format("{0}: {1}", tmpKey, requestHeaders[tmpKey]);
         headerByteArray = Encoding.UTF8.GetBytes(headerString);
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ForwardHeadersC2S(): Header Client2Server: {0}", headerString);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ForwardHeadersC2S(): Header Client2Server: {0}", headerString);
         this.webServerStreamWriter.Write(headerByteArray, 0, headerByteArray.Length);
         this.webServerStreamWriter.Write(clientNewlineBytes, 0, clientNewlineBytes.Length);
       }
@@ -150,8 +150,8 @@
       string[] headerSplitter = new string[3];
       requestObj.ServerResponseObj.StatusLine = this.webServerStreamReader.ReadServerStatusLine(false);
 
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): StatusLine={0}", requestObj.ServerResponseObj.StatusLine.StatusLine);
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): NewlineType={0}", requestObj.ServerResponseObj.StatusLine.NewlineType);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): StatusLine={0}", requestObj.ServerResponseObj.StatusLine.StatusLine);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): NewlineType={0}", requestObj.ServerResponseObj.StatusLine.NewlineType);
 
       // Evaluate response status line
       headerSplitter = requestObj.ServerResponseObj.StatusLine.StatusLine.Split(new char[] { ' ', '\t' }, 3);
@@ -181,11 +181,11 @@
         key = headerTuple[0].Trim();
         value = headerTuple[1].Trim();
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Adding headerByteArray \"{0}\" with value \"{1}\" ", key, value);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Adding headerByteArray \"{0}\" with value \"{1}\" ", key, value);
 
         if (serverResponseMetaDataObj.ResponseHeaders.ContainsKey(key))
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Header \"{0}\" (value:\"{1}\") already exists! Removing it now!", key, value);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Header \"{0}\" (value:\"{1}\") already exists! Removing it now!", key, value);
           serverResponseMetaDataObj.ResponseHeaders.Remove(key);
         }
 
@@ -209,19 +209,19 @@
       }
       catch (ProxyWarningException pex)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "TcpClientBase.ReadServerResponseHeaders(Exception): Could not determine content type: {0}", pex.Message);
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "TcpClientBase.ReadServerResponseHeaders(Exception): Setting default content type=text/html, charset=UTF-8");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.INFO, "TcpClientBase.ReadServerResponseHeaders(Exception): Could not determine content type: {0}", pex.Message);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.INFO, "TcpClientBase.ReadServerResponseHeaders(Exception): Setting default content type=text/html, charset=UTF-8");
 
         serverResponseMetaDataObj.ContentTypeEncoding.ContentType = "text/html";
         serverResponseMetaDataObj.ContentTypeEncoding.ContentCharSet = "UTF-8";
         serverResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(serverResponseMetaDataObj.ContentTypeEncoding.ContentCharSet);
       }
 
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Server response content type: {0}, {1}", serverResponseMetaDataObj.ContentTypeEncoding.ContentType, serverResponseMetaDataObj.ContentTypeEncoding.ContentCharSet);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Server response content type: {0}, {1}", serverResponseMetaDataObj.ContentTypeEncoding.ContentType, serverResponseMetaDataObj.ContentTypeEncoding.ContentCharSet);
 
       // Parse Client request content length
       this.DetermineServerResponseContentLength(serverResponseMetaDataObj);
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Server response content length: {0}", serverResponseMetaDataObj.ContentLength);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Server response content length: {0}", serverResponseMetaDataObj.ContentLength);
     }
 
     #endregion
@@ -234,7 +234,7 @@
       string statusLineStr = string.Format("{0} {1} {2}", serverResponseStatusLine.HttpVersion, serverResponseStatusLine.StatusCode, serverResponseStatusLine.StatusDescription);
       byte[] statusLineByteArr = Encoding.UTF8.GetBytes(statusLineStr);
 
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ForwardStatusLineS2C(): statusLineStr: |{0}|", statusLineStr);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.ForwardStatusLineS2C(): statusLineStr: |{0}|", statusLineStr);
       this.clientStreamWriter.Write(statusLineByteArr, 0, statusLineByteArr.Length);
       this.clientStreamWriter.Write(serverResponseStatusLine.NewlineBytes, 0, serverResponseStatusLine.NewlineBytes.Length);
     }
@@ -270,14 +270,14 @@
       // 1. No data to relay/process
       if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.NoDataToTransfer)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.NoDataToTransfer");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.NoDataToTransfer");
 
       // 2.0 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.Chunked && !mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:false");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:false");
         this.ForwardChunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes, sniffedDataChunk);
 
       // 2.1 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
@@ -285,7 +285,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ContentLength && !mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, processed:false");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, processed:false");
         this.ForwardNonchunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ClientRequestContentLength, sniffedDataChunk);
 
       // 2.2 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
@@ -293,7 +293,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ReadOneLine && !mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ReadOneLine, processed:false");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ReadOneLine, processed:false");
         this.ForwardSingleLineNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, sniffedDataChunk);
 
 
@@ -306,7 +306,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.Chunked && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:true");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:true");
         this.ForwardChunkedProcessedDataChunks(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes, sniffedDataChunk);
 
 
@@ -315,7 +315,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ContentLength && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ClientRequestObj.ClientRequestContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ClientRequestObj.ClientRequestContentLength);
         this.ForwardNonchunkedProcessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ClientRequestContentLength, sniffedDataChunk);
 
       // 3.2 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
@@ -323,7 +323,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ReadOneLine && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ReadOneLine, processed:true");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ReadOneLine, processed:true");
         this.ForwardSingleLineProcessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, sniffedDataChunk);
 
 
@@ -335,14 +335,14 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.RelayBlindly)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ClientRequestObj.ClientRequestContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ClientRequestObj.ClientRequestContentLength);
         this.BlindlyRelayData(this.clientStreamReader, this.webServerStreamWriter, sniffedDataChunk);
 
       // 5 This state actually should never happen! No idea what to do at this point :/
       }
       else
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): ContentLength:{0}, processed:false", this.requestObj.ClientRequestObj.ClientRequestContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): ContentLength:{0}, processed:false", this.requestObj.ClientRequestObj.ClientRequestContentLength);
         this.ForwardNonchunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ClientRequestContentLength, sniffedDataChunk);
       }
     }
@@ -355,7 +355,7 @@
       // 1. No data to relay/process
       if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.NoDataToTransfer)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.NoDataToTransfer");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.NoDataToTransfer");
 
 
 
@@ -366,7 +366,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && !mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:false");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:false");
         this.ForwardChunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
 
 
@@ -375,7 +375,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.ContentLength && !mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, processed:false");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, processed:false");
         // this.ForwardChunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter);
         this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
 
@@ -386,7 +386,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:true");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:true");
         this.ForwardChunkedProcessedDataChunks(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
 
 
@@ -395,7 +395,7 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.ContentLength && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
         this.ForwardNonchunkedProcessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
 
 
@@ -408,14 +408,14 @@
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.RelayBlindly)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
         this.BlindlyRelayData(this.webServerStreamReader, this.clientStreamWriter);
 
       // 5 This state actually should never happen! No idea what to do at this point :/
       }
       else
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): ContentLength:{0}, processed:false", this.requestObj.ServerResponseObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): ContentLength:{0}, processed:false", this.requestObj.ServerResponseObj.ContentLength);
         this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
       }
     }
@@ -460,7 +460,7 @@
       {
       }
 
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.DumpstringDetails():  |{0}| |{1}|", data, hexResult);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.DumpstringDetails():  |{0}| |{1}|", data, hexResult);
     }
 
 
@@ -480,7 +480,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.ERROR, "TcpClientBase.ReceiveServerResponsetHeaders(EXCEPTION/1): {0}", ex.Message);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.ERROR, "TcpClientBase.ReceiveServerResponsetHeaders(EXCEPTION/1): {0}", ex.Message);
         serverResponseMetaDataObj.ContentLength = 0;
       }
     }
@@ -513,7 +513,7 @@
         contentTypeEncoding.ContentCharSet = "UTF-8";
         contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
 
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): No Content-Type header found: text/html, UTF-8");
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): No Content-Type header found: text/html, UTF-8");
         return contentTypeEncoding;
       }
 
@@ -528,14 +528,14 @@
           contentTypeEncoding.ContentType = splitter[0];
           contentTypeEncoding.ContentCharSet = this.DetermineContentCharSet(splitter[1]);
           contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): Content-Type/Charset header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): Content-Type/Charset header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
         }
         else
         {
           contentTypeEncoding.ContentType = contentType;
           contentTypeEncoding.ContentCharSet = "UTF-8";
           contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-          Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): Content-Type (noCharset) header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(): Content-Type (noCharset) header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
         }
       }
       catch (Exception ex)
@@ -543,7 +543,7 @@
         contentTypeEncoding.ContentType = "text/html";
         contentTypeEncoding.ContentCharSet = "UTF-8";
         contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(Exception): text/html, UTF-8 {0}", ex.Message);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientBase.DetermineClientRequestContentTypeEncoding(Exception): text/html, UTF-8 {0}", ex.Message);
       }
 
       return contentTypeEncoding;

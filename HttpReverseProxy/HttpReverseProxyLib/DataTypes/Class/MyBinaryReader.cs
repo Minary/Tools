@@ -14,6 +14,7 @@
     #region MEMBERS
 
     private const int BufferSize = 1024;
+    private ProxyProtocol proxyProtocol;
     private Encoding encoding;
     private Decoder decoder;
     private char[] lineBuffer = new char[BufferSize];
@@ -24,7 +25,7 @@
 
     #region PUBLIC
 
-    public MyBinaryReader(Stream stream, int bufferSize, Encoding encoding, string clientConnectionId)
+    public MyBinaryReader(ProxyProtocol proxyProtocol, Stream stream, int bufferSize, Encoding encoding, string clientConnectionId)
       : base(stream, encoding)
     {
       this.encoding = encoding;
@@ -52,7 +53,7 @@
         }
         catch (EndOfStreamException ex)
         {
-          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadClientRequestLine(EndOfStreamException): Client request header: {0}", ex.Message);
+          Logging.Instance.LogMessage(this.clientConnectionId, this.proxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadClientRequestLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (result.Length == 0)
           {
@@ -112,7 +113,7 @@
         }
         catch (EndOfStreamException ex)
         {
-          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadServerStatusLine(EndOfStreamException): Client request header: {0}", ex.Message);
+          Logging.Instance.LogMessage(this.clientConnectionId, this.proxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadServerStatusLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (result.Length == 0)
           {
@@ -170,7 +171,7 @@
         }
         catch (EndOfStreamException ex)
         {
-          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): Client request header: {0}", ex.Message);
+          Logging.Instance.LogMessage(this.clientConnectionId, this.proxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (result.Length == 0)
           {
@@ -222,7 +223,7 @@
         }
         catch (EndOfStreamException ex)
         {
-          Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadBinaryLine(EndOfStreamException): Client request header: {0}", ex.Message);
+          Logging.Instance.LogMessage(this.clientConnectionId, this.proxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadBinaryLine(EndOfStreamException): Client request header: {0}", ex.Message);
 
           if (memStream.Length == 0)
           {
@@ -248,7 +249,7 @@
             }
             catch (Exception ex)
             {
-              Logging.Instance.LogMessage(this.clientConnectionId, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadBinaryLine(Exception): {0}", ex.Message);
+              Logging.Instance.LogMessage(this.clientConnectionId, this.proxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.MyBinaryReader.ReadBinaryLine(Exception): {0}", ex.Message);
             }
 
             foundEndOfLine = true;

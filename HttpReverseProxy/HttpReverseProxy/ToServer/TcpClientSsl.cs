@@ -56,7 +56,7 @@
     /// <returns></returns>
     public override void OpenServerConnection(string host)
     {
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientSsl.OpenServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientSsl.OpenServerConnection()");
 
       if (string.IsNullOrEmpty(host))
       {
@@ -70,7 +70,7 @@
       this.serverConnectionSslStream = new SslStream(this.httpWebServerSocket.GetStream(), false, new RemoteCertificateValidationCallback(this.ValidateCert));
       this.serverConnectionSslStream.AuthenticateAsClient(host);
 
-      this.webServerStreamReader = new MyBinaryReader(this.serverConnectionSslStream, 8192, Encoding.UTF8, this.requestObj.Id);
+      this.webServerStreamReader = new MyBinaryReader(this.requestObj.ProxyProtocol, this.serverConnectionSslStream, 8192, Encoding.UTF8, this.requestObj.Id);
       this.webServerStreamWriter = new BinaryWriter(this.serverConnectionSslStream);
     }
 
@@ -81,7 +81,7 @@
     /// <param name="pNetworkStream"></param>
     public override void CloseServerConnection()
     {
-      Logging.Instance.LogMessage(base.requestObj.Id, Logging.Level.DEBUG, "TcpClientSsl.CloseServerConnection()");
+      Logging.Instance.LogMessage(base.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientSsl.CloseServerConnection()");
 
       if (this.serverConnectionSslStream != null)
       {

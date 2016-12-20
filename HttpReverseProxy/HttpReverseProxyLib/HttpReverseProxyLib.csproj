@@ -56,6 +56,7 @@
     <Compile Include="DataTypes\Enum\Newline.cs" />
     <Compile Include="DataTypes\Class\Server\ServerResponseStatusLine.cs" />
     <Compile Include="DataTypes\Class\PluginInstruction.cs" />
+    <Compile Include="DataTypes\Enum\ProxyProtocol.cs" />
     <Compile Include="DataTypes\Enum\RedirectType.cs" />
     <Compile Include="DataTypes\Class\RequestMethod.cs" />
     <Compile Include="DataTypes\Class\RequestObj.cs" />

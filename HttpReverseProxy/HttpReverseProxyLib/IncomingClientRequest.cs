@@ -33,8 +33,8 @@
     {
       // 1. Read client HTTP request line (the GET/POST/PUT/... line)
       requestObj.ClientRequestObj.RequestLine = requestObj.ClientRequestObj.ClientBinaryReader.ReadClientRequestLine(false);
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : StatusLine={0}", requestObj.ClientRequestObj.RequestLine.RequestLine);
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : NewlineType={0}", requestObj.ClientRequestObj.RequestLine.NewlineType);
+      Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : StatusLine={0}", requestObj.ClientRequestObj.RequestLine.RequestLine);
+      Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.ReceiveClientRequestHeaders() : NewlineType={0}", requestObj.ClientRequestObj.RequestLine.NewlineType);
 
 
       // 2. Parse and verify request line parameters
@@ -61,15 +61,14 @@
       requestObj.ClientRequestObj.Host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"].ToString();
       requestObj.ClientRequestObj.Scheme = "http";
 
-//// Parse Client request content type
-// this.DetermineClientRequestContentType(requestObj);
-requestObj.ClientRequestObj.ContentTypeEncoding = this.DetermineClientRequestContentTypeEncoding(requestObj);
+      // Parse Client request content type
+      requestObj.ClientRequestObj.ContentTypeEncoding = this.DetermineClientRequestContentTypeEncoding(requestObj);
 
-// Parse Client request content length
-this.DetermineClientRequestContentLength(requestObj);
+      // Parse Client request content length
+      this.DetermineClientRequestContentLength(requestObj);
 
-requestObj.ProxyDataTransmissionModeC2S = this.DetermineDataTransmissionModeC2S(requestObj);
-Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRequestHeaders(): ProxyDataTransmissionModeC2S:{0}", requestObj.ProxyDataTransmissionModeC2S.ToString());
+      requestObj.ProxyDataTransmissionModeC2S = this.DetermineDataTransmissionModeC2S(requestObj);
+      Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "ReceiveClientRequestHeaders(): ProxyDataTransmissionModeC2S:{0}", requestObj.ProxyDataTransmissionModeC2S.ToString());
     }
 
     /*
@@ -212,14 +211,14 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
 
         if (string.IsNullOrEmpty(httpHeader))
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): All headers read", httpHeader);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): All headers read", httpHeader);
           break;
         }
 
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): Client request header: {0}", httpHeader);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): Client request header: {0}", httpHeader);
         if (!httpHeader.Contains(':'))
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): Invalid header |{0}|", httpHeader);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "HttpReverseProxyLib.ParseClientRequestHeaders(): Invalid header |{0}|", httpHeader);
           continue;
         }
 
@@ -287,7 +286,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
             }
             catch (Exception ex)
             {
-              Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, "IncomingClientRequest.ParseClientRequestHeaders(EXCEPTION) : {0}", ex.Message);
+              Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.ERROR, "IncomingClientRequest.ParseClientRequestHeaders(EXCEPTION) : {0}", ex.Message);
             }
 
             break;
@@ -324,7 +323,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
         contentTypeEncoding.ContentCharSet = "UTF-8";
         contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
 
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): No Content-Type header found: text/html, UTF-8");
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): No Content-Type header found: text/html, UTF-8");
         return contentTypeEncoding;
       }
 
@@ -339,14 +338,14 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
           contentTypeEncoding.ContentType = splitter[0];
           contentTypeEncoding.ContentCharSet = this.DetermineContentCharSet(splitter[1]);
           contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): Content-Type/Charset header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): Content-Type/Charset header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
         }
         else
         {
           contentTypeEncoding.ContentType = contentType;
           contentTypeEncoding.ContentCharSet = "UTF-8";
           contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): Content-Type (noCharset) header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(): Content-Type (noCharset) header found: {0}, {1}", contentTypeEncoding.ContentType, contentTypeEncoding.ContentCharSet);
         }
       }
       catch (Exception ex)
@@ -354,7 +353,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
         contentTypeEncoding.ContentType = "text/html";
         contentTypeEncoding.ContentCharSet = "UTF-8";
         contentTypeEncoding.ContentCharsetEncoding = Encoding.GetEncoding(contentTypeEncoding.ContentCharSet);
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(Exception): text/html, UTF-8 {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineClientRequestContentTypeEncoding(Exception): text/html, UTF-8 {0}", ex.Message);
       }
 
       return contentTypeEncoding;
@@ -405,7 +404,7 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.WARNING, "IncomingClientRequest.DetermineClientRequestContentLength(Exception): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.WARNING, "IncomingClientRequest.DetermineClientRequestContentLength(Exception): {0}", ex.Message);
         requestObj.ClientRequestObj.ClientRequestContentLength = 0;
       }
     }
@@ -419,21 +418,21 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ReceiveClientRe
       {
         string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"].ToString();
         requestObj.ClientRequestObj.ClientRequestContentLength = int.Parse(contentLen);
-Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(Content-Length)");
+Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(Content-Length)");
 
         if (requestObj.ClientRequestObj.ClientRequestContentLength > 0)
         {
-Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
+Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
           return DataTransmissionMode.ContentLength;
         }
         else if (requestObj.ClientRequestObj.ClientRequestContentLength == 0)
         {
-Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength == 0");
+Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength == 0");
           return DataTransmissionMode.NoDataToTransfer;
         }
         else
         {
-Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
+Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
           return DataTransmissionMode.Error;
         }
 
@@ -441,21 +440,21 @@ Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientR
       }
       else if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Transfer-Encoding"))
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(ransfer-Encoding)");
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(ransfer-Encoding)");
         return DataTransmissionMode.Chunked;
 
       // Transfer behavior is "Relay blindly"
       }
       else if (requestObj.ClientRequestObj.RequestLine.RequestMethod == RequestMethod.POST)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ReadOneLine");
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ReadOneLine");
         return DataTransmissionMode.ReadOneLine;
 
       // No data to transfer
       }
       else
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): NoDataToTransfer");
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): NoDataToTransfer");
         return DataTransmissionMode.NoDataToTransfer;
       }
     }
