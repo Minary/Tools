@@ -25,7 +25,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      string requestedUrl = string.Format("{0}://{1}{2}", requestObj.ClientRequestObj.Scheme, requestObj.ClientRequestObj.Host, requestObj.ClientRequestObj.Path);
+      string requestedUrl = string.Format("{0}://{1}{2}", requestObj.ClientRequestObj.Scheme, requestObj.ClientRequestObj.Host, requestObj.ClientRequestObj.RequestLine.Path);
 
       // 1. If requested Url was HTML SSL stripped
       //    -> replace "http" by "https"
@@ -34,8 +34,8 @@
         HostRecord tmpHost = CacheSslStrip.Instance.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
         requestObj.ClientRequestObj.Scheme = tmpHost.Scheme;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
-        requestObj.ClientRequestObj.Path = tmpHost.Path;
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): SslStripped from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
+        requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): SslStripped from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
       }
 
       // 2. If requested Url was detected to be redirected
@@ -45,8 +45,8 @@
         HostRecord tmpHost = CacheRedirect.Instance.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
         requestObj.ClientRequestObj.Scheme = tmpHost.Scheme;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
-        requestObj.ClientRequestObj.Path = tmpHost.Path;
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): HTTP redirect(301/302) from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
+        requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
+        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): HTTP redirect(301/302) from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
       }
 
       // 3. If requested host was flaged to use HTTPS because of HSTS

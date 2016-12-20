@@ -19,7 +19,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if (requestObj.ServerResponseMetaDataObj == null)
+      if (requestObj.ServerResponseObj == null)
       {
         throw new ProxyWarningException("The meta data object is invalid");
       }
@@ -29,12 +29,12 @@
         throw new ProxyWarningException("The data packet is invalid");
       }
 
-      if (string.IsNullOrEmpty(requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType))
+      if (string.IsNullOrEmpty(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
       {
         throw new ProxyWarningException("The server response content type is invalid");
       }
 
-      if (!this.pluginConfig.SearchPatterns.ContainsKey(requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType))
+      if (!this.pluginConfig.SearchPatterns.ContainsKey(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
       {
         return;
       }
@@ -47,7 +47,7 @@
       string strippedData = string.Empty;
 
       this.sslStrippedData = dataPacket.DataEncoding.GetString(dataPacket.ContentData, 0, dataPacket.ContentData.Length);
-      this.LocateAllTags(this.sslStrippedData, this.pluginConfig.SearchPatterns[requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
+      this.LocateAllTags(this.sslStrippedData, this.pluginConfig.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
 
       foreach (string tmpKey in foundHttpsTags.Keys)
       {
@@ -58,7 +58,7 @@
       this.sslStrippedData = this.ReplaceRelevantTags(requestObj, this.sslStrippedData, foundHttpsTags);
 
       // 3. Encode content back to the charset the server reported (or default encoding)
-      dataPacket.ContentData = requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding.GetBytes(this.sslStrippedData);
+      dataPacket.ContentData = requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding.GetBytes(this.sslStrippedData);
 
       // 4. Keep SSL stripped URLs in cache
       foreach (string tmpKey in cacheUrlMapping.Keys)

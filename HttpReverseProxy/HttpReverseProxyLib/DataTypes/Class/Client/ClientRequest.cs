@@ -1,6 +1,5 @@
-﻿namespace HttpReverseProxyLib.DataTypes.Class
+﻿namespace HttpReverseProxyLib.DataTypes.Class.Client
 {
-  using HttpReverseProxyLib.DataTypes.Enum;
   using System.Collections;
   using System.IO;
 
@@ -51,12 +50,12 @@
     public int ClientRequestContentLength { get { return this.clientRequestContentLength; } set { this.clientRequestContentLength = value; } }
 
     public string ClientRequestData { get { return this.clientRequestData; } set { this.clientRequestData = value; } }
-    
+
     #endregion
 
 
     #region PUBLIC
-    
+
     public ClientRequest(string defaultHost)
     {
       this.requestLine = new ClientRequestLine();

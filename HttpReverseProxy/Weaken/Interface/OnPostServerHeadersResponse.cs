@@ -27,10 +27,10 @@
       // Remove Strict Transport Security (HSTS) header
       try
       {
-        if (requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("strict-transport-security"))
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("strict-transport-security"))
         {
           Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"strict -transport-security: ...\"");
-          requestObj.ServerResponseMetaDataObj.ResponseHeaders.Remove("strict-transport-security");
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("strict-transport-security");
         }
       }
       catch (Exception ex)
@@ -41,14 +41,14 @@
       // Remove "Set-Cookie ... secure"
       try
       {
-        if (requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Set-Cookie") &&
-            Regex.Match(requestObj.ServerResponseMetaDataObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+secure", RegexOptions.IgnoreCase).Success)
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Set-Cookie") &&
+            Regex.Match(requestObj.ServerResponseObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+secure", RegexOptions.IgnoreCase).Success)
         {
           Logging.Instance.LogMessage(requestObj.Id, Logging.Level.INFO, "Weaken.OnPostServerHeadersResponse(): Remove \"secure\" cookie attribute.");
 
-          string newCookieHeader = Regex.Replace(requestObj.ServerResponseMetaDataObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+secure", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-          requestObj.ServerResponseMetaDataObj.ResponseHeaders.Remove("Set-Cookie");
-          requestObj.ServerResponseMetaDataObj.ResponseHeaders.Add("Set-Cookie", newCookieHeader);
+          string newCookieHeader = Regex.Replace(requestObj.ServerResponseObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+secure", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("Set-Cookie");
+          requestObj.ServerResponseObj.ResponseHeaders.Add("Set-Cookie", newCookieHeader);
         }
       }
       catch (Exception ex)
@@ -59,14 +59,14 @@
       // Remove "Set-Cookie ... HttpOnly"
       try
       {
-        if (requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Set-Cookie") &&
-            Regex.Match(requestObj.ServerResponseMetaDataObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+httponly", RegexOptions.IgnoreCase).Success)
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Set-Cookie") &&
+            Regex.Match(requestObj.ServerResponseObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+httponly", RegexOptions.IgnoreCase).Success)
         {
           Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"HttpOnly\" cookie attribute.");
 
-          string newCookieHeader = Regex.Replace(requestObj.ServerResponseMetaDataObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+httponly", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
-          requestObj.ServerResponseMetaDataObj.ResponseHeaders.Remove("Set-Cookie");
-          requestObj.ServerResponseMetaDataObj.ResponseHeaders.Add("Set-Cookie", newCookieHeader);
+          string newCookieHeader = Regex.Replace(requestObj.ServerResponseObj.ResponseHeaders["Set-Cookie"].ToString(), @";\s+httponly", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("Set-Cookie");
+          requestObj.ServerResponseObj.ResponseHeaders.Add("Set-Cookie", newCookieHeader);
         }
       }
       catch (Exception ex)

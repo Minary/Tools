@@ -1,23 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using HttpReverseProxyLib.Exceptions;
-
-
-namespace HttpReverseProxy.ToClient
+﻿namespace HttpReverseProxy.ToClient
 {
+  using System.IO;
+  using HttpReverseProxyLib.Exceptions;
+
 
   public class TcpClientBase
   {
-
-    #region MEMBERS
-
-
-
-    #endregion
-
 
     #region PUBLIC
 

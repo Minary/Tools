@@ -243,8 +243,8 @@
 
       // Encode received bytes to the announced format
       int preProcessingPacketSize = dataPacket.Length;
-      string dataBlockString = this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding.GetString(dataPacket);
-      DataPacket serverDataPacket = new DataPacket(dataPacket, this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding);
+      string dataBlockString = this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding.GetString(dataPacket);
+      DataPacket serverDataPacket = new DataPacket(dataPacket, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding);
       Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
 
       // Send data packet to recipient

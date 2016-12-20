@@ -1,5 +1,7 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Class.Client;
+  using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;
@@ -94,10 +96,10 @@
     }
 
 
-    public ServerStatusLine ReadServerStatusLine(bool keepTrailingNewline = false)
+    public ServerResponseStatusLine ReadServerStatusLine(bool keepTrailingNewline = false)
     {
       bool carriageReturnDetected = false;
-      ServerStatusLine serverStatusLine = new ServerStatusLine();
+      ServerResponseStatusLine serverStatusLine = new ServerResponseStatusLine();
       StringBuilder result = new StringBuilder();
       bool foundEndOfLine = false;
       char currentChar;
