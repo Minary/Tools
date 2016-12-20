@@ -1,9 +1,11 @@
 ﻿namespace HttpReverseProxyLib
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.Collections.Generic;
   using System.IO;
   using System.Text.RegularExpressions;
+
 
   public class Logging
   {
@@ -24,6 +26,7 @@
 
     #region TYPE DEFINITIONS
 
+
     public enum Level : int
     {
       DEBUG = 1,
@@ -38,7 +41,9 @@
     #region PROPERTIES
 
     public static Logging Instance { get { return instance ?? (instance = GetInstance()); } set { } }
+
     public Logging.Level LoggingLevel { get { return this.logLevel; } set { this.logLevel = value; } }
+
     public bool IsInTestingMode { get { return this.isInTestingMode; } set { this.isInTestingMode = value; } }
 
     #endregion
@@ -46,13 +51,7 @@
 
     #region PUBLIC
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="reqObj"></param>
-    /// <param name="message"></param>
-    /// <param name="logLevel"></param>
-    public void LogMessage(string requestId, Level logLevel, string message, params object[] messageParams)
+    public void LogMessage(string requestId, ProxyProtocol proxyProtocol, Level logLevel, string message, params object[] messageParams)
     {
       if (string.IsNullOrEmpty(message) || string.IsNullOrWhiteSpace(message))
       {
@@ -64,7 +63,7 @@
         return;
       }
 
-      if (requestId == null || string.IsNullOrEmpty(requestId))
+      if (string.IsNullOrEmpty(requestId))
       {
         requestId = "UNDEF";
       }
@@ -82,16 +81,17 @@
 
         lock (this.syncObj)
         {
-          logFileStreamWriter.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
+          string logMessage = string.Format("{0} {1} {2}: {3}", timestamp, requestId, proxyProtocol, message);
+          logFileStreamWriter.WriteLine(logMessage);
           logFileStreamWriter.Flush();
           logFileStreamWriter.BaseStream.Flush();
 
-Console.WriteLine("{0} {1}: {2}", timestamp, requestId, message);
+Console.WriteLine(logMessage);
           // If testing this application add record to array
           if (this.isInTestingMode)
           {
             string logLine = string.Format("{0} {1}: {2}{3}", timestamp, requestId, message, Environment.NewLine);
-            logs.Add(logLine);
+            this.logs.Add(logLine);
           }
         }
       }

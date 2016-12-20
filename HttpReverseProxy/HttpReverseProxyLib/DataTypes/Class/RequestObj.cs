@@ -5,7 +5,6 @@
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
-  using System.Collections;
   using System.Net.Sockets;
   using System.Text;
 
@@ -20,6 +19,7 @@
     private string srcIp;
     private string srcPort;
     private TcpClient tcpClientConnection;
+    private ProxyProtocol proxyProtocol;
 
     // Client HTTP connection
     private ClientRequest clientRequestObj;
@@ -35,8 +35,8 @@
     // ...
     private int counter;
     private string id;
+
     private string httpLogData;
-    
 
     #endregion
 
@@ -52,6 +52,8 @@
 
     public TcpClient TcpClientConnection { get { return this.tcpClientConnection; } set { this.tcpClientConnection = value; } }
 
+    public ProxyProtocol ProxyProtocol { get { return this.proxyProtocol; } set { this.proxyProtocol = value; } }
+
 
     // Client HTTP connection
     public ClientRequest ClientRequestObj { get { return this.clientRequestObj; } set { } }
@@ -63,17 +65,13 @@
     public ServerResponse ServerResponseObj { get { return this.serverResponseObj; } set { this.serverResponseObj = value; } }
 
     public bool IsServerKeepAlive { get { return this.isServerKeepAlive; } set { this.isServerKeepAlive = value; } }
-
-
-
-
+    
 
 
     public DataTransmissionMode ProxyDataTransmissionModeS2C { get { return this.proxyDataTransmissionModeS2C; } set { this.proxyDataTransmissionModeS2C = value; } }
 
     public DataTransmissionMode ProxyDataTransmissionModeC2S { get { return this.proxyDataTransmissionModeC2S; } set { this.proxyDataTransmissionModeC2S = value; } }
-
-
+    
 
     // ...
     public int Counter { get { return this.counter; } set { this.counter = value; } }
@@ -87,12 +85,7 @@
 
     #region PUBLIC METHODS
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RequestObj"/> class.
-    ///
-    /// </summary>
-    /// <param name="defaultHost"></param>
-    public RequestObj(string defaultHost)
+    public RequestObj(string defaultHost, ProxyProtocol proxyProtocol)
     {
       // Client elements
       this.clientRequestObj = new ClientRequest(defaultHost);
@@ -100,6 +93,7 @@
       // Server elements
       this.ServerResponseObj = new ServerResponse();
 
+      this.proxyProtocol = proxyProtocol;
       this.IsServerKeepAlive = false;
       this.HttpLogData = string.Empty;
       this.Counter = 0;
