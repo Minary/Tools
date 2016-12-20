@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxyLib.DataTypes.Class
+﻿namespace HttpReverseProxyLib.DataTypes.Class.Client
 {
   using HttpReverseProxyLib.DataTypes.Enum;
 
@@ -23,6 +23,19 @@
     public string Path { get; set; }
 
     public string HttpVersion { get; set; }
+
+    #endregion
+
+
+    #region PUBLIC
+
+    public ClientRequestLine()
+    {
+      this.MethodString = string.Empty;
+      this.Path = string.Empty;
+      this.HttpVersion = string.Empty;
+      this.RequestMethod = RequestMethod.Undefined;
+    }
 
     #endregion
 

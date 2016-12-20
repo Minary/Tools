@@ -39,7 +39,7 @@
       }
 
       string host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"].ToString();
-      string path = requestObj.ClientRequestObj.Path;
+      string path = requestObj.ClientRequestObj.RequestLine.Path;
 
       foreach (DataTypes.InjectConfigRecord tmpRecord in HttpReverseProxy.Plugin.Inject.Config.InjectRecords)
       {

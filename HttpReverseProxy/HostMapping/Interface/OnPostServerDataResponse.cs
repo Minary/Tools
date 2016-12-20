@@ -17,7 +17,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if (requestObj.ServerResponseMetaDataObj == null)
+      if (requestObj.ServerResponseObj == null)
       {
         throw new ProxyWarningException("The meta data object is invalid");
       }
@@ -27,7 +27,7 @@
         throw new ProxyWarningException("The data packet is invalid");
       }
 
-      if (string.IsNullOrEmpty(requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType))
+      if (string.IsNullOrEmpty(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
       {
         throw new ProxyWarningException("The server response content type is invalid");
       }

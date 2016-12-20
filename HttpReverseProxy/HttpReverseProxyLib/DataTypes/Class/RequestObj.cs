@@ -1,5 +1,7 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Class.Client;
+  using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
@@ -23,12 +25,10 @@
     private ClientRequest clientRequestObj;
 
     // Server HTTP connection
-    private bool isServerKeepAlive;
+    private ServerResponse serverResponseObj;
     private IOutgoingRequestClient serverRequestHandler;
-    private ServerStatusResponse serverStatusResponseObj;
-    private ServerResponseMetaData serverResponseMetaDataObj;
+    private bool isServerKeepAlive;
 
-//private string serverResponseData;
     private DataTransmissionMode proxyDataTransmissionModeS2C;
     private DataTransmissionMode proxyDataTransmissionModeC2S;
 
@@ -36,9 +36,7 @@
     private int counter;
     private string id;
     private string httpLogData;
-
-    private ServerStatusLine serverStatusLine;
-    private ClientRequestLine clientRequestLine;
+    
 
     #endregion
 
@@ -57,25 +55,24 @@
 
     // Client HTTP connection
     public ClientRequest ClientRequestObj { get { return this.clientRequestObj; } set { } }
-//    public ClientRequestLine ClientRequestLine { get { return this.clientRequestLine; } set { this.clientRequestLine = value; } }
 
 
     // Server HTTP connection
-    public bool IsServerKeepAlive { get { return this.isServerKeepAlive; } set { this.isServerKeepAlive = value; } }
-
     public IOutgoingRequestClient ServerRequestHandler { get { return this.serverRequestHandler; } set { this.serverRequestHandler = value; } }
 
+    public ServerResponse ServerResponseObj { get { return this.serverResponseObj; } set { this.serverResponseObj = value; } }
 
-    public ServerStatusResponse ServerStatusResponseObj { get { return this.serverStatusResponseObj; } set { this.serverStatusResponseObj = value; } }
-    public ServerResponseMetaData ServerResponseMetaDataObj { get { return this.serverResponseMetaDataObj; } set { this.serverResponseMetaDataObj = value; } }
-    public ServerStatusLine ServerStatusLine { get { return this.serverStatusLine; } set { this.serverStatusLine = value; } }
+    public bool IsServerKeepAlive { get { return this.isServerKeepAlive; } set { this.isServerKeepAlive = value; } }
 
 
-    //public string ServerResponseData { get { return this.serverResponseData; } set { this.serverResponseData = value; } }
+
+
+
 
     public DataTransmissionMode ProxyDataTransmissionModeS2C { get { return this.proxyDataTransmissionModeS2C; } set { this.proxyDataTransmissionModeS2C = value; } }
 
     public DataTransmissionMode ProxyDataTransmissionModeC2S { get { return this.proxyDataTransmissionModeC2S; } set { this.proxyDataTransmissionModeC2S = value; } }
+
 
 
     // ...
@@ -84,9 +81,6 @@
     public string Id { get { return this.id; } set { this.id = value; } }
 
     public string HttpLogData { get { return this.httpLogData; } set { this.httpLogData = value; } }
-
-
-
 
     #endregion
 
@@ -102,14 +96,11 @@
     {
       // Client elements
       this.clientRequestObj = new ClientRequest(defaultHost);
-      this.clientRequestObj.ContentTypeEncoding = new DataContentTypeEncoding();
 
       // Server elements
-      this.IsServerKeepAlive = false;
-      this.ServerStatusResponseObj = new ServerStatusResponse();
-      this.ServerResponseMetaDataObj = new ServerResponseMetaData();
-      this.ServerResponseMetaDataObj.ResponseHeaders = new Hashtable();
+      this.ServerResponseObj = new ServerResponse();
 
+      this.IsServerKeepAlive = false;
       this.HttpLogData = string.Empty;
       this.Counter = 0;
       this.ProxyDataTransmissionModeS2C = DataTransmissionMode.Undefined;
@@ -141,20 +132,16 @@
       this.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.UTF8;
       this.ClientRequestObj.ContentTypeEncoding.ContentType = "text/html";
 
-      this.ClientRequestObj.RequestLine.MethodString = string.Empty;
-      this.ClientRequestObj.RequestLine.Path = string.Empty;
-      this.ClientRequestObj.RequestLine.HttpVersion = string.Empty;
-      this.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.Undefined;
       this.ClientRequestObj.IsClientKeepAlive = false;
       this.ClientRequestObj.Host = string.Empty;
       this.ClientRequestObj.Scheme = string.Empty;
 
       // Reset server settings
-      this.ServerResponseMetaDataObj.ContentLength = 0;
-      this.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharSet = "UTF-8";
-      this.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.UTF8;
-      this.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType = "text/html";
-      this.ServerResponseMetaDataObj.ResponseHeaders.Clear();
+      this.ServerResponseObj.ContentLength = 0;
+      this.ServerResponseObj.ContentTypeEncoding.ContentCharSet = "UTF-8";
+      this.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.UTF8;
+      this.ServerResponseObj.ContentTypeEncoding.ContentType = "text/html";
+      this.ServerResponseObj.ResponseHeaders.Clear();
     }
 
     #endregion

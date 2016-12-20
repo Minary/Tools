@@ -135,12 +135,12 @@
             // 5.6 Determine whether response content type must be processed
             bool mustBeProcessed = this.IsServerResponseDataProcessable(this.requestObj);
             Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ProcessClientRequest(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
-            this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerStatusResponseObj, this.requestObj.ServerStatusLine.NewlineBytes);
-            this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseMetaDataObj.ResponseHeaders, this.requestObj.ServerStatusLine.NewlineBytes);
-            Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ProcessClientRequest(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerStatusLine.NewlineType);
+
+            this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
+            this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+            Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ProcessClientRequest(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
 
             this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
-
             Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ProcessClientRequest(): DONE! All data transferred to client");
           }
         }
@@ -223,16 +223,16 @@
     private void DetermineDataTransmissionModeS2C(RequestObj requestObj)
     {
       // Transfer behavior is "Content-Length"
-      if (this.requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Content-Length"))
+      if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
       {
-        string contentLen = this.requestObj.ServerResponseMetaDataObj.ResponseHeaders["Content-Length"].ToString();
-        this.requestObj.ServerResponseMetaDataObj.ContentLength = int.Parse(contentLen);
+        string contentLen = this.requestObj.ServerResponseObj.ResponseHeaders["Content-Length"].ToString();
+        this.requestObj.ServerResponseObj.ContentLength = int.Parse(contentLen);
 
-        if (this.requestObj.ServerResponseMetaDataObj.ContentLength > 0)
+        if (this.requestObj.ServerResponseObj.ContentLength > 0)
         {
           this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.ContentLength;
         }
-        else if (this.requestObj.ServerResponseMetaDataObj.ContentLength == 0)
+        else if (this.requestObj.ServerResponseObj.ContentLength == 0)
         {
           this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.NoDataToTransfer;
         }
@@ -243,7 +243,7 @@
 
         // Transfer behavior is "Chunked"
       }
-      else if (this.requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
+      else if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
       {
         this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.Chunked;
 
@@ -285,15 +285,15 @@
 
     private void ForwardClientRequestToServer()
     {
-      // 3. Close old server request streams
+      // 1. Close old server request streams
       if (this.RequestObj.ServerRequestHandler != null)
       {
         this.requestObj.ServerRequestHandler.CloseServerConnection();
       }
 
-      // 3.1 Reset previously received server response details
-      this.requestObj.ServerResponseMetaDataObj.ResponseHeaders.Clear();
-      this.requestObj.ServerStatusResponseObj.Reset();
+      // 1.1 Reset previously received server response details
+      this.requestObj.ServerResponseObj.ResponseHeaders.Clear();
+      this.requestObj.ServerResponseObj.StatusLine.Reset();
 
       // If remote server requires HTTPS create an SSL based socket stream.
       // Reasons : Plugin.SslStripn: Http redirect cache record
@@ -310,37 +310,37 @@
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ForwardClientRequestToServer(): Create HTTP socket connection to {0}", this.requestObj.ClientRequestObj.Host);
       }
 
-      // 4. Send tcp-client request headers to remoteSocket
+      // 2. Send tcp-client request headers to remoteSocket
       this.requestObj.ServerRequestHandler.OpenServerConnection(this.requestObj.ClientRequestObj.Host);
       this.requestObj.ServerRequestHandler.ForwardRequestC2S(this.requestObj.ClientRequestObj.RequestLine.MethodString, this.requestObj.ClientRequestObj.RequestLine.Path, this.requestObj.ClientRequestObj.RequestLine.HttpVersion, this.requestObj.ClientRequestObj.RequestLine.NewlineBytes);
       this.requestObj.ServerRequestHandler.ForwardHeadersC2S(this.requestObj.ClientRequestObj.ClientRequestHeaders, this.requestObj.ClientRequestObj.RequestLine.NewlineBytes); // this.requestObj.ServerStatusLine.NewlineBytes);
 
-      // 5. Send tcp-client request data to remoteSocket
+      // 3. Send tcp-client request data to remoteSocket
       bool mustBeProcessed = this.IsClientRequestDataProcessable(this.requestObj);
       Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "HttpReverseProxy.ProcessClientRequest(): CLIENT REQUEST : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
       SniffedDataChunk sniffedDataChunk = new SniffedDataChunk(Config.MaxSniffedClientDataSize);
       this.requestObj.ServerRequestHandler.RelayDataC2S(mustBeProcessed, sniffedDataChunk);
       this.EditClientRequestData(this.requestObj, sniffedDataChunk);
 
-      // 6 Read remotesocket response headers
-      this.requestObj.ServerStatusLine = this.requestObj.ServerRequestHandler.ReadServerStatusLine(this.requestObj.ServerStatusResponseObj);
-      this.requestObj.ServerRequestHandler.ReadServerResponseHeaders(this.requestObj.ServerResponseMetaDataObj);
+      // 4 Read remotesocket response headers
+      this.requestObj.ServerRequestHandler.ReadServerStatusLine(this.requestObj);
+      this.requestObj.ServerRequestHandler.ReadServerResponseHeaders(this.requestObj.ServerResponseObj);
     }
 
 
     private bool IsServerResponseDataProcessable(RequestObj requestObj)
     {
       // 1. Server response "Content-Type" is labelled as "supported"
-      if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType))
+      if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsServerResponseDataProcessable():\"{0}\" is not processed", this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsServerResponseDataProcessable():\"{0}\" is not processed", this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType);
         return false;
       }
 
       // 2. Server response "Content-Length" is > UPPER_LIMIT
-      if (this.requestObj.ServerResponseMetaDataObj.ContentLength > this.dataDownloadUpperLimit)
+      if (this.requestObj.ServerResponseObj.ContentLength > this.dataDownloadUpperLimit)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsServerResponseDataProcessable(): The content length is greater than the upper limit (contentLength:{0}, UpperLimit:{1}", this.requestObj.ServerResponseMetaDataObj.ContentLength, dataDownloadUpperLimit);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsServerResponseDataProcessable(): The content length is greater than the upper limit (contentLength:{0}, UpperLimit:{1}", this.requestObj.ServerResponseObj.ContentLength, dataDownloadUpperLimit);
         return false;
       }
 
@@ -360,7 +360,7 @@
       // 2. Client request "Content-Length" is > UPPER_LIMIT
       if (this.requestObj.ClientRequestObj.ClientRequestContentLength > this.dataDownloadUpperLimit)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsClientRequestDataProcessable(): The content length is greater than the upper limit (contentLength:{0}, UpperLimit:{1}", this.requestObj.ServerResponseMetaDataObj.ContentLength, dataDownloadUpperLimit);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "HttpReverseProxy.IsClientRequestDataProcessable(): The content length is greater than the upper limit (contentLength:{0}, UpperLimit:{1}", this.requestObj.ServerResponseObj.ContentLength, dataDownloadUpperLimit);
         return false;
       }
 

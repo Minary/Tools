@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.Exceptions;
   using HttpReverseProxyLib.Interface;
   using System;
@@ -104,7 +105,7 @@
         throw new Exception("HTTP version is invalid");
       }
 
-string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVersion);
+      string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVersion);
       byte[] requestByteArray = Encoding.UTF8.GetBytes(requestString);
 
       this.DumpstringDetails(requestMethod);
@@ -144,24 +145,23 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
     }
 
 
-    public ServerStatusLine ReadServerStatusLine(ServerStatusResponse serverStatusResponseObj)
+    public void ReadServerStatusLine(RequestObj requestObj)
     {
       string[] headerSplitter = new string[3];
-//string serverStatusLine = this.webServerStreamReader.ReadLine(false);
-      ServerStatusLine serverStatusLine = this.webServerStreamReader.ReadServerStatusLine(false);
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "TcpClientBase.ReadServerStatusLine(): StatusLine={0}", serverStatusLine.StatusLine);
-      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.INFO, "TcpClientBase.ReadServerStatusLine(): NewlineType={0}", serverStatusLine.NewlineType);
+      requestObj.ServerResponseObj.StatusLine = this.webServerStreamReader.ReadServerStatusLine(false);
 
-      headerSplitter = serverStatusLine.StatusLine.Split(new char[] { ' ', '\t' }, 3);
-      serverStatusResponseObj.HttpVersion = headerSplitter[0];
-      serverStatusResponseObj.StatusCode = headerSplitter[1];
-      serverStatusResponseObj.StatusDescription = headerSplitter[2];
+      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): StatusLine={0}", requestObj.ServerResponseObj.StatusLine.StatusLine);
+      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ReadServerStatusLine(): NewlineType={0}", requestObj.ServerResponseObj.StatusLine.NewlineType);
 
-      return serverStatusLine;
+      // Evaluate response status line
+      headerSplitter = requestObj.ServerResponseObj.StatusLine.StatusLine.Split(new char[] { ' ', '\t' }, 3);
+      requestObj.ServerResponseObj.StatusLine.HttpVersion = headerSplitter[0];
+      requestObj.ServerResponseObj.StatusLine.StatusCode = headerSplitter[1];
+      requestObj.ServerResponseObj.StatusLine.StatusDescription = headerSplitter[2];
     }
 
 
-    public void ReadServerResponseHeaders(ServerResponseMetaData serverResponseMetaDataObj)
+    public void ReadServerResponseHeaders(ServerResponse serverResponseMetaDataObj)
     {
       string[] headerTuple = new string[2];
       string key = string.Empty;
@@ -229,13 +229,14 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
 
     #region Client header transfer
 
-    public void ForwardStatusLineS2C(ServerStatusResponse serverStatusResponseObj, byte[] serverNewlineBytes)
+    public void ForwardStatusLineS2C(ServerResponseStatusLine serverResponseStatusLine)
     {
-      string statusLineStr = string.Format("{0} {1} {2}", serverStatusResponseObj.HttpVersion, serverStatusResponseObj.StatusCode, serverStatusResponseObj.StatusDescription);
+      string statusLineStr = string.Format("{0} {1} {2}", serverResponseStatusLine.HttpVersion, serverResponseStatusLine.StatusCode, serverResponseStatusLine.StatusDescription);
       byte[] statusLineByteArr = Encoding.UTF8.GetBytes(statusLineStr);
 
+      Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClientBase.ForwardStatusLineS2C(): statusLineStr: |{0}|", statusLineStr);
       this.clientStreamWriter.Write(statusLineByteArr, 0, statusLineByteArr.Length);
-      this.clientStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+      this.clientStreamWriter.Write(serverResponseStatusLine.NewlineBytes, 0, serverResponseStatusLine.NewlineBytes.Length);
     }
 
 
@@ -277,7 +278,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.Chunked && !mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:false");
-        this.ForwardChunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ServerStatusLine.NewlineBytes, sniffedDataChunk);
+        this.ForwardChunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes, sniffedDataChunk);
 
       // 2.1 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
@@ -306,7 +307,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.Chunked && mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.Chunked, processed:true");
-        this.ForwardChunkedProcessedDataChunks(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerStatusLine.NewlineBytes, sniffedDataChunk);
+        this.ForwardChunkedProcessedDataChunks(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes, sniffedDataChunk);
 
 
       // 3.1 Predefined amount of data is transferred from the tcpClient to the peer system because
@@ -366,7 +367,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && !mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:false");
-        this.ForwardChunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerStatusLine.NewlineBytes);
+        this.ForwardChunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
 
 
       // 2.1 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
@@ -376,7 +377,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       {
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, processed:false");
         // this.ForwardChunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter);
-        this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseMetaDataObj.ContentLength);
+        this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
 
 
 
@@ -386,7 +387,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.Chunked, processed:true");
-        this.ForwardChunkedProcessedDataChunks(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerStatusLine.NewlineBytes);
+        this.ForwardChunkedProcessedDataChunks(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
 
 
       // 3.1 Predefined amount of data is transferred from the tcpClient to the peer system because
@@ -394,8 +395,8 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.ContentLength && mustBeProcessed)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseMetaDataObj.ContentLength);
-        this.ForwardNonchunkedProcessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseMetaDataObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
+        this.ForwardNonchunkedProcessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
 
 
 
@@ -407,15 +408,15 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
       }
       else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.RelayBlindly)
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseMetaDataObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
         this.BlindlyRelayData(this.webServerStreamReader, this.clientStreamWriter);
 
       // 5 This state actually should never happen! No idea what to do at this point :/
       }
       else
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): ContentLength:{0}, processed:false", this.requestObj.ServerResponseMetaDataObj.ContentLength);
-        this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseMetaDataObj.ContentLength);
+        Logging.Instance.LogMessage(this.requestObj.Id, Logging.Level.DEBUG, "TcpClienBase.RelayDataS2C(): ContentLength:{0}, processed:false", this.requestObj.ServerResponseObj.ContentLength);
+        this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
       }
     }
 
@@ -463,7 +464,7 @@ string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVer
     }
 
 
-    private void DetermineServerResponseContentLength(ServerResponseMetaData serverResponseMetaDataObj)
+    private void DetermineServerResponseContentLength(ServerResponse serverResponseMetaDataObj)
     {
       try
       {

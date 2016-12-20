@@ -42,8 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTypes\Class\ClientRequest.cs" />
-    <Compile Include="DataTypes\Class\ClientRequestLine.cs" />
+    <Compile Include="DataTypes\Class\Client\ClientRequest.cs" />
+    <Compile Include="DataTypes\Class\Client\ClientRequestLine.cs" />
     <Compile Include="DataTypes\Class\DataContentTypeEncoding.cs" />
     <Compile Include="DataTypes\Class\DataPacket.cs" />
     <Compile Include="DataTypes\Enum\DataTransmissionMode.cs" />
@@ -54,13 +54,12 @@
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="DataTypes\Enum\Newline.cs" />
-    <Compile Include="DataTypes\Class\ServerStatusLine.cs" />
+    <Compile Include="DataTypes\Class\Server\ServerResponseStatusLine.cs" />
     <Compile Include="DataTypes\Class\PluginInstruction.cs" />
     <Compile Include="DataTypes\Enum\RedirectType.cs" />
     <Compile Include="DataTypes\Class\RequestMethod.cs" />
     <Compile Include="DataTypes\Class\RequestObj.cs" />
-    <Compile Include="DataTypes\Class\ServerResponseMetaData.cs" />
-    <Compile Include="DataTypes\Class\ServerStatusResponse.cs" />
+    <Compile Include="DataTypes\Class\Server\ServerResponse.cs" />
     <Compile Include="DataTypes\Class\SniffedDataChunk.cs" />
     <Compile Include="Exceptions\ClientNotificationException.cs" />
     <Compile Include="Exceptions\ProxyErrorException.cs" />

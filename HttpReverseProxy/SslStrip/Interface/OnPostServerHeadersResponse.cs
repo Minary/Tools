@@ -61,10 +61,10 @@
                                     requestObj.Id,
                                     Logging.Level.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2http2XX, {0} \"{1}\" -> \"-\", host:{2}, MimeType:{3}",
-                                    requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType,
+                                    requestObj.ServerResponseObj.ContentTypeEncoding.ContentType,
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ClientRequestObj.Host,
-                                    requestObj.ServerResponseMetaDataObj.ContentTypeEncoding.ContentType);
+                                    requestObj.ServerResponseObj.ContentTypeEncoding.ContentType);
 
 
 
@@ -83,7 +83,7 @@
                                     Logging.Level.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Http3XX \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"]);
+                                    requestObj.ServerResponseObj.ResponseHeaders["location"]);
 
 
 
@@ -106,7 +106,7 @@
                                     Logging.Level.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXDifferentUrl \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"]);
+                                    requestObj.ServerResponseObj.ResponseHeaders["location"]);
 
 
 
@@ -125,7 +125,7 @@
                                     Logging.Level.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseMetaDataObj.ResponseHeaders["location"],
+                                    requestObj.ServerResponseObj.ResponseHeaders["location"],
                                     requestObj.ClientRequestObj.Scheme);
 
 
