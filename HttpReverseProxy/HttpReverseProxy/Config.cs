@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System.Collections.Generic;
 
@@ -19,6 +20,7 @@ private static string defaultRemoteHost = "www.buglist.io";
     private static string httpServer = "Apache";
     private static int maxSniffedClientDataSize = 4096;
     private static List<IPlugin> loadedPlugins = new List<IPlugin>();
+    private static Loglevel loglevel;
 
     #endregion
 
@@ -38,13 +40,14 @@ private static string defaultRemoteHost = "www.buglist.io";
     public static int LocalHttpsServerPort { get { return localHttpsServerPort; } set { localHttpsServerPort = value; } }
 
     public static string CertificatePath { get { return certificatePath; } set { certificatePath = value; } }
-    
-    
+
     public static string Server { get { return httpServer; } set { httpServer = value; } }
-    
+
     public static List<IPlugin> LoadedPlugins { get { return loadedPlugins; } set { } }
 
     public static int MaxSniffedClientDataSize { get { return maxSniffedClientDataSize; } set { maxSniffedClientDataSize = value; } }
+
+    public static Loglevel Loglevel { get { return loglevel; } set { loglevel = value; } }
 
     #endregion
 

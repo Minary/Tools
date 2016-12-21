@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System;
   using System.Text.RegularExpressions;
@@ -53,13 +54,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Accept-Encoding") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Accept-Encoding"].ToString(), @"(gzip|deflate|compress)", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Accept-Encoding");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
       // Upgrade: TLS/1.0
@@ -70,13 +71,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Upgrade") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Upgrade"].ToString(), "^TLS.*", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Upgrade");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
       return instruction;

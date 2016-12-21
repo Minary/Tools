@@ -10,7 +10,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("Inject", Logging.Level.DEBUG, "Inject.OnUnload(): ");
+      Logging.Instance.LogMessage("Inject", Loglevel.DEBUG, "Inject.OnUnload(): ");
     }
   }
 }

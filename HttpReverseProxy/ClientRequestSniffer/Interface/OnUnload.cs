@@ -10,7 +10,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("ClientRequestSniffer", Logging.Level.DEBUG, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
+      Logging.Instance.LogMessage("ClientRequestSniffer", Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
     }
   }
 }

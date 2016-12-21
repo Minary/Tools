@@ -23,7 +23,7 @@
       PluginInstruction instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
+      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
       return instruction;
     }
   }

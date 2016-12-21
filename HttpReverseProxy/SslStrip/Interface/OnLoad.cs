@@ -1,6 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.SslStrip
 {
-  using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
   using System.IO;
@@ -40,11 +40,11 @@
       catch (System.IO.FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", Logging.Level.INFO, "SslStrip.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.INFO, "SslStrip.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", Logging.Level.INFO, "SslStrip.OnLoad(EXCEPTION): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.INFO, "SslStrip.OnLoad(EXCEPTION): {0}", ex.Message);
       }
 
       this.pluginProperties.PluginHost.RegisterPlugin(this);

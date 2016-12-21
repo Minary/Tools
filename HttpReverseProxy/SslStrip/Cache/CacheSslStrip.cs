@@ -2,6 +2,7 @@
 {
   using HttpReverseProxy.Plugin.SslStrip.DataTypes;
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.Collections.Generic;
   using System.Text.RegularExpressions;
@@ -64,7 +65,7 @@
         throw new Exception("Key was already added to the cache");
       }
 
-      Logging.Instance.LogMessage(id, Logging.Level.DEBUG, "CacheSslStrip.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
+      Logging.Instance.LogMessage(id, ProxyProtocol.Undefined, Loglevel.DEBUG, "CacheSslStrip.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
 
       HostRecord tmpHost = new HostRecord("GET", tmpUriValue.Scheme, tmpUriValue.Host, tmpUriValue.PathAndQuery);
       this.cache.Add(keyLocation, tmpHost);
@@ -77,7 +78,7 @@
     {
       foreach (string tmpKey in this.cache.Keys)
       {
-        Logging.Instance.LogMessage("SslStrip.CacheSslStrip.EnumerateCache", Logging.Level.DEBUG, "Cache.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.cache[tmpKey].Url, cache[tmpKey].Counter);
+        Logging.Instance.LogMessage("SslStrip.CacheSslStrip.EnumerateCache", ProxyProtocol.Undefined, Loglevel.DEBUG, "Cache.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.cache[tmpKey].Url, cache[tmpKey].Counter);
       }
     }
 
