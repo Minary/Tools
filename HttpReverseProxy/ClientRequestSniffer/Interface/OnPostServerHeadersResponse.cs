@@ -22,7 +22,7 @@
       // Send sniffed data to pipe
       this.SendClientRequestDataToPipe(requestObj);
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
       return instruction;
     }
   }

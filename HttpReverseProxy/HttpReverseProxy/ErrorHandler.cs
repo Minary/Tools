@@ -2,7 +2,7 @@
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
-  using HttpReverseProxyLib.DataTypes.Class.Client;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System;
   using System.Collections.Generic;
@@ -106,7 +106,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.ERROR, "IncomingClientRequest.ProcessWebException(EXCEPTION2) : {0} -> {1} \n{2}", requestObj.ClientRequestObj.GetRequestedUrl(), ex.Message, ex.StackTrace);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.ERROR, "IncomingClientRequest.ProcessWebException(EXCEPTION2) : {0} -> {1} \n{2}", requestObj.ClientRequestObj.GetRequestedUrl(), ex.Message, ex.StackTrace);
       }
     }
 

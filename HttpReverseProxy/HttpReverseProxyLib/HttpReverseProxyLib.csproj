@@ -53,6 +53,7 @@
     <Compile Include="DataTypes\Class\MyBinaryReader.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="DataTypes\Enum\Loglevel.cs" />
     <Compile Include="DataTypes\Enum\Newline.cs" />
     <Compile Include="DataTypes\Class\Server\ServerResponseStatusLine.cs" />
     <Compile Include="DataTypes\Class\PluginInstruction.cs" />

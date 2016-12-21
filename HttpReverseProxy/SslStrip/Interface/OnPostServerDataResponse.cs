@@ -51,7 +51,7 @@
 
       foreach (string tmpKey in foundHttpsTags.Keys)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "SslStrip.FoundHttpsHosts(): {0}: {1}", tmpKey, foundHttpsTags[tmpKey]);
+        Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "SslStrip.FoundHttpsHosts(): {0}: {1}", tmpKey, foundHttpsTags[tmpKey]);
       }
 
       // 2. Replace previously determined tags by the according replacement tag

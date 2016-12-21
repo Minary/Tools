@@ -23,7 +23,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      Logging.Instance.LogMessage(requestObj.Id, Logging.Level.DEBUG, "Inject.OnPostServerDataResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "Inject.OnPostServerDataResponse(): ");
     }
   }
 }

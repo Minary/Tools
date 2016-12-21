@@ -35,6 +35,6 @@
     // Client/Server data transfer
     void RelayDataC2S(bool mustBeProcessed, SniffedDataChunk dataChunk);
 
-    void RelayDataS2C(bool mustBeProcessed);
+    int RelayDataS2C(bool mustBeProcessed);
   }
 }

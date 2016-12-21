@@ -38,20 +38,20 @@
       try
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Logging.Level.INFO, "Inject.OnLoad(): Loaded {0} configuration records", InjectConfig.InjectRecords.Count);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Loglevel.INFO, "Inject.OnLoad(): Loaded {0} configuration records", InjectConfig.InjectRecords.Count);
       }
       catch (System.IO.FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Logging.Level.INFO, "Inject.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Loglevel.INFO, "Inject.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
       }
       catch (ProxyErrorException peex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Logging.Level.INFO, "Inject.OnLoad(): {0}", peex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Loglevel.INFO, "Inject.OnLoad(): {0}", peex.Message);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Logging.Level.INFO, "Inject.OnLoad(EXCEPTION): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", Loglevel.INFO, "Inject.OnLoad(EXCEPTION): {0}", ex.Message);
       }
 
       this.pluginProperties.PluginHost.RegisterPlugin(this);

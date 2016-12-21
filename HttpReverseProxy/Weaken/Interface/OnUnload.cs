@@ -1,6 +1,8 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
+
 
   public partial class Weaken
   {
@@ -10,7 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("Weaken", Logging.Level.DEBUG, "Weaken.OnUnload(): ");
+      Logging.Instance.LogMessage("Weaken", ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnUnload(): ");
     }
   }
 }

@@ -1,8 +1,8 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;
   using System.Net.Security;
@@ -56,7 +56,7 @@
     /// <returns></returns>
     public override void OpenServerConnection(string host)
     {
-      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientSsl.OpenServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientSsl.OpenServerConnection()");
 
       if (string.IsNullOrEmpty(host))
       {
@@ -81,7 +81,7 @@
     /// <param name="pNetworkStream"></param>
     public override void CloseServerConnection()
     {
-      Logging.Instance.LogMessage(base.requestObj.Id, this.requestObj.ProxyProtocol, Logging.Level.DEBUG, "TcpClientSsl.CloseServerConnection()");
+      Logging.Instance.LogMessage(base.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientSsl.CloseServerConnection()");
 
       if (this.serverConnectionSslStream != null)
       {

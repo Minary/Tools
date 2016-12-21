@@ -11,7 +11,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("SslStrip", Logging.Level.DEBUG, "SslStrip.OnUnload():");
+      Logging.Instance.LogMessage("SslStrip", Loglevel.DEBUG, "SslStrip.OnUnload():");
 
       CacheHsts.Instance.ResetCache();
       CacheRedirect.Instance.RedirectCache.Clear();

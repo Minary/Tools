@@ -2,6 +2,7 @@
 {
   using HttpReverseProxy.Plugin.SslStrip.DataTypes;
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.Collections.Generic;
 
@@ -55,7 +56,7 @@
         return;
       }
 
-      Logging.Instance.LogMessage("SslStrip.CacheHsts.AddElement", Logging.Level.DEBUG, "Cache.AddElement(): host => {0}", host);
+      Logging.Instance.LogMessage("SslStrip.CacheHsts.AddElement", ProxyProtocol.Undefined, Loglevel.DEBUG, "Cache.AddElement(): host => {0}", host);
 
       HstsRecord tmpHost = new HstsRecord(host);
       this.cache.Add(host, tmpHost);
@@ -69,7 +70,7 @@
     {
       foreach (string tmpKey in this.cache.Keys)
       {
-        Logging.Instance.LogMessage("SslStrip.CacheHsts.EnumerateCache", Logging.Level.DEBUG, "EnumerateCache(): host:\"{0}\"", tmpKey);
+        Logging.Instance.LogMessage("SslStrip.CacheHsts.EnumerateCache", ProxyProtocol.Undefined, Loglevel.DEBUG, "EnumerateCache(): host:\"{0}\"", tmpKey);
       }
     }
 

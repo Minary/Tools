@@ -5,6 +5,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class SslStrip
@@ -35,7 +36,7 @@
         requestObj.ClientRequestObj.Scheme = tmpHost.Scheme;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
         requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): SslStripped from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.INFO, "SslStrip.OnPostClientHeadersRequest(): SslStripped from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
       }
 
       // 2. If requested Url was detected to be redirected
@@ -46,14 +47,14 @@
         requestObj.ClientRequestObj.Scheme = tmpHost.Scheme;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
         requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): HTTP redirect(301/302) from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.INFO, "SslStrip.OnPostClientHeadersRequest(): HTTP redirect(301/302) from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.Scheme, tmpHost.Host, tmpHost.Path);
       }
 
       // 3. If requested host was flaged to use HTTPS because of HSTS
       //    -> replace scheme "http://" by "https://"
       if (CacheHsts.Instance.GetElement(requestObj.ClientRequestObj.Host) != null)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.INFO, "SslStrip.OnPostClientHeadersRequest(): HSTS header set for \"{0}\"", requestObj.ClientRequestObj.Host);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.INFO, "SslStrip.OnPostClientHeadersRequest(): HSTS header set for \"{0}\"", requestObj.ClientRequestObj.Host);
         requestObj.ClientRequestObj.Scheme = "https";
       }
 

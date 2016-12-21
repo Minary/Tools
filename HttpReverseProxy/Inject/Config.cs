@@ -2,6 +2,7 @@
 {
   using HttpReverseProxy.Plugin.Inject.DataTypes;
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System;
   using System.Collections.Generic;
@@ -69,11 +70,11 @@
         }
         catch (ProxyWarningException pwex)
         {
-          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
         }
         catch (ProxyErrorException peex)
         {
-          Logging.Instance.LogMessage("CONFIG", Logging.Level.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.DEBUG, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
         }
       }
     }

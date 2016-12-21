@@ -12,6 +12,7 @@
     private ServerResponseStatusLine statusLine;
     private DataContentTypeEncoding contentTypeEncoding;
     private int contentLen;
+    private int noTransferredBytes;
     private Hashtable responseHeaders;
 
     #endregion
@@ -27,6 +28,8 @@
 
     public ServerResponseStatusLine StatusLine { get { return this.statusLine; } set { this.statusLine = value; } }
 
+    public int NoTransferredBytes { get { return this.noTransferredBytes; } set { this.noTransferredBytes = value; } }
+
     #endregion
 
 
@@ -37,6 +40,7 @@
       this.contentTypeEncoding = new DataContentTypeEncoding();
       this.statusLine = new ServerResponseStatusLine();
       this.responseHeaders = new Hashtable();
+      this.noTransferredBytes = 0;
     }
 
     #endregion

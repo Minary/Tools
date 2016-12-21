@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
 
@@ -32,7 +33,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.WARNING, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -66,7 +67,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.WARNING, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -90,7 +91,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Logging.Level.WARNING, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
