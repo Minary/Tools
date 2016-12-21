@@ -3,6 +3,7 @@
   using Fclp;
   using global::HttpReverseProxy.Http;
   using global::HttpReverseProxy.Https;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;
   using System.Net.NetworkInformation;
@@ -26,17 +27,22 @@
       parser.Setup<int>("httpPort")
        .Callback(item => { Config.LocalHttpServerPort = item; })
        .SetDefault(80)
-       .WithDescription("Define TCP port for incoming HTTP requests");
+       .WithDescription("Define TCP port for incoming HTTP requests (default: 80)");
 
       parser.Setup<int>("httpsPort")
        .Callback(item => { Config.LocalHttpsServerPort = item; })
        .SetDefault(443)
-       .WithDescription("Define TCP port for incoming HTTPS requests");
+       .WithDescription("Define TCP port for incoming HTTPS requests (default: 443)");
 
       parser.Setup<string>("certificate")
        .Callback(item => { Config.CertificatePath = item; })
        .Required()
        .WithDescription("Define certificate file path");
+
+      parser.Setup<Loglevel>("loglevel")
+       .Callback(item => Config.Loglevel = item)
+       .SetDefault(Loglevel.INFO)
+       .WithDescription("Define log level (default: INFO)");
 
       // sets up the parser to execute the callback when -? or --help is detected
       parser.SetupHelp("?", "help")
@@ -57,6 +63,7 @@
     private static void StartProxyServer()
     {
       Config.LocalIp = Lib.Common.GetLocalIpAddress();
+      HttpReverseProxyLib.Logging.Instance.LoggingLevel = Config.Loglevel;
 
       // Parse HTTP port parameter
       try

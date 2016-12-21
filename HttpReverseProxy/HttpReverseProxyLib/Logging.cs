@@ -18,22 +18,8 @@
     private static string logFileName = "HttpProxy.log";
     private object syncObj = new object();
     private List<string> logs = new List<string>();
-    private Logging.Level logLevel;
+    private Loglevel logLevel;
     private bool isInTestingMode;
-
-    #endregion
-
-
-    #region TYPE DEFINITIONS
-
-
-    public enum Level : int
-    {
-      DEBUG = 1,
-      INFO = 2,
-      WARNING = 3,
-      ERROR = 4
-    }
 
     #endregion
 
@@ -42,7 +28,7 @@
 
     public static Logging Instance { get { return instance ?? (instance = GetInstance()); } set { } }
 
-    public Logging.Level LoggingLevel { get { return this.logLevel; } set { this.logLevel = value; } }
+    public Loglevel LoggingLevel { get { return this.logLevel; } set { this.logLevel = value; } }
 
     public bool IsInTestingMode { get { return this.isInTestingMode; } set { this.isInTestingMode = value; } }
 
@@ -51,7 +37,7 @@
 
     #region PUBLIC
 
-    public void LogMessage(string requestId, ProxyProtocol proxyProtocol, Level logLevel, string message, params object[] messageParams)
+    public void LogMessage(string requestId, ProxyProtocol proxyProtocol, Loglevel logLevel, string message, params object[] messageParams)
     {
       if (string.IsNullOrEmpty(message) || string.IsNullOrWhiteSpace(message))
       {
@@ -97,7 +83,7 @@ Console.WriteLine(logMessage);
       }
       catch (Exception ex)
       {
-        if (logLevel == Logging.Level.DEBUG)
+        if (logLevel == Loglevel.DEBUG)
         {
           Console.WriteLine("ERROR: Error occurred in LogMessage: {0}", ex.Message);
         }
@@ -152,7 +138,7 @@ Console.WriteLine(logMessage);
     ///
     /// </summary>
     /// <param name="logLevel"></param>
-    private Logging(Logging.Level logLevel = Level.DEBUG)
+    private Logging(Loglevel logLevel = Loglevel.DEBUG)
     {
       this.logLevel = logLevel;
     }
