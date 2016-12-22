@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
 
@@ -23,7 +24,7 @@
       PluginInstruction instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
 
-      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
       return instruction;
     }
   }

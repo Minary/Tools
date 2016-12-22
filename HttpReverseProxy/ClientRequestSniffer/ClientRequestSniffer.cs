@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.ClientRequestSniffer
 {
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
   using System.IO;
@@ -45,7 +46,7 @@
                                       80,
                                       requestObj.HttpLogData);
       Task.Run(() => this.WriteToPipe(requestObj, pipeData));
-      this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, HttpReverseProxyLib. Loglevel.DEBUG, "ClientRequestSniffer.SendClientRequestDataToPipe(): Sending data to attack service pipe: {0} ...", pipeData.Trim().Substring(0, 40));
+      this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ClientRequestSniffer.SendClientRequestDataToPipe(): Sending data to attack service pipe: {0} ...", pipeData.Trim().Substring(0, 40));
     }
 
 
@@ -99,11 +100,11 @@
       }
       catch (System.TimeoutException tex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, HttpReverseProxyLib. Loglevel.WARNING, "ClientRequestSniffer.WriteToPipe(TimeOutException): {0}", tex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, "ClientRequestSniffer.WriteToPipe(TimeOutException): {0}", tex.Message);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, HttpReverseProxyLib. Loglevel.WARNING, "ClientRequestSniffer.WriteToPipe(Exception): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, "ClientRequestSniffer.WriteToPipe(Exception): {0}", ex.Message);
       }
 
       return retVal;

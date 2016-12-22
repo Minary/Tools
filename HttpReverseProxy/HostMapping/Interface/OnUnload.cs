@@ -1,6 +1,8 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
+
 
   public partial class HostMapping
   {
@@ -10,8 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("HostMapping", Loglevel.DEBUG, "HostMapping.OnUnload():");
-      
+      Logging.Instance.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.DEBUG, "HostMapping.OnUnload():");
     }
   }
 }

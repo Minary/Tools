@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
   public partial class ClientRequestSniffer
@@ -23,7 +24,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "ClientRequestSniffer.OnPostServerDataResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.OnPostServerDataResponse(): ");
     }
   }
 }
