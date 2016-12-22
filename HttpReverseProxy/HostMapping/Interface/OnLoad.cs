@@ -1,6 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
-  using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
   using System.IO;
@@ -40,11 +40,11 @@
       catch (System.IO.FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", Loglevel.INFO, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.INFO, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", Loglevel.INFO, "HostMapping.OnLoad(EXCEPTION): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.INFO, "HostMapping.OnLoad(EXCEPTION): {0}", ex.Message);
       }
 
       this.pluginProperties.PluginHost.RegisterPlugin(this);

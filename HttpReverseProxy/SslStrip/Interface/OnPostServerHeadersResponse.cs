@@ -59,7 +59,8 @@
 
         Logging.Instance.LogMessage(
                                     requestObj.Id,
-                                     Loglevel.DEBUG,
+                                    ProxyProtocol.Undefined,
+                                    Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2http2XX, {0} \"{1}\" -> \"-\", host:{2}, MimeType:{3}",
                                     requestObj.ServerResponseObj.ContentTypeEncoding.ContentType,
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
@@ -80,6 +81,7 @@
 
         Logging.Instance.LogMessage(
                                     requestObj.Id,
+                                    ProxyProtocol.Undefined,
                                      Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Http3XX \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
@@ -103,7 +105,8 @@
 
         Logging.Instance.LogMessage(
                                     requestObj.Id,
-                                     Loglevel.DEBUG,
+                                    ProxyProtocol.Undefined,
+                                    Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXDifferentUrl \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseObj.ResponseHeaders["location"]);
@@ -122,7 +125,8 @@
 
         Logging.Instance.LogMessage(
                                     requestObj.Id,
-                                     Loglevel.DEBUG,
+                                    ProxyProtocol.Undefined,
+                                    Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseObj.ResponseHeaders["location"],
@@ -139,7 +143,8 @@
 
         Logging.Instance.LogMessage(
                                     requestObj.Id,
-                                     Loglevel.DEBUG,
+                                    ProxyProtocol.Undefined,
+                                    Loglevel.DEBUG,
                                     "SslStrip.DoClientRequestProcessing(): TYPE definition error for Url \"{0}\" ",
                                     requestObj.ClientRequestObj.GetRequestedUrl());
       }

@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.ClientRequestSniffer
 {
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes.Enum;
 
   public partial class ClientRequestSniffer
   {
@@ -10,7 +11,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("ClientRequestSniffer", Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
+      Logging.Instance.LogMessage("ClientRequestSniffer", ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
     }
   }
 }

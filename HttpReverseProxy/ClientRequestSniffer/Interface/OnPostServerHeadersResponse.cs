@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
 
@@ -22,7 +23,7 @@
       // Send sniffed data to pipe
       this.SendClientRequestDataToPipe(requestObj);
 
-      Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
       return instruction;
     }
   }

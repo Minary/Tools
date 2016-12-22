@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System.Collections.Concurrent;
 
@@ -51,7 +52,7 @@
 
       foreach (string tmpKey in foundHttpsTags.Keys)
       {
-        Logging.Instance.LogMessage(requestObj.Id, Loglevel.DEBUG, "SslStrip.FoundHttpsHosts(): {0}: {1}", tmpKey, foundHttpsTags[tmpKey]);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "SslStrip.FoundHttpsHosts(): {0}: {1}", tmpKey, foundHttpsTags[tmpKey]);
       }
 
       // 2. Replace previously determined tags by the according replacement tag
