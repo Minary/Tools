@@ -7,6 +7,7 @@
   using System;
   using System.IO;
   using System.Net.NetworkInformation;
+  using System.Text.RegularExpressions;
   using System.Security.Cryptography.X509Certificates;
 
 
@@ -21,8 +22,13 @@
     /// <param name="args"></param>
     public static void Main(string[] args)
     {
+      string certificateHost = string.Empty;
       var parser = new FluentCommandLineParser();
       parser.IsCaseSensitive = false;
+
+      parser.Setup<string>("createCertificate")
+       .Callback(item => { certificateHost = item; })
+       .WithDescription("Create selfsigned certificate for HOSTNAME");
 
       parser.Setup<int>("httpPort")
        .Callback(item => { Config.LocalHttpServerPort = item; })
@@ -36,7 +42,6 @@
 
       parser.Setup<string>("certificate")
        .Callback(item => { Config.CertificatePath = item; })
-       .Required()
        .WithDescription("Define certificate file path");
 
       parser.Setup<Loglevel>("loglevel")
@@ -53,10 +58,42 @@
       {
         Console.WriteLine("{0}\r\n\r\n", result.ErrorText);
       }
+      else if (!string.IsNullOrEmpty(certificateHost) && !string.IsNullOrWhiteSpace(certificateHost))
+      {
+        CreateCertificate(certificateHost);
+      }
+      else if (string.IsNullOrEmpty(Config.CertificatePath))
+      {
+        Console.WriteLine("You did not define a certificate file");
+      }
       else
       {
         StartProxyServer();
       }
+    }
+
+
+    private static void CreateCertificate(string certificateHost)
+    {
+      Console.WriteLine("Creating new certificate for {0}", certificateHost);
+      string certificateFileName = Regex.Replace(certificateHost, @"[^\d\w_]", "_");
+      string certificateOutputPath = string.Format("{0}.pfx", certificateFileName);
+      DateTime validityStartDate = DateTime.Now.AddDays(-1);
+      DateTime validityEndDate = DateTime.Now.AddYears(5);
+
+      // Delete certificate file if it already exists
+      if (File.Exists(certificateOutputPath))
+      {
+        Console.WriteLine("Certificate file \"{0}\" already exists. You have to (re)move the file in order to create a new certificate.", certificateOutputPath);
+        return;
+      }
+
+      // Create certificate
+      NativeWindowsLib.Crypto.Crypto.CreateNewCertificate(certificateOutputPath, certificateHost, validityStartDate, validityEndDate);
+      Console.WriteLine("Certificate created successfully.");
+      Console.WriteLine("Certificate file: {0}", certificateOutputPath);
+      Console.WriteLine("Certificate validity start: {0}", validityStartDate);
+      Console.WriteLine("Certificate validity end: {0}", validityEndDate);
     }
 
 

@@ -120,6 +120,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Libs\NativeWindowsLib\NativeWindowsLib.csproj">
+      <Project>{48fe6d15-e639-44ae-81d5-d88d89c8c4a6}</Project>
+      <Name>NativeWindowsLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\HttpReverseProxyLib\HttpReverseProxyLib.csproj">
       <Project>{e30fa5df-3dbb-41b1-a325-27d478757ffb}</Project>
       <Name>HttpReverseProxyLib</Name>
