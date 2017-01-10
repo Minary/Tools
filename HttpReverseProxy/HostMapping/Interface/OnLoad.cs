@@ -6,6 +6,7 @@
   using System.IO;
   using HostMappingConfig = HttpReverseProxy.Plugin.HostMapping.Config;
 
+
   public partial class HostMapping
   {
 
@@ -15,16 +16,7 @@
     /// <returns></returns>
     public void OnLoad(IPluginHost pluginHost)
     {
-      // Set plugin properties
-      this.pluginProperties = new PluginProperties()
-      {
-        Name = HostMappingConfig.PluginName,
-        Priority = HostMappingConfig.PluginPriority,
-        Version = HostMappingConfig.PluginVersion,
-        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", HostMappingConfig.PluginName),
-        PluginHost = pluginHost,
-        IsActive = true,
-      };
+      this.pluginProperties.PluginHost = pluginHost;
 
       // Parse configuration file
       this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, HostMappingConfig.ConfigFileName);

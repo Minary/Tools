@@ -37,6 +37,16 @@
     /// <param name="requestObj"></param>
     private void SendClientRequestDataToPipe(RequestObj requestObj)
     {
+      // Set plugin properties
+      this.pluginProperties = new PluginProperties()
+      {
+        Name = ClientSnifferConfig.PluginName,
+        Priority = ClientSnifferConfig.PluginPriority,
+        Version = ClientSnifferConfig.PluginVersion,
+        PluginDirectory = Directory.GetCurrentDirectory(),
+        IsActive = true,
+      };
+
       // 2. Send request/response data to pipe/GUI
       string pipeData = string.Format("TCP||{0}||{1}||{2}||{3}||{4}||{5}\r\n",
                                       requestObj.SrcMac,

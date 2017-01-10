@@ -6,6 +6,7 @@
   using System.IO;
   using SslStripConfig = HttpReverseProxy.Plugin.SslStrip.Config;
 
+
   public partial class SslStrip
   {
 
@@ -16,15 +17,7 @@
     public void OnLoad(IPluginHost pluginHost)
     {
       // Set plugin properties
-      this.pluginProperties = new PluginProperties()
-      {
-        Name = SslStripConfig.PluginName,
-        Priority = SslStripConfig.PluginPriority,
-        Version = SslStripConfig.PluginVersion,
-        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", SslStripConfig.PluginName),
-        PluginHost = pluginHost,
-        IsActive = true,
-      };
+      this.pluginProperties.PluginHost = pluginHost;
 
       // Parse configuration file
       this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, SslStripConfig.ConfigFileName);

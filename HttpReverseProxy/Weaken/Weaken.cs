@@ -1,6 +1,9 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
   using HttpReverseProxyLib.Interface;
+  using System.IO;
+  using WeakenConfig = HttpReverseProxy.Plugin.Weaken.Config;
+
 
   public partial class Weaken : IPlugin
   {
@@ -24,6 +27,14 @@
 
     public Weaken()
     {
+      this.pluginProperties = new PluginProperties()
+      {
+        Name = WeakenConfig.PluginName,
+        Priority = WeakenConfig.PluginPriority,
+        Version = WeakenConfig.PluginVersion,
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", WeakenConfig.PluginName),
+        IsActive = true,
+      };
     }
 
     #endregion

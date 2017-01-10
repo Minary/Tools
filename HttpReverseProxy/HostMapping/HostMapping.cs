@@ -1,6 +1,8 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
   using HttpReverseProxyLib.Interface;
+  using System.IO;
+  using HostMappingConfig = HttpReverseProxy.Plugin.HostMapping.Config;
 
 
   public partial class HostMapping : IPlugin
@@ -26,9 +28,15 @@
 
     public HostMapping()
     {
-      //this.sslStrippedData = string.Empty;
-      //this.sslStrippedHosts = new Dictionary<string, bool>();
-      //this.sslStrippedUrls = new Dictionary<string, string>();
+      // Set plugin properties
+      this.pluginProperties = new PluginProperties()
+      {
+        Name = HostMappingConfig.PluginName,
+        Priority = HostMappingConfig.PluginPriority,
+        Version = HostMappingConfig.PluginVersion,
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", HostMappingConfig.PluginName),
+        IsActive = true,
+      };
     }
 
     #endregion

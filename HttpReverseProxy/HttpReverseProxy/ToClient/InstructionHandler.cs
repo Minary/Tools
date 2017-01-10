@@ -66,8 +66,8 @@ namespace HttpReverseProxy.ToClient
       }
 
       byte[] fileData = File.ReadAllBytes(injectFilePath);
-      string redirectData = Header.SendFile.GetHeader(injectFilePath, fileData.Count(), requestObj.ServerResponseObj.StatusLine.NewlineString);
-      byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectData);
+      string redirectHeader = Header.SendFile.GetHeader(injectFilePath, fileData.Count(), requestObj.ClientRequestObj.RequestLine.NewlineString);
+      byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectHeader);
 
       this.tcpClientConnection.SendToClient(redirectDataByteArray, requestObj.ClientRequestObj.ClientBinaryWriter);
       this.tcpClientConnection.SendToClient(fileData, requestObj.ClientRequestObj.ClientBinaryWriter);
