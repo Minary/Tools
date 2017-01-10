@@ -8,7 +8,9 @@
   using System;
   using System.Collections.Concurrent;
   using System.Collections.Generic;
+  using System.IO;
   using System.Text.RegularExpressions;
+  using SslStripConfig = HttpReverseProxy.Plugin.SslStrip.Config;
 
 
   public partial class SslStrip : IPlugin
@@ -46,6 +48,15 @@
       this.sslStrippedData = string.Empty;
       this.sslStrippedHosts = new Dictionary<string, bool>();
       this.sslStrippedUrls = new Dictionary<string, string>();
+
+      this.pluginProperties = new PluginProperties()
+      {
+        Name = SslStripConfig.PluginName,
+        Priority = SslStripConfig.PluginPriority,
+        Version = SslStripConfig.PluginVersion,
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", SslStripConfig.PluginName),
+        IsActive = true,
+      };
     }
 
 

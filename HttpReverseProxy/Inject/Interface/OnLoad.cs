@@ -5,7 +5,6 @@
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using HttpReverseProxyLib.Interface;
-  using InjectConfig = HttpReverseProxy.Plugin.Inject.Config;
 
 
   public partial class Inject
@@ -18,15 +17,7 @@
     public void OnLoad(IPluginHost pluginHost)
     {
       // Set plugin properties
-      this.pluginProperties = new PluginProperties()
-      {
-        Name = InjectConfig.PluginName,
-        Priority = InjectConfig.PluginPriority,
-        Version = InjectConfig.PluginVersion,
-        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", InjectConfig.PluginName),
-        PluginHost = pluginHost,
-        IsActive = true,
-      };
+      this.pluginProperties.PluginHost = pluginHost;
 
       // Parse configuration file
       this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, InjectConfig.ConfigFileName);

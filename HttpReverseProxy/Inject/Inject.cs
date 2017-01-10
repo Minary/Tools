@@ -1,7 +1,9 @@
 ﻿namespace HttpReverseProxy.Plugin.Inject
 {
-  using System.Collections.Generic;
   using HttpReverseProxyLib.Interface;
+  using System.Collections.Generic;
+  using System.IO;
+  using InjectConfig = HttpReverseProxy.Plugin.Inject.Config;
 
 
   public partial class Inject : IPlugin
@@ -30,6 +32,15 @@
 
     public Inject()
     {
+      this.pluginProperties = new PluginProperties()
+      {
+        Name = InjectConfig.PluginName,
+        Priority = InjectConfig.PluginPriority,
+        Version = InjectConfig.PluginVersion,
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", InjectConfig.PluginName),
+        IsActive = true,
+      };
+
       // Host->Path->type->redirect_resource
       this.injectHostPathPair = new Dictionary<string, Dictionary<string, DataTypes.InjectType>>();
     }

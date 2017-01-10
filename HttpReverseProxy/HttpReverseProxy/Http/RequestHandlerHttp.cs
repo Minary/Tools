@@ -324,6 +324,7 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
       bool mustBeProcessed = this.IsClientRequestDataProcessable(this.requestObj);
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "HttpReverseProxy.ProcessClientRequest(): CLIENT REQUEST : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
       SniffedDataChunk sniffedDataChunk = new SniffedDataChunk(Config.MaxSniffedClientDataSize);
+
       this.requestObj.ServerRequestHandler.RelayDataC2S(mustBeProcessed, sniffedDataChunk);
       this.EditClientRequestData(this.requestObj, sniffedDataChunk);
 

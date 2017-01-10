@@ -7,6 +7,7 @@
   using System;
   using System.Collections.Generic;
   using System.IO;
+  using System.Linq;
   using System.Net;
   using System.Net.Sockets;
   using System.Reflection;
@@ -86,7 +87,7 @@
       return true;
     }
 
- 
+
     public void Stop()
     {
       this.tcpListener.Stop();
@@ -100,6 +101,44 @@
 
       // Unload loaded plugins
       this.UnloadAllPlugins();
+    }
+
+ 
+    public void LoadPlugin(string pluginFileFullPath)
+    {
+      Assembly pluginAssembly;
+
+      if ((pluginAssembly = Assembly.LoadFile(pluginFileFullPath)) == null)
+      {
+        throw new Exception("The plugin file could not be loaded");
+      }
+
+      try
+      {
+        string fileName = Path.GetFileName(pluginFileFullPath);
+        fileName = Path.GetFileNameWithoutExtension(fileName);
+
+        string pluginName = string.Format("HttpReverseProxy.Plugin.{0}.{0}", fileName);
+        Type objType = pluginAssembly.GetType(pluginName, false, false);
+        object tmpPluginObj = Activator.CreateInstance(objType, true);
+
+        if (!(tmpPluginObj is HttpReverseProxyLib.Interface.IPlugin))
+        {
+          throw new Exception("The plugin file does not support the required plugin interface");
+        }
+
+        IPlugin tmpPlugin = (IPlugin)tmpPluginObj;
+        if (Config.LoadedPlugins.Find(elem => elem.Config.Name == tmpPlugin.Config.Name) != null)
+        {
+          throw new Exception("This plugin was loaded already");
+        }
+
+        tmpPlugin.OnLoad(this);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine("An error occurred while loading plugin file \"{0}\": {1}\r\n{2}", Path.GetFileName(pluginFileFullPath), ex.Message, ex.StackTrace);
+      }
     }
 
     #endregion
@@ -219,7 +258,6 @@
     /// </summary>
     private void LoadAllPlugins()
     {
-      Assembly pluginAssembly;
       string pluginsPath = Path.Combine(Directory.GetCurrentDirectory(), "plugins");
       string[] pluginDirs;
 
@@ -238,31 +276,13 @@
         // Load all plugin files, instantiate an object and initialize plugin.
         foreach (string pluginFileFullPath in pluginFiles)
         {
-          if ((pluginAssembly = Assembly.LoadFile(pluginFileFullPath)) == null)
-          {
-            continue;
-          }
-
           try
           {
-            string fileName = Path.GetFileName(pluginFileFullPath);
-            fileName = Path.GetFileNameWithoutExtension(fileName);
-
-            string pluginName = string.Format("HttpReverseProxy.Plugin.{0}.{0}", fileName);
-            Type objType = pluginAssembly.GetType(pluginName, false, false);
-            object tmpPluginObj = Activator.CreateInstance(objType);
-
-            if (!(tmpPluginObj is HttpReverseProxyLib.Interface.IPlugin))
-            {
-              continue;
-            }
-
-            IPlugin tmpPlugin = (IPlugin)tmpPluginObj;
-            tmpPlugin.OnLoad(this);
+            this.LoadPlugin(pluginFileFullPath);
           }
           catch (Exception ex)
           {
-            Console.WriteLine("Error occurred while loading plugin file \"{0}\": {1}\r\n{2}", pluginFileFullPath, ex.Message, ex.StackTrace);
+            Console.WriteLine("An error occurred while loading the plugin \"{0}\": {1}", Path.GetFileNameWithoutExtension(pluginFileFullPath), ex.Message);
           }
         }
       }
@@ -307,7 +327,7 @@
     }
 
 
-    public Logging LoggingInst { get { return Logging.Instance; }  set { } }
+    public Logging LoggingInst { get { return Logging.Instance; } set { } }
 
     #endregion
 

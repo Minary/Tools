@@ -202,6 +202,7 @@
 
         if (blockSize > 0)
         {
+if (serverNewlineBytes == null) Console.WriteLine("serverNewlineBytes == null");
           this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding, serverNewlineBytes);
           noBytesTransferred += blockSize;
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize > 0: ChunkNo={0} chunkLenStr.Length={1}, Content=|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);

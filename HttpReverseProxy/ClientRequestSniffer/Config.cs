@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.ClientRequestSniffer
 {
+
   public class Config
   {
 
