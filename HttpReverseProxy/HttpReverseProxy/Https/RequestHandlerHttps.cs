@@ -92,7 +92,7 @@
           this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
           this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
 
-          string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0].ToString() : string.Empty;
+          string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.INFO, "HttpsReverseProxy.ProcessClientRequest(): {0}{1}, {2}, {3} bytes", this.requestObj.ServerResponseObj.StatusLine.StatusCode, redirectLocation, this.requestObj.ProxyDataTransmissionModeS2C, this.requestObj.ServerResponseObj.NoTransferredBytes);
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "HttpsReverseProxy.ProcessClientRequest(): DONE! All data transferred to client");
         }
@@ -172,7 +172,7 @@
       // Transfer behavior is "Content-Length"
       if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
       {
-        string contentLen = this.requestObj.ServerResponseObj.ResponseHeaders["Content-Length"][0].ToString();
+        string contentLen = this.requestObj.ServerResponseObj.ResponseHeaders["Content-Length"][0];
         this.requestObj.ServerResponseObj.ContentLength = int.Parse(contentLen);
 
         if (this.requestObj.ServerResponseObj.ContentLength > 0)

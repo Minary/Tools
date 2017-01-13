@@ -64,21 +64,25 @@
     {
       foreach (string tmpKey in requestObj.ServerResponseObj.ResponseHeaders.Keys)
       {
-        if (tmpKey.ToLower() == "strict-transport-security")
+        if (tmpKey.ToLower() != "strict-transport-security")
         {
-          if (!CacheHsts.Instance.HstsCache.ContainsKey(requestObj.ClientRequestObj.GetRequestedUrl()))
-          {
-            try
-            {
-              CacheHsts.Instance.AddElement(requestObj.ClientRequestObj.GetRequestedUrl());
-            }
-            catch
-            {
-            }
-          }
-
-          break;
+          continue;
         }
+
+        if (CacheHsts.Instance.HstsCache.ContainsKey(requestObj.ClientRequestObj.GetRequestedUrl()))
+        {
+          continue;
+        }
+
+        try
+        {
+          CacheHsts.Instance.AddElement(requestObj.ClientRequestObj.GetRequestedUrl());
+        }
+        catch
+        {
+        }
+
+        break;
       }
     }
 
@@ -96,7 +100,7 @@
       {
         if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location"))
         {
-          redirectHeader = requestObj.ServerResponseObj.ResponseHeaders["Location"].ToString();
+          redirectHeader = requestObj.ServerResponseObj.ResponseHeaders["Location"][0];
         }
         else
         {
@@ -161,7 +165,7 @@
     private void ProcessHeadersSameRedirectLocation(RequestObj requestObj)
     {
       // 1. Cache HTTP2HTTPS redirect Location
-      string redirectLocationHttps = requestObj.ServerResponseObj.ResponseHeaders["Location"].ToString();
+      string redirectLocationHttps = requestObj.ServerResponseObj.ResponseHeaders["Location"][0];
       string requestedLocation = requestObj.ClientRequestObj.GetRequestedUrl();
 
       try
@@ -192,9 +196,9 @@
     private void ProcessHeadersDifferentRedirectLocation(RequestObj requestObj)
     {
       // 1. Determine and cache HTTP2HTTPS redirect Location
-      string redirectLocationHttps = requestObj.ServerResponseObj.ResponseHeaders["Location"].ToString();
+      string redirectLocationHttps = requestObj.ServerResponseObj.ResponseHeaders["Location"][0];
       ////      string redirectLocationHttp = requestObj.ServerWebResponse.GetResponseHeader("Location");
-      string redirectLocationHttp = requestObj.ServerResponseObj.ResponseHeaders["Location"].ToString();
+      string redirectLocationHttp = requestObj.ServerResponseObj.ResponseHeaders["Location"][0];
       string requestedLocation = requestObj.ClientRequestObj.GetRequestedUrl();
 
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "SslStrip.ProcessHeadersDifferentRedirectLocation(): TYPE Http2Https3XXSameUrl {0} -> {1}", requestedLocation, redirectLocationHttps);
@@ -218,7 +222,7 @@
         requestObj.ServerResponseObj.ResponseHeaders.Remove("Location");
       }
 
-      requestObj.ServerResponseObj.ResponseHeaders.Add("Location", redirectLocationHttp);
+      requestObj.ServerResponseObj.ResponseHeaders.Add("Location", new List<string>() { redirectLocationHttp });
     }
 
 

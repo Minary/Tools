@@ -85,7 +85,7 @@
                                      Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Http3XX \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseObj.ResponseHeaders["location"]);
+                                    requestObj.ServerResponseObj.ResponseHeaders["Location"][0]);
 
 
 
@@ -102,14 +102,14 @@
         pluginInstruction.Instruction = Instruction.DoNothing;
 
         //// Http2Https3XXSameUrl         -> Remember redirect, strip SSL, request new Url    SSLCacheAndRedirectClient2RedirectLocation()
-
+        
         Logging.Instance.LogMessage(
                                     requestObj.Id,
                                     ProxyProtocol.Undefined,
                                     Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXDifferentUrl \"{0}\" -> \"{1}\"",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseObj.ResponseHeaders["location"]);
+                                    requestObj.ServerResponseObj.ResponseHeaders["Location"][0]);
 
 
 
@@ -129,7 +129,7 @@
                                     Loglevel.DEBUG,
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
-                                    requestObj.ServerResponseObj.ResponseHeaders["location"],
+                                    requestObj.ServerResponseObj.ResponseHeaders["Location"][0],
                                     requestObj.ClientRequestObj.Scheme);
 
 

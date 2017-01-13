@@ -144,7 +144,7 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
             Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "HttpReverseProxy.ProcessClientRequest(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
 
             this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
-            string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0].ToString() : string.Empty;
+            string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
             Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.INFO, "HttpReverseProxy.ProcessClientRequest(): {0}{1}, {2}, {3} bytes", this.requestObj.ServerResponseObj.StatusLine.StatusCode, redirectLocation, this.requestObj.ProxyDataTransmissionModeS2C, this.requestObj.ServerResponseObj.NoTransferredBytes);
             Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "HttpReverseProxy.ProcessClientRequest(): DONE! All data transferred to client");
           }
@@ -230,7 +230,7 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
       // Transfer behavior is "Content-Length"
       if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
       {
-        string contentLen = this.requestObj.ServerResponseObj.ResponseHeaders["Content-Length"][0].ToString();
+        string contentLen = this.requestObj.ServerResponseObj.ResponseHeaders["Content-Length"][0];
         this.requestObj.ServerResponseObj.ContentLength = int.Parse(contentLen);
 
         if (this.requestObj.ServerResponseObj.ContentLength > 0)
