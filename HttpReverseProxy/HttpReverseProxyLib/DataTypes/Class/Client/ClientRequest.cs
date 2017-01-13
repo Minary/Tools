@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Class.Client
 {
   using System.Collections;
+  using System.Collections.Generic;
   using System.IO;
 
 
@@ -17,7 +18,7 @@
     private DataContentTypeEncoding contentTypeEncoding;
 
     private IncomingClientRequest clientWebRequestHandler;
-    private Hashtable clientRequestHeaders;
+    private Dictionary<string, List<string>> clientRequestHeaders;
     private MyBinaryReader clientBinaryReader;
     private BinaryWriter clientBinaryWriter;
 
@@ -41,7 +42,7 @@
 
     public IncomingClientRequest ClientWebRequestHandler { get { return this.clientWebRequestHandler; } set { this.clientWebRequestHandler = value; } }
 
-    public Hashtable ClientRequestHeaders { get { return this.clientRequestHeaders; } set { this.clientRequestHeaders = value; } }
+    public Dictionary<string, List<string>> ClientRequestHeaders { get { return this.clientRequestHeaders; } set { this.clientRequestHeaders = value; } }
 
     public MyBinaryReader ClientBinaryReader { get { return this.clientBinaryReader; } set { this.clientBinaryReader = value; } }
 
@@ -62,7 +63,7 @@
       this.defaultHost = defaultHost;
 
       this.clientRequestContentLength = 0;
-      this.clientRequestHeaders = new Hashtable();
+      this.clientRequestHeaders = new Dictionary<string, List<string>>();
       this.contentTypeEncoding = new DataContentTypeEncoding();
       this.clientBinaryReader = null;
       this.clientBinaryWriter = null;

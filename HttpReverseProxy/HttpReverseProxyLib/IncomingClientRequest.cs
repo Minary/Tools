@@ -5,6 +5,7 @@
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System;
+  using System.Collections.Generic;
   using System.Linq;
   using System.Net;
   using System.Text;
@@ -58,7 +59,7 @@
         throw exception;
       }
 
-      requestObj.ClientRequestObj.Host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"].ToString();
+      requestObj.ClientRequestObj.Host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0];
       requestObj.ClientRequestObj.Scheme = "http";
 
       // Parse Client request content type
@@ -226,25 +227,30 @@
         httpHeaders[0] = httpHeaders[0].Trim();
         httpHeaders[1] = httpHeaders[1].Trim();
 
+        if (!requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey(httpHeaders[0]))
+        {
+          requestObj.ClientRequestObj.ClientRequestHeaders.Add(httpHeaders[0], new List<string>());
+        }
+
         switch (httpHeaders[0].ToLower())
         {
           case "host":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Host", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(httpHeaders[1]);
             break;
           case "user-agent":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("User-Agent", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["User-Agent"].Add(httpHeaders[1]);
             break;
           case "accept":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Accept", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Accept"].Add(httpHeaders[1]);
             break;
           case "referer":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Referer", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Referer"].Add(httpHeaders[1]);
             break;
           case "cookie":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Cookie", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Cookie"].Add(httpHeaders[1]);
             break;
           case "connection":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Connection", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Connection"].Add(httpHeaders[1]);
             if (httpHeaders[1].ToLower().Trim() == "close")
             {
               requestObj.ClientRequestObj.IsClientKeepAlive = false;
@@ -265,24 +271,24 @@
           case "content-length":
             int.TryParse(httpHeaders[1], out contentLen);
             requestObj.ClientRequestObj.ClientRequestContentLength = contentLen;
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Content-Length", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"].Add(httpHeaders[1]);
             break;
           case "content-type":
-            requestObj.ClientRequestObj.ClientRequestHeaders.Add("Content-Type", httpHeaders[1]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Content-Type"].Add(httpHeaders[1]);
             break;
           case "if-modified-since":
             string[] sb = httpHeaders[1].Trim().Split(new char[] { ';' });
             DateTime d;
             if (DateTime.TryParse(sb[0], out d))
             {
-              requestObj.ClientRequestObj.ClientRequestHeaders.Add("If-Modified-Since", httpHeaders[1]);
+              requestObj.ClientRequestObj.ClientRequestHeaders["If-Modified-Since"].Add(httpHeaders[1]);
             }
 
             break;
           default:
             try
             {
-              requestObj.ClientRequestObj.ClientRequestHeaders.Add(httpHeaders[0], httpHeaders[1]);
+              requestObj.ClientRequestObj.ClientRequestHeaders[httpHeaders[0]].Add( httpHeaders[1]);
             }
             catch (Exception ex)
             {
@@ -296,7 +302,7 @@
     }
 
 
-    private DataContentTypeEncoding DetermineClientRequestContentTypeEncoding(RequestObj requestObj) //Hashtable headers)
+    private DataContentTypeEncoding DetermineClientRequestContentTypeEncoding(RequestObj requestObj)
     {
       DataContentTypeEncoding contentTypeEncoding = new DataContentTypeEncoding();
 
@@ -317,7 +323,7 @@
 
       // If there is no content type headerByteArray set the default values
       if (!requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Content-Type") ||
-          string.IsNullOrEmpty(requestObj.ClientRequestObj.ClientRequestHeaders["Content-Type"].ToString()))
+          string.IsNullOrEmpty(requestObj.ClientRequestObj.ClientRequestHeaders["Content-Type"][0]))
       {
         contentTypeEncoding.ContentType = "text/html";
         contentTypeEncoding.ContentCharSet = "UTF-8";
@@ -330,7 +336,7 @@
       // Parse the server response content type
       try
       {
-        string contentType = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Type"].ToString();
+        string contentType = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Type"][0];
 
         if (contentType.Contains(";"))
         {
@@ -390,7 +396,7 @@
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Content-Length"))
         {
-          string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"].ToString();
+          string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"][0];
           requestObj.ClientRequestObj.ClientRequestContentLength = int.Parse(contentLen);
         }
         else if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Transfer-Encoding"))
@@ -416,7 +422,7 @@
       // Transfer behavior is "Content-Length"
       if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Content-Length"))
       {
-        string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"].ToString();
+        string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"][0];
         requestObj.ClientRequestObj.ClientRequestContentLength = int.Parse(contentLen);
 Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(Content-Length)");
 

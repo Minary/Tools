@@ -312,7 +312,8 @@
       {
         foreach (string key in requestObj.ClientRequestObj.ClientRequestHeaders.Keys)
         {
-          this.requestObj.HttpLogData += string.Format("..{0}: {1}", key, requestObj.ClientRequestObj.ClientRequestHeaders[key]);
+          string logData = string.Join("..", requestObj.ClientRequestObj.ClientRequestHeaders[key]);
+          this.requestObj.HttpLogData += string.Format("..{0}: {1}", key, logData);
         }
       }
       catch (Exception)

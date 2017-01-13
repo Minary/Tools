@@ -31,7 +31,7 @@
       {
         throw new ProxyWarningException("The server response content type is invalid");
       }
-      
+
     }
   }
 }
