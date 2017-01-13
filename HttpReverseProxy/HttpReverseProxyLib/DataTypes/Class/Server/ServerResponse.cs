@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib.DataTypes.Class;
   using System.Collections;
+  using System.Collections.Generic;
 
 
   public class ServerResponse
@@ -13,7 +14,7 @@
     private DataContentTypeEncoding contentTypeEncoding;
     private int contentLen;
     private int noTransferredBytes;
-    private Hashtable responseHeaders;
+    private Dictionary<string, List<string>> responseHeaders;
 
     #endregion
 
@@ -24,7 +25,7 @@
 
     public int ContentLength { get { return this.contentLen; } set { this.contentLen = value; } }
  
-    public Hashtable ResponseHeaders { get { return this.responseHeaders; } set { this.responseHeaders = value; } }
+    public Dictionary<string, List<string>> ResponseHeaders { get { return this.responseHeaders; } set { this.responseHeaders = value; } }
 
     public ServerResponseStatusLine StatusLine { get { return this.statusLine; } set { this.statusLine = value; } }
 
@@ -39,7 +40,7 @@
     {
       this.contentTypeEncoding = new DataContentTypeEncoding();
       this.statusLine = new ServerResponseStatusLine();
-      this.responseHeaders = new Hashtable();
+      this.responseHeaders = new Dictionary<string, List<string>>();
       this.noTransferredBytes = 0;
     }
 

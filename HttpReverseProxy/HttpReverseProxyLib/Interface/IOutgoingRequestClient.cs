@@ -1,9 +1,9 @@
 ﻿namespace HttpReverseProxyLib.Interface
 {
-  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Class.Server;
   using System.Collections;
+  using System.Collections.Generic;
   using System.Net.Sockets;
 
   public interface IOutgoingRequestClient
@@ -29,7 +29,7 @@
     // Server header transfer
     void ForwardStatusLineS2C(ServerResponseStatusLine serverResponseStatusLine);
 
-    void ForwardHeadersS2C(Hashtable serverResponseHeaders, byte[] clientNewlineBytes);
+    void ForwardHeadersS2C(Dictionary<string, List<string>> serverResponseHeaders, byte[] clientNewlineBytes);
 
 
     // Client/Server data transfer
