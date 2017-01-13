@@ -120,7 +120,7 @@
     }
 
 
-    public void ForwardHeadersC2S(Hashtable requestHeaders, byte[] clientNewlineBytes)
+    public void ForwardHeadersC2S(Dictionary<string, List<string>> requestHeaders, byte[] clientNewlineBytes)
     {
       byte[] headerByteArray;
       string headerString;

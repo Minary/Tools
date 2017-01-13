@@ -24,8 +24,8 @@
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
         {
-          requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Host");
-          requestObj.ClientRequestObj.ClientRequestHeaders.Add("Host", Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2);
+          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
+          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2);
 
           requestObj.ClientRequestObj.Scheme = Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item1;
           requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2;

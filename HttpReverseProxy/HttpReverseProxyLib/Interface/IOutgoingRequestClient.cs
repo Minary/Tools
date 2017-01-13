@@ -19,7 +19,7 @@
     // Client header transfer
     void ForwardRequestC2S(string requestMethod, string path, string httpVersion, byte[] newlineBytes);
 
-    void ForwardHeadersC2S(Hashtable requestHeaders, byte[] clientNewlineBytes);
+    void ForwardHeadersC2S(Dictionary<string, List<string>> requestHeaders, byte[] clientNewlineBytes);
 
     void ReadServerStatusLine(RequestObj requestObj);
 

@@ -52,7 +52,7 @@
       try
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Accept-Encoding") &&
-            Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Accept-Encoding"].ToString(), @"(gzip|deflate|compress)", RegexOptions.IgnoreCase).Success)
+            Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Accept-Encoding"][0], @"(gzip|deflate|compress)", RegexOptions.IgnoreCase).Success)
         {
           Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Accept-Encoding");
@@ -69,7 +69,7 @@
       try
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Upgrade") &&
-            Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Upgrade"].ToString(), "^TLS.*", RegexOptions.IgnoreCase).Success)
+            Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Upgrade"][0], "^TLS.*", RegexOptions.IgnoreCase).Success)
         {
           Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Upgrade");
