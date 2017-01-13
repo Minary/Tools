@@ -9,6 +9,7 @@
   using HttpReverseProxyLib.Interface;
   using System;
   using System.Collections;
+  using System.Collections.Generic;
   using System.IO;
   using System.Net.Sockets;
   using System.Text;
@@ -184,10 +185,10 @@
 
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Adding headerByteArray \"{0}\" with value \"{1}\" ", key, value);
 
-        if (serverResponseMetaDataObj.ResponseHeaders.ContainsKey(key))
+        // Process Cookie headers ...
+        if (!serverResponseMetaDataObj.ResponseHeaders.ContainsKey(key))
         {
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Header \"{0}\" (value:\"{1}\") already exists! Removing it now!", key, value);
-          serverResponseMetaDataObj.ResponseHeaders.Remove(key);
+          serverResponseMetaDataObj.ResponseHeaders.Add(key, new List<string>());
         }
 
         if (key.ToLower() == "connection" && value.ToLower() == "keep-alive")
@@ -199,7 +200,7 @@
           this.requestObj.IsServerKeepAlive = false;
         }
 
-        serverResponseMetaDataObj.ResponseHeaders.Add(key, value);
+        serverResponseMetaDataObj.ResponseHeaders[key].Add(value);
         dataLine = this.webServerStreamReader.ReadLine(false);
       }
 
@@ -241,17 +242,20 @@
     }
 
 
-    public void ForwardHeadersS2C(Hashtable serverResponseHeaders, byte[] serverNewlineBytes)
+    public void ForwardHeadersS2C(Dictionary<string, List<string>> serverResponseHeaders, byte[] serverNewlineBytes)
     {
       string header;
       byte[] headerByteArr;
-      foreach (string tmpKey in serverResponseHeaders.Keys)
+      foreach (string tmpHeaderKey in serverResponseHeaders.Keys)
       {
-        header = string.Format("{0}: {1}", tmpKey, serverResponseHeaders[tmpKey].ToString());
-        headerByteArr = Encoding.UTF8.GetBytes(header);
-        this.clientStreamWriter.Write(headerByteArr, 0, headerByteArr.Length);
-        this.clientStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
-        this.clientStreamWriter.Flush();
+        foreach (string headerValue in serverResponseHeaders[tmpHeaderKey])
+        {
+          header = string.Format("{0}: {1}", tmpHeaderKey, headerValue);
+          headerByteArr = Encoding.UTF8.GetBytes(header);
+          this.clientStreamWriter.Write(headerByteArr, 0, headerByteArr.Length);
+          this.clientStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+          this.clientStreamWriter.Flush();
+        }
       }
 
       // Send empty line to server to signalize "End of headerByteArray"
@@ -489,7 +493,7 @@
     }
 
 
-    private DataContentTypeEncoding DetermineServerResponseContentTypeEncoding(Hashtable headers)
+    private DataContentTypeEncoding DetermineServerResponseContentTypeEncoding(Dictionary<string, List<string>> headers)
     {
       DataContentTypeEncoding contentTypeEncoding = new DataContentTypeEncoding();
 
@@ -503,14 +507,19 @@
         throw new ProxyWarningException("The content type headerByteArray is invalid");
       }
 
-      if (string.IsNullOrEmpty(headers["Content-Type"].ToString()))
+      if (headers["Content-Type"].Count <= 0)
+      {
+        throw new ProxyWarningException("The content type headerByteArray is invalid");
+      }
+
+      if (string.IsNullOrEmpty(headers["Content-Type"][0].ToString()))
       {
         throw new ProxyWarningException("The content type headerByteArray is invalid");
       }
 
       // If there is no content type headerByteArray set the default values
       if (!headers.ContainsKey("Content-Type") ||
-          string.IsNullOrEmpty(headers["Content-Type"].ToString()))
+          string.IsNullOrEmpty(headers["Content-Type"][0].ToString()))
       {
         contentTypeEncoding.ContentType = "text/html";
         contentTypeEncoding.ContentCharSet = "UTF-8";
@@ -523,7 +532,7 @@
       // Parse the server response content type
       try
       {
-        string contentType = headers["Content-Type"].ToString();
+        string contentType = headers["Content-Type"][0].ToString();
 
         if (contentType.Contains(";"))
         {
