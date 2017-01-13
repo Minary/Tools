@@ -120,25 +120,27 @@
     }
 
 
-    public void ForwardHeadersC2S(Dictionary<string, List<string>> requestHeaders, byte[] clientNewlineBytes)
+    public void ForwardHeadersC2S(Dictionary<string, List<string>> clientRequestHeaders, byte[] clientNewlineBytes)
     {
       byte[] headerByteArray;
       string headerString;
 
-      if (requestHeaders == null || requestHeaders.Keys.Count <= 0)
+      if (clientRequestHeaders == null || clientRequestHeaders.Keys.Count <= 0)
       {
         throw new Exception("Request headers are invalid");
       }
 
       // Send headers to server
-      foreach (string tmpKey in requestHeaders.Keys)
+      foreach (string tmpHeaderKey in clientRequestHeaders.Keys)
       {
-        headerString = string.Format("{0}: {1}", tmpKey, requestHeaders[tmpKey]);
-        headerByteArray = Encoding.UTF8.GetBytes(headerString);
-
-        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientBase.ForwardHeadersC2S(): Header Client2Server: {0}", headerString);
-        this.webServerStreamWriter.Write(headerByteArray, 0, headerByteArray.Length);
-        this.webServerStreamWriter.Write(clientNewlineBytes, 0, clientNewlineBytes.Length);
+        foreach (string headerValue in clientRequestHeaders[tmpHeaderKey])
+        {
+          headerString = string.Format("{0}: {1}", tmpHeaderKey, headerValue);
+          headerByteArray = Encoding.UTF8.GetBytes(headerString);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientBase.ForwardHeadersC2S(): Header Client2Server: {0}", headerString);
+          this.webServerStreamWriter.Write(headerByteArray, 0, headerByteArray.Length);
+          this.webServerStreamWriter.Write(clientNewlineBytes, 0, clientNewlineBytes.Length);
+        }
       }
 
       // Send empty line to server to signalize "End of headerByteArray"
@@ -185,7 +187,7 @@
 
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientBase.ReadServerResponseHeaders(): Adding headerByteArray \"{0}\" with value \"{1}\" ", key, value);
 
-        // Process Cookie headers ...
+        // If it does not exist yet create a Server response HTTP header collection container
         if (!serverResponseMetaDataObj.ResponseHeaders.ContainsKey(key))
         {
           serverResponseMetaDataObj.ResponseHeaders.Add(key, new List<string>());
@@ -477,7 +479,7 @@
       {
         if (serverResponseMetaDataObj.ResponseHeaders.ContainsKey("Content-Length"))
         {
-          string contentLen = serverResponseMetaDataObj.ResponseHeaders["Content-Length"].ToString();
+          string contentLen = serverResponseMetaDataObj.ResponseHeaders["Content-Length"][0];
           serverResponseMetaDataObj.ContentLength = int.Parse(contentLen);
         }
         else

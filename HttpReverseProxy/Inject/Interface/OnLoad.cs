@@ -20,7 +20,7 @@
       this.pluginProperties.PluginHost = pluginHost;
 
       // Parse configuration file
-      this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, InjectConfig.ConfigFileName);
+      this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, Plugin.Inject.Config.ConfigFileName);
       if (string.IsNullOrEmpty(this.configurationFileFullPath))
       {
         return;
@@ -29,7 +29,7 @@
       try
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.INFO, "Inject.OnLoad(): Loaded {0} configuration records", InjectConfig.InjectRecords.Count);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.INFO, "Inject.OnLoad(): Loaded {0} configuration records", Plugin.Inject.Config.InjectRecords.Count);
       }
       catch (System.IO.FileNotFoundException)
       {
