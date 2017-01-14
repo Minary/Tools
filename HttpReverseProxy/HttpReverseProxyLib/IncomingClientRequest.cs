@@ -261,12 +261,12 @@
             }
 
             break;
-            
+
           // Ignore these
-          case "proxy-connection":
-          case "keep-alive":
-          case "upgrade-insecure-requests":
-            break;
+          //case "proxy-connection":
+          //case "keep-alive":
+          //case "upgrade-insecure-requests":
+          //  break;
 
           case "content-length":
             int.TryParse(httpHeaders[1], out contentLen);
