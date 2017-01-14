@@ -80,6 +80,21 @@
         Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
+
+      // Remove upgrade-insecure-requests header
+      try
+      {
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("upgrade-insecure-requests"))
+        {
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"upgrade-insecure-requests: ...\"");
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("upgrade-insecure-requests");
+        }
+      }
+      catch (Exception ex)
+      {
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
+      }
+
       return instruction;
     }
   }

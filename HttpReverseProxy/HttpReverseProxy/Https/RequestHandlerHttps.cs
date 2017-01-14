@@ -122,13 +122,9 @@
         }
         catch (System.IO.IOException ioex)
         {
-          // ClientNotificationException cnex = new ClientNotificationException();
-          //// cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.InternalServerError);
-          //// this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
-
           string innerException = (ioex.InnerException != null) ? string.Format("INNER EXCEPTION: {0}={1}", ioex.InnerException.GetType(), ioex.InnerException.Message) : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.ERROR, "HttpsReverseProxy.ProcessClientRequest(IOException): Inner exception:{0}\r\nRegular exception: {1}={2}\r\n{3}", innerException, ioex.GetType(), ioex.Message, ioex.StackTrace);
-          //break;
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.ERROR, "HttpsReverseProxy.ProcessClientRequest(IOException): Inner exception:{0}\r\nRegular exception: {1}={2}", innerException, ioex.GetType(), ioex.Message);
+          break;
         }
         catch (ObjectDisposedException odex)
         {
