@@ -23,7 +23,7 @@
       // Send sniffed data to pipe
       this.SendClientRequestDataToPipe(requestObj);
 
-      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "ClientRequestSniffer.ClientRequestSniffer.OnPostServerHeadersResponse(): ");
       return instruction;
     }
   }

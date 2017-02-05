@@ -24,7 +24,7 @@
       PluginInstruction instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
 
-      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "ClientRequestSniffer.OnPostClientHeaderRequest(): ");
       return instruction;
     }
   }

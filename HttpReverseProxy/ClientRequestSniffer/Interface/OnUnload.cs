@@ -11,7 +11,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("ClientRequestSniffer", ProxyProtocol.Undefined, Loglevel.DEBUG, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
+      Logging.Instance.LogMessage("ClientRequestSniffer", ProxyProtocol.Undefined, Loglevel.Debug, "ClientRequestSniffer.ClientRequestSnifferOnUnload(): ");
     }
   }
 }

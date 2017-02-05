@@ -7,9 +7,9 @@ namespace HttpReverseProxyLib.DataTypes.Enum
   [Flags]
   public enum Loglevel : int
   {
-    DEBUG = 1,
-    INFO = 2,
-    WARNING = 3,
-    ERROR = 4
+    Debug = 1,
+    Info = 2,
+    Warnung = 3,
+    Error = 4
   }
 }

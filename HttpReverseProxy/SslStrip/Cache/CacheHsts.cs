@@ -56,7 +56,7 @@
         return;
       }
 
-      Logging.Instance.LogMessage("SslStrip.CacheHsts.AddElement", ProxyProtocol.Undefined, Loglevel.DEBUG, "Cache.AddElement(): host => {0}", host);
+      Logging.Instance.LogMessage("SslStrip.CacheHsts.AddElement", ProxyProtocol.Undefined, Loglevel.Debug, "Cache.AddElement(): host => {0}", host);
 
       HstsRecord tmpHost = new HstsRecord(host);
       this.cache.Add(host, tmpHost);
@@ -70,7 +70,7 @@
     {
       foreach (string tmpKey in this.cache.Keys)
       {
-        Logging.Instance.LogMessage("SslStrip.CacheHsts.EnumerateCache", ProxyProtocol.Undefined, Loglevel.DEBUG, "EnumerateCache(): host:\"{0}\"", tmpKey);
+        Logging.Instance.LogMessage("SslStrip.CacheHsts.EnumerateCache", ProxyProtocol.Undefined, Loglevel.Debug, "EnumerateCache(): host:\"{0}\"", tmpKey);
       }
     }
 

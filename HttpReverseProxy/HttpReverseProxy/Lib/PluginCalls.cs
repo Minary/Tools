@@ -33,7 +33,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -67,7 +67,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -91,7 +91,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.WARNING, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 

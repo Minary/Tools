@@ -67,6 +67,7 @@
     <Compile Include="Exceptions\ProxyErrorException.cs" />
     <Compile Include="Exceptions\ProxyWarningException.cs" />
     <Compile Include="IncomingClientRequest.cs" />
+    <Compile Include="Interface\HttpReverseProxyBasis.cs" />
     <Compile Include="Interface\IOutgoingRequestClient.cs" />
     <Compile Include="Interface\IPlugin.cs" />
     <Compile Include="Interface\IPluginHost.cs" />
@@ -81,7 +82,12 @@
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\..\..\packages\StyleCop.Analyzers.1.0.0\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libs\NativeWindowsLib\NativeWindowsLib.csproj">
+      <Project>{48fe6d15-e639-44ae-81d5-d88d89c8c4a6}</Project>
+      <Name>NativeWindowsLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

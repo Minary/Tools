@@ -3,6 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
+  using HttpReverseProxyLib.Interface;
   using System;
   using System.IO;
   using System.Net;
@@ -14,7 +15,7 @@
   using System.Threading;
 
 
-  public class HttpsReverseProxy
+  public class HttpsReverseProxy : HttpReverseProxyBasis
   {
 
     #region MEMBERS
@@ -45,11 +46,11 @@
 
     #region PUBLIC
 
-    public bool Start(int localServerPort, string certificateFilePath)
+    public override bool Start(int localServerPort, string certificateFilePath)
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
-      
+
       // Start listener
       serverCertificate2 = new X509Certificate2(certificateFilePath, string.Empty);
       this.tcpListener = new TcpListener(this.ListeningIpInterface, localServerPort);
@@ -60,7 +61,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.ERROR, "ProxyServer.Start(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Error, "ProxyServer.Start(EXCEPTION): {0}", ex.Message);
         return false;
       }
 
@@ -70,7 +71,7 @@
     }
 
 
-    public void Stop()
+    public override void Stop()
     {
       this.tcpListener.Stop();
 
@@ -172,11 +173,11 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}\r\n{1}", ex.Message, ex.GetType().ToString());
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}\r\n{1}", ex.Message, ex.GetType().ToString());
 
         if (ex.InnerException is Exception)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(INNEREXCEPTION): {0}, {1}", ex.InnerException.Message, ex.GetType().ToString());
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(INNEREXCEPTION): {0}, {1}", ex.InnerException.Message, ex.GetType().ToString());
         }
       }
       finally
@@ -184,25 +185,25 @@
         if (requestObj.ClientRequestObj.ClientBinaryReader != null)
         {
           requestObj.ClientRequestObj.ClientBinaryReader.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryReader.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryReader.Close()");
         }
 
         if (requestObj.ClientRequestObj.ClientBinaryWriter != null)
         {
           requestObj.ClientRequestObj.ClientBinaryWriter.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
         }
 
         if (requestObj.ServerRequestHandler != null)
         {
           requestObj.ServerRequestHandler.CloseServerConnection();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
         }
 
         if (requestObj.TcpClientConnection != null)
         {
           requestObj.TcpClientConnection.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): TcpClientConnection.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): TcpClientConnection.Close()");
         }
       }
     }

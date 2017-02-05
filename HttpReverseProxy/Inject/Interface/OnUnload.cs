@@ -12,7 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.DEBUG, "Inject.OnUnload(): ");
+      Logging.Instance.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Debug, "Inject.OnUnload(): ");
     }
   }
 }

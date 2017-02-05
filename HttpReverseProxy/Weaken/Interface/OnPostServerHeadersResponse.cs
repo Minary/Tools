@@ -31,13 +31,13 @@
       {
         if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("strict-transport-security"))
         {
-          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"strict -transport-security: ...\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostServerHeadersResponse(): Remove \"strict -transport-security: ...\"");
           requestObj.ServerResponseObj.ResponseHeaders.Remove("strict-transport-security");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
       }
 
       // Remove "Set-Cookie ... secure"
@@ -52,7 +52,7 @@
           {
             if (Regex.Match(tmpValue, @";\s+secure", RegexOptions.IgnoreCase).Success)
             {
-              Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, "Weaken.OnPostServerHeadersResponse(): Remove \"secure\" cookie attribute.");
+              Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.OnPostServerHeadersResponse(): Remove \"secure\" cookie attribute.");
               string newCookieHeader = Regex.Replace(tmpValue, @";\s+secure", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
               newServerHeaders.Add(newCookieHeader);
@@ -73,7 +73,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, @"Weaken.WeakenClientRequestHeaders(EXCEPTION:SetCookie secure): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, @"Weaken.WeakenClientRequestHeaders(EXCEPTION:SetCookie secure): {0}", ex.Message);
       }
 
       // Remove "Set-Cookie ... HttpOnly"
@@ -88,7 +88,7 @@
           {
             if (Regex.Match(tmpValue, @";\s+httponly", RegexOptions.IgnoreCase).Success)
             {
-              Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"HttpOnly\" cookie attribute.");
+              Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostServerHeadersResponse(): Remove \"HttpOnly\" cookie attribute.");
               string newCookieHeader = Regex.Replace(tmpValue, @";\s+httponly", string.Empty, RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
               newServerHeaders.Add(newCookieHeader);
@@ -109,7 +109,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, @"Weaken.WeakenClientRequestHeaders(EXCEPTION:SetCookie HttpOnly): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, @"Weaken.WeakenClientRequestHeaders(EXCEPTION:SetCookie HttpOnly): {0}", ex.Message);
       }
 
       return instruction;

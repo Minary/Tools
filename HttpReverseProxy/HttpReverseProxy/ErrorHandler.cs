@@ -106,7 +106,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.ERROR, "IncomingClientRequest.ProcessWebException(EXCEPTION2) : {0} -> {1} \n{2}", requestObj.ClientRequestObj.GetRequestedUrl(), ex.Message, ex.StackTrace);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Error, "IncomingClientRequest.ProcessWebException(EXCEPTION2) : {0} -> {1} \n{2}", requestObj.ClientRequestObj.GetRequestedUrl(), ex.Message, ex.StackTrace);
       }
     }
 

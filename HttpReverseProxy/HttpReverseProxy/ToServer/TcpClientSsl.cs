@@ -49,14 +49,12 @@
     #region INTERFACE overrides: IOutgoingRequestClient
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="pHostName"></param>
-    /// <param name="pPort"></param>
-    /// <returns></returns>
+    /// <param name="host"></param>
     public override void OpenServerConnection(string host)
     {
-      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientSsl.OpenServerConnection()");
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientSsl.OpenServerConnection()");
 
       if (string.IsNullOrEmpty(host))
       {
@@ -76,12 +74,11 @@
 
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="pNetworkStream"></param>
     public override void CloseServerConnection()
     {
-      Logging.Instance.LogMessage(base.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.DEBUG, "TcpClientSsl.CloseServerConnection()");
+      Logging.Instance.LogMessage(base.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientSsl.CloseServerConnection()");
 
       if (this.serverConnectionSslStream != null)
       {

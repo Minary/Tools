@@ -12,7 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("Weaken", ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnUnload(): ");
+      Logging.Instance.LogMessage("Weaken", ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnUnload(): ");
     }
   }
 }
