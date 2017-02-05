@@ -33,11 +33,11 @@
       catch (System.IO.FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.INFO, "SslStrip.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.INFO, "SslStrip.OnLoad(EXCEPTION): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(EXCEPTION): {0}", ex.Message);
       }
 
       this.pluginProperties.PluginHost.RegisterPlugin(this);

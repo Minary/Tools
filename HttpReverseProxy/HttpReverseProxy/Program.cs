@@ -33,12 +33,12 @@
       parser.Setup<int>("httpPort")
        .Callback(item => { Config.LocalHttpServerPort = item; })
        .SetDefault(80)
-       .WithDescription("Define TCP port for incoming HTTP requests (default: 80)");
+       .WithDescription("Define TCP port for incoming HTTP requests. Default port is \"80\"");
 
       parser.Setup<int>("httpsPort")
        .Callback(item => { Config.LocalHttpsServerPort = item; })
        .SetDefault(443)
-       .WithDescription("Define TCP port for incoming HTTPS requests (default: 443)");
+       .WithDescription("Define TCP port for incoming HTTPS requests. Default port is \"443\"");
 
       parser.Setup<string>("certificate")
        .Callback(item => { Config.CertificatePath = item; })
@@ -46,8 +46,8 @@
 
       parser.Setup<Loglevel>("loglevel")
        .Callback(item => Config.Loglevel = item)
-       .SetDefault(Loglevel.INFO)
-       .WithDescription("Define log level (default: INFO)");
+       .SetDefault(Loglevel.Info)
+       .WithDescription("Define log level. Default level is \"Info\". Possible values are: " + string.Join(", ", Enum.GetNames(typeof(Loglevel))));
 
       // sets up the parser to execute the callback when -? or --help is detected
       parser.SetupHelp("?", "help")
@@ -75,25 +75,7 @@
 
     private static void CreateCertificate(string certificateHost)
     {
-      Console.WriteLine("Creating new certificate for {0}", certificateHost);
-      string certificateFileName = Regex.Replace(certificateHost, @"[^\d\w_]", "_");
-      string certificateOutputPath = string.Format("{0}.pfx", certificateFileName);
-      DateTime validityStartDate = DateTime.Now.AddDays(-1);
-      DateTime validityEndDate = DateTime.Now.AddYears(5);
-
-      // Delete certificate file if it already exists
-      if (File.Exists(certificateOutputPath))
-      {
-        Console.WriteLine("Certificate file \"{0}\" already exists. You have to (re)move the file in order to create a new certificate.", certificateOutputPath);
-        return;
-      }
-
-      // Create certificate
-      NativeWindowsLib.Crypto.Crypto.CreateNewCertificate(certificateOutputPath, certificateHost, validityStartDate, validityEndDate);
-      Console.WriteLine("Certificate created successfully.");
-      Console.WriteLine("Certificate file: {0}", certificateOutputPath);
-      Console.WriteLine("Certificate validity start: {0}", validityStartDate);
-      Console.WriteLine("Certificate validity end: {0}", validityEndDate);
+      HttpsReverseProxy.Server.CreateCertificate(certificateHost);
     }
 
 
@@ -161,7 +143,7 @@
 
     #region PRIVATE
 
-    public static bool VerifyCertificateValidity(string certificateFilePath)
+    private static bool VerifyCertificateValidity(string certificateFilePath)
     {
       if (string.IsNullOrEmpty(certificateFilePath))
       {
@@ -197,7 +179,7 @@
     }
 
 
-    public static bool IsPortAvailable(int portNo)
+    private static bool IsPortAvailable(int portNo)
     {
       if (portNo <= 0 || portNo > 65535)
       {

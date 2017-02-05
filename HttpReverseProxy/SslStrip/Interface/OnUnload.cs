@@ -12,7 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.DEBUG, "SslStrip.OnUnload():");
+      Logging.Instance.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Debug, "SslStrip.OnUnload():");
 
       CacheHsts.Instance.ResetCache();
       CacheRedirect.Instance.RedirectCache.Clear();

@@ -32,11 +32,11 @@
       catch (System.IO.FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.INFO, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Info, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.INFO, "HostMapping.OnLoad(EXCEPTION): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Info, "HostMapping.OnLoad(EXCEPTION): {0}", ex.Message);
       }
 
       this.pluginProperties.PluginHost.RegisterPlugin(this);

@@ -12,7 +12,7 @@
     /// </summary>
     public void OnUnload()
     {
-      Logging.Instance.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.DEBUG, "HostMapping.OnUnload():");
+      Logging.Instance.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Debug, "HostMapping.OnUnload():");
     }
   }
 }

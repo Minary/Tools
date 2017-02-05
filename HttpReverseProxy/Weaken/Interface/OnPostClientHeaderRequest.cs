@@ -54,13 +54,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Accept-Encoding") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Accept-Encoding"][0], @"(gzip|deflate|compress)", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostClientHeaderRequest(): Remove  \"Accept -Encoding: gzip|deflate|compress\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Accept-Encoding");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Error, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
       // Upgrade: TLS/1.0
@@ -71,13 +71,13 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Upgrade") &&
             Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Upgrade"][0], "^TLS.*", RegexOptions.IgnoreCase).Success)
         {
-          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostClientHeaderRequest(): Remove  \"Upgrade: TLS.*\"");
           requestObj.ClientRequestObj.ClientRequestHeaders.Remove("Upgrade");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.ERROR, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Error, @"SslStrip.WeakenClientRequestHeaders(EXCEPTION): {0}", ex.Message);
       }
 
 
@@ -86,13 +86,13 @@
       {
         if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("upgrade-insecure-requests"))
         {
-          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.DEBUG, "Weaken.OnPostServerHeadersResponse(): Remove \"upgrade-insecure-requests: ...\"");
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostServerHeadersResponse(): Remove \"upgrade-insecure-requests: ...\"");
           requestObj.ServerResponseObj.ResponseHeaders.Remove("upgrade-insecure-requests");
         }
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.INFO, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
       }
 
       return instruction;

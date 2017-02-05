@@ -7,7 +7,6 @@
   using System;
   using System.Collections.Generic;
   using System.IO;
-  using System.Linq;
   using System.Net;
   using System.Net.Sockets;
   using System.Reflection;
@@ -15,7 +14,7 @@
   using System.Threading;
 
 
-  public sealed class HttpReverseProxy : IPluginHost
+  public sealed class HttpReverseProxy : HttpReverseProxyBasis, IPluginHost
   {
 
     #region MEMBERS
@@ -56,10 +55,12 @@
     #region PUBLIC METHODS
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="localServerPort"></param>
+    /// <param name="certificatepath"></param>
     /// <returns></returns>
-    public bool Start(int localServerPort)
+    public override bool Start(int localServerPort, string certificatepath = "")
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
@@ -77,7 +78,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.ERROR, "ProxyServer.Start(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Error, "ProxyServer.Start(EXCEPTION): {0}", ex.Message);
         return false;
       }
 
@@ -88,7 +89,7 @@
     }
 
 
-    public void Stop()
+    public override void Stop()
     {
       this.tcpListener.Stop();
 
@@ -185,7 +186,7 @@
       string clientMac = string.Empty;
       RequestObj requestObj = new RequestObj(Config.DefaultRemoteHost, ProxyProtocol.Http);
 
-      //// Determine tcpClient IP and MAC address.
+      // Determine tcpClient IP and MAC address.
       try
       {
         string[] splitter = tcpClient.Client.RemoteEndPoint.ToString().Split(new char[] { ':' });
@@ -222,32 +223,32 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}", ex.Message);
       }
       finally
       {
         if (requestObj.ClientRequestObj.ClientBinaryReader != null)
         {
           requestObj.ClientRequestObj.ClientBinaryReader.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryReader.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryReader.Close()");
         }
 
         if (requestObj.ClientRequestObj.ClientBinaryWriter != null)
         {
           requestObj.ClientRequestObj.ClientBinaryWriter.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ClientBinaryWriter.Close()");
         }
 
         if (requestObj.ServerRequestHandler != null)
         {
           requestObj.ServerRequestHandler.CloseServerConnection();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): ServerRequestHandler.CloseServerConnection())");
         }
 
         if (requestObj.TcpClientConnection != null)
         {
           requestObj.TcpClientConnection.Close();
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.DEBUG, "ProxyServer.InitiateClientRequestProcessing(): TcpClientConnection.Close()");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(): TcpClientConnection.Close()");
         }
       }
     }
@@ -320,7 +321,7 @@
           if (foundPlugins == null || foundPlugins.Count <= 0)
           {
             Config.AddNewPlugin(pluginData);
-            Logging.Instance.LogMessage("HttpReverseProxy", ProxyProtocol.Undefined, Loglevel.INFO, "Registered plugin \"{0}\"", pluginData.Config.Name);
+            Logging.Instance.LogMessage("HttpReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
           }
         }
       }

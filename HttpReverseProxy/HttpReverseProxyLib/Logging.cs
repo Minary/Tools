@@ -83,7 +83,7 @@ Console.WriteLine(logMessage);
       }
       catch (Exception ex)
       {
-        if (logLevel == Loglevel.DEBUG)
+        if (logLevel == Loglevel.Debug)
         {
           Console.WriteLine("ERROR: Error occurred in LogMessage: {0}", ex.Message);
         }
@@ -138,7 +138,7 @@ Console.WriteLine(logMessage);
     ///
     /// </summary>
     /// <param name="logLevel"></param>
-    private Logging(Loglevel logLevel = Loglevel.DEBUG)
+    private Logging(Loglevel logLevel = Loglevel.Debug)
     {
       this.logLevel = logLevel;
     }
