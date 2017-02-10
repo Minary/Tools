@@ -55,6 +55,8 @@
       serverCertificate2 = new X509Certificate2(certificateFilePath, string.Empty);
       this.tcpListener = new TcpListener(this.ListeningIpInterface, localServerPort);
 
+      Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Info, "HTTPS reverse proxy server started on port {0}", localServerPort, Path.GetFileName(certificateFilePath));
+
       try
       {
         this.tcpListener.Start();
@@ -95,6 +97,7 @@
       {
         while (true)
         {
+          Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Debug, "Waiting for incoming HTTPS request");
           TcpClient tcpClient = tcpListener.AcceptTcpClient();
           tcpClient.NoDelay = true;
 
@@ -158,12 +161,6 @@
       {
         SslStream sslStream = new SslStream(requestObj.TcpClientConnection.GetStream(), false, new RemoteCertificateValidationCallback(remoteCertificateValidation));
         sslStream.AuthenticateAsServer(serverCertificate2, false, SslProtocols.Tls | SslProtocols.Ssl3, false);
-        // sslStream.ReadTimeout = 5000;
-        // sslStream.WriteTimeout = 5000;
-        // DisplaySecurityLevel(sslStream);
-        // DisplaySecurityServices(sslStream);
-        // DisplayCertificateInformation(sslStream);
-        // DisplayStreamProperties(sslStream);
 
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(requestObj.ProxyProtocol, sslStream, 8192, Encoding.UTF8, requestObj.Id);
         requestObj.ClientRequestObj.ClientBinaryWriter = new BinaryWriter(sslStream);
