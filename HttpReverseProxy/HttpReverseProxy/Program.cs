@@ -51,7 +51,8 @@
 
       // sets up the parser to execute the callback when -? or --help is detected
       parser.SetupHelp("?", "help")
-       .Callback(text => Console.WriteLine(text));
+            .UseForEmptyArgs()
+            .Callback(text => Console.WriteLine(text));
 
       ICommandLineParserResult result = parser.Parse(args);
       if (result.HasErrors == true)

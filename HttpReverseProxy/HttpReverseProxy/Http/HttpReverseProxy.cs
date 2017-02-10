@@ -58,9 +58,9 @@
     /// 
     /// </summary>
     /// <param name="localServerPort"></param>
-    /// <param name="certificatepath"></param>
+    /// <param name="certificateFilePath"></param>
     /// <returns></returns>
-    public override bool Start(int localServerPort, string certificatepath = "")
+    public override bool Start(int localServerPort, string certificateFilePath = "")
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
@@ -71,6 +71,8 @@
 
       // Start listener
       this.tcpListener = new TcpListener(this.ListeningIpInterface, localServerPort);
+
+      Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Info, "HTTP reverse proxy server started on port {0}", localServerPort, Path.GetFileName(certificateFilePath));
 
       try
       {
@@ -145,7 +147,7 @@
     #endregion
 
 
-    #region PRIVATE METHODS
+    #region PRIVATE
 
     private static void HandleHttpClient(object tcpListenerObj)
     {
@@ -154,6 +156,7 @@
       {
         while (true)
         {
+          Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Debug, "Waiting for incoming HTTP request");
           TcpClient tcpClient = tcpListener.AcceptTcpClient();
           tcpClient.NoDelay = true;
 

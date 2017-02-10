@@ -69,7 +69,7 @@
       {
         // (Re) Initialize request object values like client request and server response headers
         this.requestObj.InitRequestValues();
-
+        
         try
         {
           // 0. Read Client request line
