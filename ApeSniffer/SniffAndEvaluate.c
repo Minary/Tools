@@ -413,9 +413,9 @@ int WriteOutput(char *pData, int pDataLen)
   // Write output data to named pipe
   //  if (gOutputPipe != INVALID_HANDLE_VALUE && gOutputPipe != 0)
 
-  if (gCurrentScanParams.OutputPipeName[0] == NULL)
-  {
-    if (gOutputPipe != INVALID_HANDLE_VALUE && gOutputPipe != 0)
+  if (gCurrentScanParams.OutputPipeName[0] != NULL &&
+      gOutputPipe != INVALID_HANDLE_VALUE && 
+      gOutputPipe != 0)
     {
       if (!WriteFile(gOutputPipe, pData, pDataLen, &dwRead, NULL))
       {
@@ -427,12 +427,13 @@ int WriteOutput(char *pData, int pDataLen)
       {
         //LogMsg(DBG_INFO, "WriteOutput() : Data written \"%s\" ...", pData);
       }
-    }
   }
   else
   {
     // Write output data to the screen
     printf("gOutputPipe == INVALID_HANDLE_VALUE || gOutputPipe == 0\n");
+    printf("gCurrentScanParams.OutputPipeName[0]=%s\n", gCurrentScanParams.OutputPipeName[0]);
+
     printf(pData);
   }
 
@@ -513,7 +514,6 @@ void HandleHTTPTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
       stringify((unsigned char *)data, tcpDataLength, (unsigned char *)realData);
     }
     
-
     //Archive packet
     if (ConnectionNodeExists(gConnectionList, connectionId) == NULL)
     {

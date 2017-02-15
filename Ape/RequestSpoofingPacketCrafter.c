@@ -34,7 +34,8 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
     return retVal;
   }
 
-  ipHdr = (PIPHDR) (data + sizeof(ETHDR));
+//  ipHdr = (PIPHDR)(data + sizeof(ETHDR));
+  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
 
   if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
   {
