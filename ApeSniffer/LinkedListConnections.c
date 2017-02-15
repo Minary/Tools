@@ -45,36 +45,39 @@ void AddConnectionToList(PPCONNODE conNodesParam, char *srcMacStr, char *srcIpSt
   char id[MAX_ID_LEN + 1];
   PCONNODE tempNode = NULL;
 
+  if (conNodesParam == NULL ||
+    *conNodesParam == NULL ||
+    srcMacStr == NULL ||
+    srcIpStrParam == NULL ||
+    srcPortParam <= 0 ||
+    dstIpStrParam == NULL ||
+    dstPortParam <= 0)
+  {
+    return;
+  }
+
   EnterCriticalSection(&gCSConnectionsList);
 
-  if (conNodesParam != NULL && *conNodesParam != NULL && srcMacStr != NULL && srcIpStrParam != NULL && srcPortParam > 0 && dstIpStrParam != NULL && dstPortParam > 0)
+  if ((tempNode = (PCONNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CONNODE))) != NULL)
   {
-    if ((tempNode = (PCONNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CONNODE))) != NULL)
-    {
+    ZeroMemory(id, sizeof(id));
+    snprintf(id, sizeof(id) - 1, "%s:%d->%s:%d", srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam);
 
-      /*
-       * Copy info to the list element
-       *
-       */
-      ZeroMemory(id, sizeof(id));
-      snprintf(id, sizeof(id) - 1, "%s:%d->%s:%d", srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam);
+    strncpy(tempNode->ID, id, sizeof(tempNode->ID) - 1);
+    tempNode->Created = time(NULL);
 
-      strncpy(tempNode->ID, id, sizeof(tempNode->ID) - 1);
-      tempNode->Created = time(NULL);
+    tempNode->srcPort = srcPortParam;
+    tempNode->dstPort = dstPortParam;
+    strncpy(tempNode->srcMacStr, srcMacStr, sizeof(tempNode->srcMacStr) - 1);
+    strncpy(tempNode->srcIpStr, srcIpStrParam, sizeof(tempNode->srcIpStr) - 1);
+    strncpy(tempNode->dstIpStr, dstIpStrParam, sizeof(tempNode->dstIpStr) - 1);
 
-      tempNode->srcPort = srcPortParam;
-      tempNode->dstPort = dstPortParam;
-      strncpy(tempNode->srcMacStr, srcMacStr, sizeof(tempNode->srcMacStr) - 1);
-      strncpy(tempNode->srcIpStr, srcIpStrParam, sizeof(tempNode->srcIpStr) - 1);
-      strncpy(tempNode-dstIpStrParam, dstIpStrParam, sizeof(tempNode->dstIpStr) - 1);
-
-      // Prepend new element to the list.
-      tempNode->prev = NULL;
-      tempNode->first = 0;
-      tempNode->next = *conNodesParam;
-      ((PCONNODE)*conNodesParam)->prev = tempNode;
-      *conNodesParam = tempNode;
-    }
+    // Prepend new element to the list.
+    tempNode->prev = NULL;
+    tempNode->first = 0;
+    tempNode->next = *conNodesParam;
+    ((PCONNODE)*conNodesParam)->prev = tempNode;
+    *conNodesParam = tempNode;
   }
 
   LeaveCriticalSection(&gCSConnectionsList);
@@ -125,9 +128,9 @@ PCONNODE ConnectionNodeExists(PCONNODE conNodesParam, char *pID)
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 void ConnectionDeleteNode(PPCONNODE conNodesParam, char *pConID)
 {
   int retVal = 0;
@@ -215,11 +218,11 @@ void ConnectionAddData(PCONNODE nodeParam, char *dataParam, int dataLengthParam)
     }
 
 
-   /*
-    * Append the new data block to the existing
-    * data.
-    *
-    */
+  /*
+   * Append the new data block to the existing
+   * data.
+   *
+   */
   }
   else
   {
@@ -296,7 +299,7 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
   {
     // The first entry in the linked list.
     if (now - ((PCONNODE)*conNodesParam)->Created > TCP_MAX_ACTIVITY ||
-        ((PCONNODE)*conNodesParam)->dataLength > MAX_CONNECTION_VOLUME)
+      ((PCONNODE)*conNodesParam)->dataLength > MAX_CONNECTION_VOLUME)
     {
       tempNode = *conNodesParam;
       *conNodesParam = ((PCONNODE)*conNodesParam)->next;
@@ -311,7 +314,7 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
       HeapFree(GetProcessHeap(), 0, tempNode);
       goto END;
     }
-    
+
     q = (PCONNODE)*conNodesParam;
     while (q->next != NULL && q->next->next != NULL && q->first == 0)
     {
