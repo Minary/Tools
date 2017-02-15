@@ -1,6 +1,7 @@
 # Ignore files that are not part of the solution/project basis files. 
 # This are files like products of the build process (.exe, .dll, .log, etc)
 #
+**/*.ipdb
 **/*.pdb
 **/*.pch
 **/*.dll
@@ -9,6 +10,7 @@
 **/*.tlog
 **/*.resources
 **/*.obj
+**/*.iobj
 **/*.txt
 **/*.exe
 **/*.xml
