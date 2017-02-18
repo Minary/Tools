@@ -72,6 +72,7 @@
     <Compile Include="Interface\IPlugin.cs" />
     <Compile Include="Interface\IPluginHost.cs" />
     <Compile Include="Logging.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

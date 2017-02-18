@@ -82,6 +82,13 @@
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.ProcessClientRequest(): {0} requestint {1}", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.GetRequestedUrl());
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Data transmission mode C2S is: {0}", this.requestObj.ProxyDataTransmissionModeC2S.ToString());
 
+          // 1.1 Interrupt request if target system is within the private IP address ranges
+          if (Network.Instance.IpPartOfPrivateNetwork(this.requestObj.ClientRequestObj.Host))
+          {
+            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
+            throw new ClientNotificationException("The requested host is invalid");
+          }
+
           // 2. Call post tcp-client request methodString of each loaded plugin
           try
           {
