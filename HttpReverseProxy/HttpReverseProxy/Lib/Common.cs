@@ -38,29 +38,34 @@
 
       foreach (NetworkInterface tmpNetworkIfc in NetworkInterface.GetAllNetworkInterfaces())
       {
-        if ((tmpNetworkIfc.NetworkInterfaceType == NetworkInterfaceType.Ethernet || tmpNetworkIfc.NetworkInterfaceType == NetworkInterfaceType.Wireless80211) &&
-            tmpNetworkIfc.OperationalStatus == OperationalStatus.Up)
+        if ((tmpNetworkIfc.NetworkInterfaceType != NetworkInterfaceType.Ethernet &&
+             tmpNetworkIfc.NetworkInterfaceType != NetworkInterfaceType.Wireless80211) ||
+            tmpNetworkIfc.OperationalStatus != OperationalStatus.Up)
         {
-          IPInterfaceProperties adapterProperties = tmpNetworkIfc.GetIPProperties();
-          GatewayIPAddressInformation gatewayInfo = adapterProperties.GatewayAddresses.FirstOrDefault();
+          continue;
+        }
 
-          if (gatewayInfo != null && gatewayInfo.Address != null)
+        IPInterfaceProperties adapterProperties = tmpNetworkIfc.GetIPProperties();
+        GatewayIPAddressInformation gatewayInfo = adapterProperties.GatewayAddresses.FirstOrDefault();
+
+        if (gatewayInfo == null || gatewayInfo.Address == null)
+        {
+          continue;
+        }
+
+        foreach (UnicastIPAddressInformation tmpIpAddr in tmpNetworkIfc.GetIPProperties().UnicastAddresses)
+        {
+          if (tmpIpAddr.Address.AddressFamily == AddressFamily.InterNetwork)
           {
-            foreach (UnicastIPAddressInformation tmpIpAddr in tmpNetworkIfc.GetIPProperties().UnicastAddresses)
-            {
-              if (tmpIpAddr.Address.AddressFamily == AddressFamily.InterNetwork)
-              {
-                retVal = tmpIpAddr.Address.ToString();
-                break;
-              }
-            }
+            retVal = tmpIpAddr.Address.ToString();
+            break;
           }
         }
       }
 
       return retVal;
     }
- 
+
 
     /// <summary>
     ///
