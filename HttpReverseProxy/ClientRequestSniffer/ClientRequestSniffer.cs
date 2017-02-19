@@ -30,12 +30,8 @@
 
 
     #region PUBLIC
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="requestObj"></param>
-    private void SendClientRequestDataToPipe(RequestObj requestObj)
+    
+    public ClientRequestSniffer()
     {
       // Set plugin properties
       this.pluginProperties = new PluginProperties()
@@ -43,10 +39,18 @@
         Name = ClientSnifferConfig.PluginName,
         Priority = ClientSnifferConfig.PluginPriority,
         Version = ClientSnifferConfig.PluginVersion,
-        PluginDirectory = Directory.GetCurrentDirectory(),
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", ClientSnifferConfig.PluginName),
         IsActive = true,
       };
+    }
 
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="requestObj"></param>
+    private void SendClientRequestDataToPipe(RequestObj requestObj)
+    {
       // 2. Send request/response data to pipe/GUI
       string pipeData = string.Format("TCP||{0}||{1}||{2}||{3}||{4}||{5}\r\n",
                                       requestObj.SrcMac,
