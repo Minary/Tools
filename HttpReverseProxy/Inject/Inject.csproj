@@ -45,12 +45,11 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="DataTypes\InjectConfigRecord.cs" />
-    <Compile Include="DataTypes\InjectType.cs" />
     <Compile Include="Inject.cs" />
     <Compile Include="Interface\OnLoad.cs" />
     <Compile Include="Interface\OnPostClientHeaderRequest.cs" />
     <Compile Include="Interface\OnPostServerDataResponse.cs" />
-    <Compile Include="Interface\OnPostServerHeadersResponse.cs.cs" />
+    <Compile Include="Interface\OnPostServerHeadersResponse.cs" />
     <Compile Include="Interface\OnUnload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

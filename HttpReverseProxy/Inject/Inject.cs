@@ -12,7 +12,7 @@
     #region MEMBERS
 
     private PluginProperties pluginProperties;
-    private Dictionary<string, Dictionary<string, HttpReverseProxy.Plugin.Inject.DataTypes.InjectType>> injectHostPathPair;
+    private Dictionary<string, string> injectHostPathPair;
     private Config pluginConfig = new Config();
     private string configurationFileFullPath;
 
@@ -45,7 +45,7 @@
       };
 
       // Host->Path->type->redirect_resource
-      this.injectHostPathPair = new Dictionary<string, Dictionary<string, DataTypes.InjectType>>();
+      this.injectHostPathPair = new Dictionary<string, string>();
     }
 
     #endregion

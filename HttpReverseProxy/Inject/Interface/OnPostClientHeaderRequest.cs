@@ -49,22 +49,9 @@
         if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
         {
-          if (tmpRecord.Type == DataTypes.InjectType.File)
-          {
-            instruction.Instruction = Instruction.SendBackLocalFile;
-            instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
-            break;
-          }
-          else if (tmpRecord.Type == DataTypes.InjectType.URL)
-          {
-            instruction.Instruction = Instruction.RedirectToNewUrl;
-            instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
-            break;
-          }
-          else
-          {
-            continue;
-          }
+          instruction.Instruction = Instruction.SendBackLocalFile;
+          instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
+          break;
         }
       }
 
