@@ -97,7 +97,6 @@
         foreach (string tmpTemplate in this.searchPatternTemplates)
         {
           string realPattern = string.Format(tmpTemplate, Regex.Escape(configRecord.Host));
-          Console.WriteLine("Regex:|{0}|", realPattern);
           this.searchPatterns[configRecord.ContentType].Add(realPattern);
         }
       }

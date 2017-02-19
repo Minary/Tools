@@ -30,6 +30,9 @@
 
     #region PUBLIC
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Inject()
     {
       this.pluginProperties = new PluginProperties()
