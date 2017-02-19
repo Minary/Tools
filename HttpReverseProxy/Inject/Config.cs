@@ -15,12 +15,11 @@
     #region MEMBERS
 
     private static string pluginName = "Inject";
-    private static int pluginPriority = 3;
+    private static int pluginPriority = 4;
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
     private static List<InjectConfigRecord> injectRecords = new List<InjectConfigRecord>();
-    private Dictionary<string, InjectType> types = new Dictionary<string, InjectType>() { { "file", InjectType.File }, { "url", InjectType.URL } };
 
     #endregion
 
@@ -86,7 +85,6 @@
     protected InjectConfigRecord VerifyRecordParameters(string configFileLine)
     {
       string typeStr = string.Empty;
-      InjectType type;
       string host = string.Empty;
       string path = string.Empty;
       string replacementResource = string.Empty;
@@ -115,10 +113,6 @@
       }
 
       typeStr = typeStr.ToLower();
-      if (!this.types.ContainsKey(typeStr))
-      {
-        throw new ProxyWarningException(string.Format("Replacement type parameter is invalid: {0}", typeStr));
-      }
 
       if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
       {
@@ -135,13 +129,12 @@
         throw new ProxyWarningException(string.Format("Replacement resource parameter is invalid: {0}", replacementResource));
       }
 
-      type = this.types[typeStr];
-      if (injectRecords.Exists(elem => type == elem.Type && elem.Host == host && elem.Path == path))
+      if (injectRecords.Exists(elem => elem.Host == host && elem.Path == path))
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
 
-      return new InjectConfigRecord(type, host, path, replacementResource);
+      return new InjectConfigRecord(host, path, replacementResource);
     }
 
     #endregion
