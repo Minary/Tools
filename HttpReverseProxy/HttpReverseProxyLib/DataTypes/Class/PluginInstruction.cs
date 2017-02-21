@@ -18,6 +18,7 @@
     #region PROPERTIES
 
     public Instruction Instruction { get { return this.instruction; } set { this.instruction = value; } }
+
     public InstructionParams InstructionParameters { get { return this.instructionParameters; } set { this.instructionParameters = value; } }
 
     #endregion
@@ -42,7 +43,7 @@
       this.instructionParameters.Url = url;
       this.instructionParameters.Status = status;
       this.instructionParameters.Data = data;
-      this.instructionParameters.HTTPHeaders = httpHeaders;
+      this.instructionParameters.HttpHeaders = httpHeaders;
     }
 
 
@@ -57,7 +58,7 @@
       this.instructionParameters.Url = string.Empty;
       this.instructionParameters.Status = string.Empty;
       this.instructionParameters.Data = string.Empty;
-      this.instructionParameters.HTTPHeaders = new List<string>();
+      this.instructionParameters.HttpHeaders = new List<string>();
     }
 
     #endregion

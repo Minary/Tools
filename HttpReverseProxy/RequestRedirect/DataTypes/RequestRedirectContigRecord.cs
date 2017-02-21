@@ -7,6 +7,8 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
 
     #region MEMBERS
 
+    private string redirectType;
+    private string redirectDescription;
     private string host;
     private string path;
     private string replacementResource;
@@ -15,6 +17,10 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
 
 
     #region PROPERTIES
+
+    public string RedirectType { get { return this.redirectType; } set { this.redirectType = value; } }
+
+    public string RedirectDescription { get { return this.redirectDescription; } set { this.redirectDescription = value; } }
 
     public string Host { get { return this.host; } set { this.host = value; } }
 
@@ -29,13 +35,17 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
 
     public RequestRedirectConfigRecord()
     {
+      this.redirectType = string.Empty;
+      this.redirectDescription = string.Empty;
       this.host = string.Empty;
       this.path = string.Empty;
       this.replacementResource = string.Empty;
     }
 
-    public RequestRedirectConfigRecord(string host, string path, string replacementResource)
+    public RequestRedirectConfigRecord(string redirectType, string redirectDescription, string host, string path, string replacementResource)
     {
+      this.redirectType = redirectType;
+      this.redirectDescription = redirectDescription;
       this.host = host;
       this.path = path;
       this.replacementResource = replacementResource;
