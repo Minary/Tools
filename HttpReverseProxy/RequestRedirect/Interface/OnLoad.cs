@@ -29,7 +29,7 @@
       try
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnLoad(): Loaded {0} configuration records", Plugin.RequestRedirect.Config.RequestRedirectRecords.Count);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnLoad(): Loaded {0} configuration record(s)", Plugin.RequestRedirect.Config.RequestRedirectRecords.Count);
       }
       catch (System.IO.FileNotFoundException)
       {

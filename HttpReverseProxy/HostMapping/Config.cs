@@ -55,8 +55,6 @@
       }
 
       string[] configFileLines = File.ReadAllLines(configFilePath);
-
-
       foreach (string tmpLine in configFileLines)
       {
         if (string.IsNullOrEmpty(tmpLine))
