@@ -25,7 +25,7 @@
       {
         return;
       }
-
+      
       writer.Write(data, 0, data.Length);
     }
 
