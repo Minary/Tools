@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
   using System.Text.RegularExpressions;
 
@@ -28,7 +29,8 @@
         return instruction;
       }
 
-      if (requestObj.ClientRequestObj.ClientRequestHeaders == null || requestObj.ClientRequestObj.ClientRequestHeaders.Count <= 0)
+      if (requestObj.ClientRequestObj.ClientRequestHeaders == null || 
+          requestObj.ClientRequestObj.ClientRequestHeaders.Count <= 0)
       {
         return instruction;
       }
@@ -49,7 +51,9 @@
         if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
         {
-          instruction.Instruction = Instruction.SendBackLocalFile;
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"",
+            host, path, tmpRecord.ReplacementResource);
+          instruction.Instruction = Instruction.RedirectToNewUrl;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
           break;
         }

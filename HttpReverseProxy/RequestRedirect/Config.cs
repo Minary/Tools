@@ -84,7 +84,6 @@
 
     protected RequestRedirectConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string typeStr = string.Empty;
       string host = string.Empty;
       string path = string.Empty;
       string replacementResource = string.Empty;
@@ -95,24 +94,16 @@
         throw new ProxyWarningException("Configuration line is invalid");
       }
 
-      string[] splitter = configFileLine.Split(delimiter, 4);
+      string[] splitter = configFileLine.Split(delimiter, 3);
 
-      if (splitter.Length != 4)
+      if (splitter.Length != 3)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
       }
-
-      typeStr = splitter[0];
-      host = splitter[1];
-      path = splitter[2];
-      replacementResource = splitter[3];
-
-      if (string.IsNullOrEmpty(typeStr))
-      {
-        throw new ProxyWarningException(string.Format("Replacement type parameter is invalid: {0}", typeStr));
-      }
-
-      typeStr = typeStr.ToLower();
+      
+      host = splitter[0];
+      path = splitter[1];
+      replacementResource = splitter[2];
 
       if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
       {
