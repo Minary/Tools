@@ -30,19 +30,19 @@ namespace HttpReverseProxy.ToClient
     /// </summary>
     /// <param name="requestObj"></param>
     /// <param name="redirectUrl"></param>
-    public void Redirect(RequestObj requestObj, string redirectUrl)
+    public void Redirect(RequestObj requestObj, InstructionParams parameters)
     {
       if (requestObj == null)
       {
         throw new ProxyWarningException("Request object is invalid");
       }
 
-      if (string.IsNullOrEmpty(redirectUrl))
+      if (string.IsNullOrEmpty(parameters.Data))
       {
         throw new ProxyWarningException("Redirect URL is invalid");
       }
 
-      string redirectData = Header.Redirect.GetHeader(redirectUrl, requestObj.ClientRequestObj.RequestLine.NewlineString);
+      string redirectData = Header.Redirect.GetHeader(parameters.Status, parameters.StatusDescription, parameters.Data, requestObj.ClientRequestObj.RequestLine.NewlineString);
       byte[] redirectDataByteArray = Encoding.UTF8.GetBytes(redirectData);
       this.tcpClientConnection.SendToClient(redirectDataByteArray, requestObj.ClientRequestObj.ClientBinaryWriter);
     }
@@ -53,13 +53,19 @@ namespace HttpReverseProxy.ToClient
     /// </summary>
     /// <param name="requestObj"></param>
     /// <param name="injectFilePath"></param>
-    public void SendLocalFileToClient(RequestObj requestObj, string injectFilePath)
+    public void SendLocalFileToClient(RequestObj requestObj, InstructionParams parameters)
     {
       if (requestObj == null)
       {
         throw new ProxyWarningException("Request object is invalid");
       }
 
+      if (parameters == null)
+      {
+        throw new ProxyWarningException("Parameters object is invalid");
+      }
+
+      string injectFilePath = parameters.Data;
       if (string.IsNullOrEmpty(injectFilePath))
       {
         throw new ProxyWarningException("Inject file is invalid");

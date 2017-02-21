@@ -97,13 +97,13 @@
             if (pluginInstr.Instruction == Instruction.RedirectToNewUrl)
             {
               Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
-              this.clientInstructionHandler.Redirect(this.requestObj, pluginInstr.InstructionParameters.Data);
+              this.clientInstructionHandler.Redirect(this.requestObj, pluginInstr.InstructionParameters);
               break;
             }
             else if (pluginInstr.Instruction == Instruction.SendBackLocalFile)
             {
               Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
-              this.clientInstructionHandler.SendLocalFileToClient(this.requestObj, pluginInstr.InstructionParameters.Data);
+              this.clientInstructionHandler.SendLocalFileToClient(this.requestObj, pluginInstr.InstructionParameters);
               break;
             }
           }

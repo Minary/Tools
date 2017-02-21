@@ -4,12 +4,12 @@
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
+  using System.Collections.Generic;
   using System.Text.RegularExpressions;
 
 
   public partial class RequestRedirect
   {
-
     /// <summary>
     ///
     /// </summary>
@@ -51,10 +51,12 @@
         if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"",
-            host, path, tmpRecord.ReplacementResource);
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" ---{2}--> \"{3}\"",
+            host, path, tmpRecord.RedirectType, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.RedirectToNewUrl;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
+          instruction.InstructionParameters.Status = tmpRecord.RedirectType;
+          instruction.InstructionParameters.StatusDescription = tmpRecord.RedirectDescription;
           break;
         }
       }
