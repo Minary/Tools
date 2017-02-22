@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System.Collections.Generic;
   using System.IO;
@@ -42,10 +43,11 @@
         Version = InjectFileConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", InjectFileConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
 
       // Host->Path->type->redirect_resource
-      this.injectFileHostPathPair = new Dictionary<string, string>();
+      this.injectFileHostPathPair = new Dictionary<string, string>(); 
     }
 
     #endregion

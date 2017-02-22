@@ -15,7 +15,7 @@
     private static int pluginPriority = 1;
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
-    
+
     private static Dictionary<string, Tuple<string, string>> mappings = new Dictionary<string, Tuple<string, string>>();
 
     #endregion

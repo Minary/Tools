@@ -1,8 +1,6 @@
 ﻿namespace HttpReverseProxy
 {
   using Fclp;
-  using global::HttpReverseProxy.Http;
-  using global::HttpReverseProxy.Https;
   using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;

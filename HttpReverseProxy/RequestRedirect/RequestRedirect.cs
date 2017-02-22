@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.RequestRedirect
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System.Collections.Generic;
   using System.IO;
@@ -42,6 +43,7 @@
         Version = RequestRedirectConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", RequestRedirectConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
 
       // Host->Path->type->redirect_resource

@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy.Http
+﻿namespace HttpReverseProxy
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
@@ -223,10 +223,18 @@
 
         RequestHandlerHttp requestHandler = new RequestHandlerHttp(requestObj);
         requestHandler.ProcessClientRequest();
+
+
+
       }
       catch (Exception ex)
       {
         Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(EXCEPTION): {0}", ex.Message);
+
+        if (ex.InnerException is Exception)
+        {
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateClientRequestProcessing(INNEREXCEPTION): {0}, {1}", ex.InnerException.Message, ex.GetType().ToString());
+        }
       }
       finally
       {

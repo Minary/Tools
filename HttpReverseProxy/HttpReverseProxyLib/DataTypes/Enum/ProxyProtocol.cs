@@ -1,10 +1,10 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Enum
 {
 
-  public enum ProxyProtocol
+  public enum ProxyProtocol : int
   {
-    Undefined,
-    Http,
-    Https
+    Undefined = 0x00,
+    Http = 0x01,
+    Https = 0x02
   }
 }

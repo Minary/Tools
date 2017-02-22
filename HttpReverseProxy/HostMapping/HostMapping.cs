@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System.IO;
   using HostMappingConfig = HttpReverseProxy.Plugin.HostMapping.Config;
@@ -36,6 +37,7 @@
         Version = HostMappingConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", HostMappingConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
     }
 
