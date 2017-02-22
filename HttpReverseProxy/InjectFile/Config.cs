@@ -1,6 +1,6 @@
-﻿namespace HttpReverseProxy.Plugin.Inject
+﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
-  using HttpReverseProxy.Plugin.Inject.DataTypes;
+  using HttpReverseProxy.Plugin.InjectFile.DataTypes;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
@@ -14,12 +14,12 @@
 
     #region MEMBERS
 
-    private static string pluginName = "Inject";
+    private static string pluginName = "InjectFile";
     private static int pluginPriority = 4;
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private static List<InjectConfigRecord> injectRecords = new List<InjectConfigRecord>();
+    private static List<InjectFileConfigRecord> injectFileRecords = new List<InjectFileConfigRecord>();
 
     #endregion
 
@@ -34,7 +34,7 @@
 
     public static string PluginVersion { get { return pluginVersion; } set { } }
 
-    public static List<InjectConfigRecord> InjectRecords { get { return injectRecords; } set { } }
+    public static List<InjectFileConfigRecord> InjectFileRecords { get { return injectFileRecords; } set { } }
 
     #endregion
 
@@ -58,21 +58,21 @@
       }
 
       string[] configFileLines = File.ReadAllLines(configFilePath);
-      injectRecords.Clear();
+      injectFileRecords.Clear();
 
       foreach (string tmpLine in configFileLines)
       {
         try
         {
-          injectRecords.Add(this.VerifyRecordParameters(tmpLine));
+          injectFileRecords.Add(this.VerifyRecordParameters(tmpLine));
         }
         catch (ProxyWarningException pwex)
         {
-          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectFile.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
         }
         catch (ProxyErrorException peex)
         {
-          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"Inject.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectFile.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
         }
       }
     }
@@ -82,7 +82,7 @@
 
     #region PROTECTED
 
-    protected InjectConfigRecord VerifyRecordParameters(string configFileLine)
+    protected InjectFileConfigRecord VerifyRecordParameters(string configFileLine)
     {
       string host = string.Empty;
       string path = string.Empty;
@@ -120,12 +120,12 @@
         throw new ProxyWarningException(string.Format("Replacement resource parameter is invalid: {0}", replacementResource));
       }
 
-      if (injectRecords.Exists(elem => elem.Host == host && elem.Path == path))
+      if (injectFileRecords.Exists(elem => elem.Host == host && elem.Path == path))
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
 
-      return new InjectConfigRecord(host, path, replacementResource);
+      return new InjectFileConfigRecord(host, path, replacementResource);
     }
 
     #endregion

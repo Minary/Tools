@@ -1,18 +1,18 @@
-﻿namespace HttpReverseProxy.Plugin.Inject
+﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
   using HttpReverseProxyLib.Interface;
   using System.Collections.Generic;
   using System.IO;
-  using InjectConfig = HttpReverseProxy.Plugin.Inject.Config;
+  using InjectFileConfig = HttpReverseProxy.Plugin.InjectFile.Config;
 
 
-  public partial class Inject : IPlugin
+  public partial class InjectFile : IPlugin
   {
 
     #region MEMBERS
 
     private PluginProperties pluginProperties;
-    private Dictionary<string, string> injectHostPathPair;
+    private Dictionary<string, string> injectFileHostPathPair;
     private Config pluginConfig = new Config();
     private string configurationFileFullPath;
 
@@ -33,19 +33,19 @@
     /// <summary>
     /// 
     /// </summary>
-    public Inject()
+    public InjectFile()
     {
       this.pluginProperties = new PluginProperties()
       {
-        Name = InjectConfig.PluginName,
-        Priority = InjectConfig.PluginPriority,
-        Version = InjectConfig.PluginVersion,
-        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", InjectConfig.PluginName),
+        Name = InjectFileConfig.PluginName,
+        Priority = InjectFileConfig.PluginPriority,
+        Version = InjectFileConfig.PluginVersion,
+        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", InjectFileConfig.PluginName),
         IsActive = true,
       };
 
       // Host->Path->type->redirect_resource
-      this.injectHostPathPair = new Dictionary<string, string>();
+      this.injectFileHostPathPair = new Dictionary<string, string>();
     }
 
     #endregion
