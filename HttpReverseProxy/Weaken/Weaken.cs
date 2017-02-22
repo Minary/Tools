@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System.IO;
   using WeakenConfig = HttpReverseProxy.Plugin.Weaken.Config;
@@ -34,6 +35,7 @@
         Version = WeakenConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", WeakenConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
     }
 

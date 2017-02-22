@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy.Http
+﻿namespace HttpReverseProxy
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;

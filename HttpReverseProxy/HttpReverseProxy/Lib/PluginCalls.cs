@@ -14,14 +14,23 @@
     #region PUBLIC
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="requestObj"></param>
+    /// <returns></returns>
     public static PluginInstruction PostClientHeadersRequest(RequestObj requestObj)
     {
       PluginInstruction pluginInstr = new PluginInstruction();
 
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
+        // If the plugin does not support the request type 
+        // go to the next item.
+        if ((tmpPlugin.Config.SupportedProtocols & requestObj.ProxyProtocol) != requestObj.ProxyProtocol)
+        {
+          continue;
+        }
+
         try
         {
           pluginInstr = tmpPlugin.OnPostClientHeadersRequest(requestObj);
@@ -45,14 +54,23 @@
 
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="requestObj"></param>
+    /// <returns></returns>
     public static PluginInstruction PostServerHeadersResponse(RequestObj requestObj)
     {
       PluginInstruction pluginInstr = new PluginInstruction();
 
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
+        // If the plugin does not support the request type 
+        // go to the next item.
+        if ((tmpPlugin.Config.SupportedProtocols & requestObj.ProxyProtocol) != requestObj.ProxyProtocol)
+        {
+          continue;
+        }
+
         try
         {
           pluginInstr = tmpPlugin.OnPostServerHeadersResponse(requestObj);
@@ -79,12 +97,21 @@
 
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="requestObj"></param>
+    /// <param name="dataPacket"></param>
     public static void PostServerDataResponse(RequestObj requestObj, DataPacket dataPacket)
     {
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
+        // If the plugin does not support the request type 
+        // go to the next item.
+        if ((tmpPlugin.Config.SupportedProtocols & requestObj.ProxyProtocol) != requestObj.ProxyProtocol)
+        {
+          continue;
+        }
+
         try
         {
           tmpPlugin.OnPostServerDataResponse(requestObj, dataPacket);
@@ -94,7 +121,6 @@
           Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
-
     }
 
     #endregion

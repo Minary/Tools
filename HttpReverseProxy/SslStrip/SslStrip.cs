@@ -56,6 +56,7 @@
         Version = SslStripConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", SslStripConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http
       };
     }
 

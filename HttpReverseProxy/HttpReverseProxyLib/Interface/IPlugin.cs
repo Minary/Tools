@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.DataTypes.Enum;
 
 
   public class PluginProperties
@@ -20,6 +21,8 @@
     public bool IsActive { get; set; }
 
     public IPluginHost PluginHost { get; set; }
+
+    public ProxyProtocol SupportedProtocols { get; set; }
 
     #endregion
 

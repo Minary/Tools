@@ -41,6 +41,7 @@
         Version = ClientSnifferConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", ClientSnifferConfig.PluginName),
         IsActive = true,
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
     }
 
