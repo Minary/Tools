@@ -1,7 +1,7 @@
-﻿namespace HttpReverseProxy.Plugin.Inject.DataTypes
+﻿namespace HttpReverseProxy.Plugin.InjectFile.DataTypes
 {
 
-  public class InjectConfigRecord
+  public class InjectFileConfigRecord
   {
 
     #region MEMBERS
@@ -26,14 +26,14 @@
 
     #region PUBLIC
 
-    public InjectConfigRecord()
+    public InjectFileConfigRecord()
     {
       this.host = string.Empty;
       this.path = string.Empty;
       this.replacementResource = string.Empty;
     }
 
-    public InjectConfigRecord(string host, string path, string replacementResource)
+    public InjectFileConfigRecord(string host, string path, string replacementResource)
     {
       this.host = host;
       this.path = path;

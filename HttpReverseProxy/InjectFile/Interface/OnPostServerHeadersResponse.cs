@@ -1,11 +1,11 @@
-﻿namespace HttpReverseProxy.Plugin.Inject
+﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.Exceptions;
 
 
-  public partial class Inject
+  public partial class InjectFile
   {
 
     /// <summary>

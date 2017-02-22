@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy.Plugin.Inject
+﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
@@ -7,7 +7,7 @@
   using System.Text.RegularExpressions;
 
 
-  public partial class Inject
+  public partial class InjectFile
   {
 
     /// <summary>
@@ -24,7 +24,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if (HttpReverseProxy.Plugin.Inject.Config.InjectRecords == null)
+      if (HttpReverseProxy.Plugin.InjectFile.Config.InjectFileRecords == null)
       {
         return instruction;
       }
@@ -43,7 +43,7 @@
       string host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0];
       string path = requestObj.ClientRequestObj.RequestLine.Path;
 
-      foreach (DataTypes.InjectConfigRecord tmpRecord in HttpReverseProxy.Plugin.Inject.Config.InjectRecords)
+      foreach (DataTypes.InjectFileConfigRecord tmpRecord in HttpReverseProxy.Plugin.InjectFile.Config.InjectFileRecords)
       {
         string hostSearchPattern = "^" + Regex.Escape(tmpRecord.Host) + "$";
         string pathSearchPattern = "^" + Regex.Escape(tmpRecord.Path) + "$";
@@ -51,7 +51,7 @@
         if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Debug, "Inject.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"", host, path, tmpRecord.ReplacementResource);
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Debug, "InjectFile.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"", host, path, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.SendBackLocalFile;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
           break;

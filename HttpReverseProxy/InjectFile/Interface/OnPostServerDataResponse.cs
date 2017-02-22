@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxy.Plugin.Inject
+﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
@@ -6,7 +6,7 @@
   using HttpReverseProxyLib.Exceptions;
 
 
-  public partial class Inject
+  public partial class InjectFile
   {
 
     /// <summary>
@@ -25,7 +25,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Inject.OnPostServerDataResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "InjectFile.OnPostServerDataResponse(): ");
     }
   }
 }
