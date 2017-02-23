@@ -19,19 +19,30 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if (!string.IsNullOrEmpty(requestObj.ClientRequestObj.Host) &&
-          Plugin.HostMapping.Config.Mappings != null && 
+      if (string.IsNullOrEmpty(requestObj.ClientRequestObj.Host))
+      {
+        return instruction;
+      }
+
+      string hostName = requestObj.ClientRequestObj.Host.ToLower();
+      if (Plugin.HostMapping.Config.Mappings != null &&
           Plugin.HostMapping.Config.Mappings.Count > 0 &&
-          Plugin.HostMapping.Config.Mappings.ContainsKey(requestObj.ClientRequestObj.Host))
+          Plugin.HostMapping.Config.Mappings.ContainsKey(hostName))
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Debug, "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\"", requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(), Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2);
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage(
+                                                                  "HostMapping",
+                                                                  ProxyProtocol.Undefined,
+                                                                  Loglevel.Debug,
+                                                                  "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\"",
+                                                                  requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(),
+                                                                  Plugin.HostMapping.Config.Mappings[hostName].Item2);
           requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
-          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2);
+          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[hostName].Item2);
 
-          requestObj.ClientRequestObj.Scheme = Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item1;
-          requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[requestObj.ClientRequestObj.Host].Item2;
+          requestObj.ClientRequestObj.Scheme = Plugin.HostMapping.Config.Mappings[hostName].Item1;
+          requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[hostName].Item2;
         }
       }
 

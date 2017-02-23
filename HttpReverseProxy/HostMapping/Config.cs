@@ -67,6 +67,7 @@
           continue;
         }
 
+        // Data structure is: RequestedHost:MappedHostScheme:MappedHost
         string[] splitter = tmpLine.Split(new char[] { ':' });
 
         if (splitter.Length != 3)
@@ -77,7 +78,7 @@
         // Generate regex per host/contentype
         if (!mappings.ContainsKey(splitter[0]))
         {
-          mappings.Add(splitter[0], new Tuple<string, string>(splitter[1], splitter[2]));
+          mappings.Add(splitter[0].ToLower(), new Tuple<string, string>(splitter[1], splitter[2]));
         }
       }
     }

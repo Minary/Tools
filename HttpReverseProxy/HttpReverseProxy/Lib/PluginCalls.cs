@@ -24,7 +24,7 @@
 
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
-        // If the plugin does not support the request type 
+        // If the plugin does not support the user requested scheme (http/https)
         // go to the next item.
         if ((tmpPlugin.Config.SupportedProtocols & requestObj.ProxyProtocol) != requestObj.ProxyProtocol)
         {

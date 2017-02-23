@@ -40,7 +40,7 @@
         return instruction;
       }
 
-      string host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0];
+      string host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToLower();
       string path = requestObj.ClientRequestObj.RequestLine.Path;
 
       foreach (DataTypes.RequestRedirectConfigRecord tmpRecord in HttpReverseProxy.Plugin.RequestRedirect.Config.RequestRedirectRecords)
