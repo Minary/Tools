@@ -101,7 +101,7 @@
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
       }
 
-      host = splitter[0];
+      host = splitter[0]?.ToLower();
       path = splitter[1];
       replacementResource = splitter[2];
 

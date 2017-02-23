@@ -105,7 +105,7 @@
 
       redirectType = splitter[0];
       redirectDescription = splitter[1];
-      host = splitter[2];
+      host = splitter[2].ToLower();
       path = splitter[3];
       replacementResource = splitter[4];
 
