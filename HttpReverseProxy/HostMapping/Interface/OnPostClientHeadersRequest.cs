@@ -37,12 +37,10 @@
                                                                   Loglevel.Debug,
                                                                   "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\"",
                                                                   requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(),
-                                                                  Plugin.HostMapping.Config.Mappings[hostName].Item2);
+                                                                  Plugin.HostMapping.Config.Mappings[hostName]);
           requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
-          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[hostName].Item2);
-
-          requestObj.ClientRequestObj.Scheme = Plugin.HostMapping.Config.Mappings[hostName].Item1;
-          requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[hostName].Item2;
+          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[hostName]);
+          requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[hostName];
         }
       }
 
