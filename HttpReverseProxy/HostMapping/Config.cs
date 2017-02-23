@@ -16,7 +16,8 @@
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private static Dictionary<string, Tuple<string, string>> mappings = new Dictionary<string, Tuple<string, string>>();
+//    private static Dictionary<string, Tuple<string, string>> mappings = new Dictionary<string, Tuple<string, string>>();
+    private static Dictionary<string, string> mappings = new Dictionary<string, string>();
 
     #endregion
 
@@ -31,7 +32,7 @@
 
     public static string ConfigFileName { get { return configFileName; } set { } }
 
-    public static Dictionary<string, Tuple<string, string>> Mappings { get { return mappings; } set { } }
+    public static Dictionary<string, string> Mappings { get { return mappings; } set { } }
 
     #endregion
 
@@ -67,10 +68,10 @@
           continue;
         }
 
-        // Data structure is: RequestedHost:MappedHostScheme:MappedHost
+        // Data structure is: RequestedHost:MappedHost
         string[] splitter = tmpLine.Split(new char[] { ':' });
 
-        if (splitter.Length != 3)
+        if (splitter.Length != 2)
         {
           continue;
         }
@@ -78,7 +79,7 @@
         // Generate regex per host/contentype
         if (!mappings.ContainsKey(splitter[0]))
         {
-          mappings.Add(splitter[0].ToLower(), new Tuple<string, string>(splitter[1], splitter[2]));
+          mappings.Add(splitter[0].ToLower(),  splitter[1]);
         }
       }
     }
