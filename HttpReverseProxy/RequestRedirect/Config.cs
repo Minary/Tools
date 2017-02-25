@@ -89,15 +89,13 @@
       string host = string.Empty;
       string path = string.Empty;
       string replacementResource = string.Empty;
-      char[] delimiter = { ':' };
 
       if (string.IsNullOrEmpty(configFileLine))
       {
         throw new ProxyWarningException("Configuration line is invalid");
       }
 
-      string[] splitter = configFileLine.Split(delimiter, 5);
-
+      string[] splitter = Regex.Split(configFileLine, @"\|\|");
       if (splitter.Length != 5)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");

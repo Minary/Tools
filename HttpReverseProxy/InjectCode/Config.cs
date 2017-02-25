@@ -62,6 +62,16 @@
 
       foreach (string tmpLine in configFileLines)
       {
+        if (string.IsNullOrEmpty(tmpLine))
+        {
+          continue;
+        }
+
+        if (!tmpLine.Contains("||"))
+        {
+          continue;
+        }
+
         try
         {
           injectCodeRecords.Add(this.VerifyRecordParameters(tmpLine));

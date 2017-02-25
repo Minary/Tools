@@ -4,6 +4,7 @@
   using System;
   using System.Collections.Generic;
   using System.IO;
+  using System.Text.RegularExpressions;
 
 
   public class Config
@@ -63,13 +64,13 @@
           continue;
         }
 
-        if (!tmpLine.Contains(":"))
+        if (!tmpLine.Contains("||"))
         {
           continue;
         }
 
         // Data structure is: RequestedHost:MappedHost
-        string[] splitter = tmpLine.Split(new char[] { ':' });
+        string[] splitter = Regex.Split(tmpLine, @"\|\|");
 
         if (splitter.Length != 2)
         {
