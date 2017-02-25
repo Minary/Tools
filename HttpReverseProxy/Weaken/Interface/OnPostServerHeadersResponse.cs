@@ -40,6 +40,38 @@
         Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
       }
 
+
+      // Remove X-Frame-Options (obsolete, actually)
+      try
+      {
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("X-Frame-Options"))
+        {
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostServerHeadersResponse(): Remove \" X-Frame-Options: ...\"");
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("X-Frame-Options");
+        }
+      }
+      catch (Exception ex)
+      {
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
+      }
+
+
+      // Remove Content - Security - Policy
+      try
+      {
+        if (requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Security-Policy"))
+        {
+          Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "Weaken.OnPostServerHeadersResponse(): Remove \" Content-Security-Policy: ...\"");
+          requestObj.ServerResponseObj.ResponseHeaders.Remove("Content-Security-Policy");
+        }
+      }
+      catch (Exception ex)
+      {
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "Weaken.WeakenClientRequestHeaders(EXCEPTION:Hsts): {0}", ex.Message);
+      }
+
+
+      
       // Remove "Set-Cookie ... secure"
       try
       {
