@@ -20,7 +20,7 @@ private static string defaultRemoteHost = "www.buglist.io";
     private static string httpServer = "Apache";
     private static int maxSniffedClientDataSize = 4096;
     private static List<IPlugin> loadedPlugins = new List<IPlugin>();
-    private static Loglevel loglevel;
+    private static Loglevel currentLoglevel;
 
     #endregion
 
@@ -47,7 +47,7 @@ private static string defaultRemoteHost = "www.buglist.io";
 
     public static int MaxSniffedClientDataSize { get { return maxSniffedClientDataSize; } set { maxSniffedClientDataSize = value; } }
 
-    public static Loglevel Loglevel { get { return loglevel; } set { loglevel = value; } }
+    public static Loglevel CurrentLoglevel { get { return currentLoglevel; } set { currentLoglevel = value; } }
 
     #endregion
 
