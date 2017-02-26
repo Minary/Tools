@@ -43,7 +43,7 @@
        .WithDescription("Define certificate file path");
 
       parser.Setup<Loglevel>("loglevel")
-       .Callback(item => Config.Loglevel = item)
+       .Callback(item => Config.CurrentLoglevel = item)
        .SetDefault(Loglevel.Info)
        .WithDescription("Define log level. Default level is \"Info\". Possible values are: " + string.Join(", ", Enum.GetNames(typeof(Loglevel))));
 
@@ -81,7 +81,8 @@
     private static void StartProxyServer()
     {
       Config.LocalIp = Lib.Common.GetLocalIpAddress();
-      HttpReverseProxyLib.Logging.Instance.LoggingLevel = Config.Loglevel;
+      HttpReverseProxyLib.Logging.Instance.CurrentLoggingLevel = Config.CurrentLoglevel;
+      HttpReverseProxyLib.Logging.Instance.LogMessage("Main", ProxyProtocol.Undefined, Loglevel.Info, "StartProxyServer(): Current loglevel= {0}", Config.CurrentLoglevel.ToString());
 
       // Parse HTTP port parameter
       try
