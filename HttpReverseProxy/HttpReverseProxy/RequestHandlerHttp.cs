@@ -74,87 +74,22 @@
 
         try
         {
-          // 0. Read Client request line
-          this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestLine(this.requestObj);
-
-          // 1. Read Client request and pass request, headers and data to plugins
-          this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestHeaders(this.requestObj);
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.ProcessClientRequest(): {0} requestint {1}", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.GetRequestedUrl());
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Data transmission mode C2S is: {0}", this.requestObj.ProxyDataTransmissionModeC2S.ToString());
-
-          // 1.1 Interrupt request if target system is within the private IP address ranges
-          if (Network.Instance.IpPartOfPrivateNetwork(this.requestObj.ClientRequestObj.Host))
-          {
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
-            throw new ClientNotificationException("The requested host is invalid");
-          }
+          // 1. Receive client data
+          this.ReadClientRequestHeaders();
 
           // 2. Call post tcp-client request methodString of each loaded plugin
-          try
+          bool mustBreakLoop = this.PostClientHeadersRequest();
+          if (mustBreakLoop == true)
           {
-            pluginInstr = Lib.PluginCalls.PostClientHeadersRequest(this.requestObj);
-
-            if (pluginInstr.Instruction == Instruction.RedirectToNewUrl)
-            {
-              Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
-              this.clientInstructionHandler.Redirect(this.requestObj, pluginInstr.InstructionParameters);
-              break;
-            }
-            else if (pluginInstr.Instruction == Instruction.SendBackLocalFile)
-            {
-              Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
-              this.clientInstructionHandler.SendLocalFileToClient(this.requestObj, pluginInstr.InstructionParameters);
-              break;
-            }
-          }
-          catch (Exception ex)
-          {
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeadersRequest(EXCEPTION): {0} ", ex.Message);
+            break;
           }
 
           // 3. Re(re)quest server
-          pluginInstr = null;
-          while (pluginInstr == null || pluginInstr.Instruction == Instruction.ReloadUrlWithHttps)
-          {
-            Logging.Instance.LogMessage(
-                                        this.requestObj.Id,
-                                        this.requestObj.ProxyProtocol,
-                                         Loglevel.Debug,
-                                        "HttpReverseProxy.ProcessClientRequest(): {0}",
-                                        (pluginInstr == null) ? "Forward clinet request to server" : "Plugin instruction:Instruction.ReloadUrlWithHttps");
+          pluginInstr = this.SendClientRequestToServer();
 
-            // 4. Forward client request data to the server
-            this.ForwardClientRequestToServer();
+          // 4. Send server response to client
+          this.SendServerResponseToClient(pluginInstr);
 
-            // 5. Call post remoteSocket response methodString of each loaded plugin
-            pluginInstr = Lib.PluginCalls.PostServerHeadersResponse(this.requestObj);
-
-            // 6. Determine data transmission mode S2C
-            this.DetermineDataTransmissionModeS2C(this.requestObj);
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Data transmission mode S2C is: {0}", this.requestObj.ProxyDataTransmissionModeS2C);
-          }
-
-          if (pluginInstr.Instruction == Instruction.RedirectToNewUrl)
-          {
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Plugin instruction:Instruction.RedirectToNewUrl");
-          }
-          else
-          {
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Plugin instruction:Instruction.DoNothing");
-
-            // 5.6 Determine whether response content type must be processed
-            bool mustBeProcessed = this.IsServerResponseDataProcessable(this.requestObj);
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
-
-            this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
-            this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
-
-            this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
-            string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.ProcessClientRequest(): {0}{1}, {2}, {3} bytes", this.requestObj.ServerResponseObj.StatusLine.StatusCode, redirectLocation, this.requestObj.ProxyDataTransmissionModeS2C, this.requestObj.ServerResponseObj.NoTransferredBytes);
-            Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): DONE! All data transferred to client");
-          }
         }
         catch (ClientNotificationException cnex)
         {
@@ -211,7 +146,7 @@
 
         // If remote socket was closed or the client sent a "Conection: close" headerByteArray
         // break out of the loop
-        if (this.CloseClientServerConnection(this.requestObj))
+        if (this.CloseClientServerConnection())
         {
           break;
 
@@ -229,7 +164,134 @@
 
     #region PRIVATE
 
-    private void DetermineDataTransmissionModeS2C(RequestObj requestObj)
+    private bool PostClientHeadersRequest()
+    {
+      bool mustBreakLoop = false;
+      PluginInstruction pluginInstr;
+
+      try
+      {
+        pluginInstr = Lib.PluginCalls.PostClientHeadersRequest(this.requestObj);
+
+        if (pluginInstr.Instruction == Instruction.RedirectToNewUrl)
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
+          this.clientInstructionHandler.Redirect(this.requestObj, pluginInstr.InstructionParameters);
+          mustBreakLoop = true;
+        }
+        else if (pluginInstr.Instruction == Instruction.SendBackLocalFile)
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeaders Rrequest instruction: {0} -> {1}", pluginInstr.Instruction, pluginInstr.InstructionParameters.Data);
+          this.clientInstructionHandler.SendLocalFileToClient(this.requestObj, pluginInstr.InstructionParameters);
+          mustBreakLoop = true;
+        }
+      }
+      catch (Exception ex)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): PostClientHeadersRequest(EXCEPTION): {0} ", ex.Message);
+      }
+
+      return mustBreakLoop;
+    }
+
+
+    private void ReadClientRequestHeaders()
+    {
+      // Read Client request line
+      this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestLine(this.requestObj);
+
+      // Read Client request and pass request, headers and data to plugins
+      this.requestObj.ClientRequestObj.ClientWebRequestHandler.ReceiveClientRequestHeaders(this.requestObj);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.ReadClientRequestHeaders(): {0} requesting {1}", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.GetRequestedUrl());
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ReadClientRequestHeaders(): Data transmission mode C2S is: {0}", this.requestObj.ProxyDataTransmissionModeC2S.ToString());
+
+      // Interrupt request if target system is within the private IP address ranges
+      if (Network.Instance.IpPartOfPrivateNetwork(this.requestObj.ClientRequestObj.Host))
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ReadClientRequestHeaders(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
+        throw new ClientNotificationException("The requested host is invalid");
+      }
+    }
+
+
+    private PluginInstruction SendClientRequestToServer()
+    {
+      PluginInstruction pluginInstruction = null;
+      while (pluginInstruction == null || pluginInstruction.Instruction == Instruction.ReloadUrlWithHttps)
+      {
+        Logging.Instance.LogMessage(
+                                    this.requestObj.Id,
+                                    this.requestObj.ProxyProtocol,
+                                     Loglevel.Debug,
+                                    "HttpReverseProxy.SendRequestToServer(): {0}",
+                                    (pluginInstruction == null) ? "Forward clinet request to server" : "Plugin instruction:Instruction.ReloadUrlWithHttps");
+
+        // 4. Forward client request data to the server
+        this.ForwardClientRequestToServer();
+
+        // 5. Call post remoteSocket response methodString of each loaded plugin
+        pluginInstruction = Lib.PluginCalls.PostServerHeadersResponse(this.requestObj);
+
+        // 6. Determine data transmission mode S2C
+        this.DetermineDataTransmissionModeS2C();
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendRequestToServer(): Data transmission mode S2C is: {0}", this.requestObj.ProxyDataTransmissionModeS2C);
+      }
+
+      return pluginInstruction;
+    }
+
+
+    private void SendServerResponseToClient(PluginInstruction pluginInstruction)
+    {
+      // Send server response to client: Redirect
+      if (pluginInstruction.Instruction == Instruction.RedirectToNewUrl)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.RedirectToNewUrl");
+
+
+      // Send server response to client: Inject code
+      }
+      else if (pluginInstruction.Instruction == Instruction.InjectLocalFileIntoStream)
+      {
+
+        // If the server data is transmitted in chunked mode go here.
+        if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked)
+        {
+          ToClient.InjectCode.Chunked injectIntoChunkedConnection = new ToClient.InjectCode.Chunked(this.requestObj);
+          injectIntoChunkedConnection.InjectIntoChunkedTransfer(pluginInstruction);
+
+        // If the server data has a fixed length go here.
+        }
+        else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.FixedContentLength)
+        {
+          ToClient.InjectCode.NonChunked injectIntoFixedContentLengthConnection = new ToClient.InjectCode.NonChunked(this.requestObj);
+          injectIntoFixedContentLengthConnection.InjectIntoNonChunkedTransfer(pluginInstruction);
+        }
+
+
+      // Send server response to client: Regular server response
+      }
+      else
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.DoNothing");
+
+        // 5.6 Determine whether response content type must be processed
+        bool mustBeProcessed = this.IsServerResponseDataProcessable();
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
+
+        this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
+        this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
+
+        this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
+        string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.SendServerResponseToClient(): {0}{1}, {2}, {3} bytes", this.requestObj.ServerResponseObj.StatusLine.StatusCode, redirectLocation, this.requestObj.ProxyDataTransmissionModeS2C, this.requestObj.ServerResponseObj.NoTransferredBytes);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): DONE! All data transferred to client");
+      }
+    }
+
+
+    private void DetermineDataTransmissionModeS2C()
     {
       // Transfer behavior is "Content-Length"
       if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
@@ -239,7 +301,7 @@
 
         if (this.requestObj.ServerResponseObj.ContentLength > 0)
         {
-          this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.ContentLength;
+          this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.FixedContentLength;
         }
         else if (this.requestObj.ServerResponseObj.ContentLength == 0)
         {
@@ -250,7 +312,7 @@
           this.requestObj.ProxyDataTransmissionModeS2C = DataTransmissionMode.Error;
         }
 
-        // Transfer behavior is "Chunked"
+      // Transfer behavior is "Chunked"
       }
       else if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
       {
@@ -265,7 +327,7 @@
     }
 
 
-    private bool CloseClientServerConnection(RequestObj requestObj)
+    private bool CloseClientServerConnection()
     {
       if (this.requestObj.ServerRequestHandler.ServerSocket.Connected == false)
       {
@@ -325,12 +387,12 @@
       this.requestObj.ServerRequestHandler.ForwardHeadersC2S(this.requestObj.ClientRequestObj.ClientRequestHeaders, this.requestObj.ClientRequestObj.RequestLine.NewlineBytes);
 
       // 3. Send tcp-client request data to remoteSocket
-      bool mustBeProcessed = this.IsClientRequestDataProcessable(this.requestObj);
-      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): CLIENT REQUEST : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
+      bool mustBeProcessed = this.IsClientRequestDataProcessable();
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ForwardClientRequestToServer(): CLIENT REQUEST : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
       SniffedDataChunk sniffedDataChunk = new SniffedDataChunk(Config.MaxSniffedClientDataSize);
 
       this.requestObj.ServerRequestHandler.RelayDataC2S(mustBeProcessed, sniffedDataChunk);
-      this.EditClientRequestData(this.requestObj, sniffedDataChunk);
+      this.EditClientRequestData(sniffedDataChunk);
 
       // 4 Read remotesocket response headers
       this.requestObj.ServerRequestHandler.ReadServerStatusLine(this.requestObj);
@@ -338,7 +400,7 @@
     }
 
 
-    private bool IsServerResponseDataProcessable(RequestObj requestObj)
+    private bool IsServerResponseDataProcessable()
     {
       // 1. Server response "Content-Type" is labelled as "supported"
       if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
@@ -358,7 +420,7 @@
     }
 
 
-    private bool IsClientRequestDataProcessable(RequestObj requestObj)
+    private bool IsClientRequestDataProcessable()
     {
       // 1. Client request "Content-Type" is labelled as "supported"
       if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentType))
@@ -378,14 +440,14 @@
     }
 
 
-    private void EditClientRequestData(RequestObj requestObj, SniffedDataChunk sniffedDataChunk)
+    private void EditClientRequestData(SniffedDataChunk sniffedDataChunk)
     {
       // Append client request headers to the log data string
       try
       {
-        foreach (string key in requestObj.ClientRequestObj.ClientRequestHeaders.Keys)
+        foreach (string key in this.requestObj.ClientRequestObj.ClientRequestHeaders.Keys)
         {
-          string logData = string.Join("..", requestObj.ClientRequestObj.ClientRequestHeaders[key]);
+          string logData = string.Join("..", this.requestObj.ClientRequestObj.ClientRequestHeaders[key]);
           this.requestObj.HttpLogData += string.Format("..{0}: {1}", key, logData);
         }
       }

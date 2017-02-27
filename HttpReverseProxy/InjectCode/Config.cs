@@ -19,7 +19,7 @@
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private static List<InjectCodeConfigRecord> injectCodeRecords = new List<InjectCodeConfigRecord>();
+    private static Dictionary<string, InjectCodeConfigRecord> injectCodeRecords = new Dictionary<string, InjectCodeConfigRecord>();
 
     #endregion
 
@@ -34,7 +34,7 @@
 
     public static string PluginVersion { get { return pluginVersion; } set { } }
 
-    public static List<InjectCodeConfigRecord> InjectCodeRecords { get { return injectCodeRecords; } set { } }
+    public static Dictionary<string, InjectCodeConfigRecord> InjectCodeRecords { get { return injectCodeRecords; } set { } }
 
     #endregion
 
@@ -59,7 +59,7 @@
 
       string[] configFileLines = File.ReadAllLines(configFilePath);
       injectCodeRecords.Clear();
-
+      
       foreach (string tmpLine in configFileLines)
       {
         if (string.IsNullOrEmpty(tmpLine))
@@ -74,15 +74,16 @@
 
         try
         {
-          injectCodeRecords.Add(this.VerifyRecordParameters(tmpLine));
+          InjectCodeConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
+          injectCodeRecords.Add(newRecord.Host.ToLower(), newRecord);
         }
         catch (ProxyWarningException pwex)
         {
-          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectFile.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectCode.VerifyRecordParameters(EXCEPTION) : {0}", pwex.Message);
         }
         catch (ProxyErrorException peex)
         {
-          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectFile.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
+          Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"InjectCode.VerifyRecordParameters(EXCEPTION) : {0}", peex.Message);
         }
       }
     }
@@ -107,11 +108,11 @@
       
       string[] splitter = Regex.Split(configFileLine, @"\|\|");
 
-      if (splitter.Length != 3)
+      if (splitter.Length != 5)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
       }
-
+      
       tag = splitter[0];
       position = splitter[1];
       injectionCodeFile = splitter[2];
@@ -133,11 +134,13 @@
         throw new ProxyWarningException(string.Format("The injection code file parameter is invalid: {0}", injectionCodeFile));
       }
 
-      if (injectCodeRecords.Exists(elem => elem.Host == host && elem.Path == path))
+
+      if (injectCodeRecords.ContainsKey(host) &&
+          injectCodeRecords[host].Path == path)
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
-
+      
       return new InjectCodeConfigRecord(host, path, injectionCodeFile, tag, position);
     }
 
