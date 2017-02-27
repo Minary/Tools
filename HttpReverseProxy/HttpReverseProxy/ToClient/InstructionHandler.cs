@@ -1,12 +1,11 @@
-﻿using HttpReverseProxyLib.DataTypes.Class;
-using HttpReverseProxyLib.Exceptions;
-using System.IO;
-using System.Linq;
-using System.Text;
-
-
-namespace HttpReverseProxy.ToClient
+﻿namespace HttpReverseProxy.ToClient
 {
+  using HttpReverseProxyLib.DataTypes.Class;
+  using HttpReverseProxyLib.Exceptions;
+  using System.IO;
+  using System.Linq;
+  using System.Text;
+
 
   public class InstructionHandler
   {

@@ -290,7 +290,7 @@
       // 2.1 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
       }
-      else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ContentLength && !mustBeProcessed)
+      else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.FixedContentLength && !mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, processed:false");
         this.ForwardNonchunkedNonprocessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ClientRequestContentLength, sniffedDataChunk);
@@ -320,7 +320,7 @@
       // 3.1 Predefined amount of data is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Content-Length" was defined
       }
-      else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.ContentLength && mustBeProcessed)
+      else if (this.requestObj.ProxyDataTransmissionModeC2S == DataTransmissionMode.FixedContentLength && mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayDataC2S(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ClientRequestObj.ClientRequestContentLength);
         this.ForwardNonchunkedProcessedDataToPeer(this.clientStreamReader, this.webServerStreamWriter, this.requestObj.ClientRequestObj.ClientRequestContentLength, sniffedDataChunk);
@@ -367,8 +367,6 @@
 
 
 
-
-
       // 2.0 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
       }
@@ -381,7 +379,7 @@
       // 2.1 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
       }
-      else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.ContentLength && !mustBeProcessed)
+      else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.FixedContentLength && !mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, processed:false");
         noRelayedBytes = this.ForwardNonchunkedNonprocessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
@@ -400,12 +398,10 @@
       // 3.1 Predefined amount of data is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Content-Length" was defined
       }
-      else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.ContentLength && mustBeProcessed)
+      else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.FixedContentLength && mustBeProcessed)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.ContentLength, ContentLength:{0}, processed:true", this.requestObj.ServerResponseObj.ContentLength);
         noRelayedBytes = this.ForwardNonchunkedProcessedDataToPeer(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
-
-
 
 
 
@@ -428,6 +424,57 @@
 
       return noRelayedBytes;
     }
+
+
+    public int RelayChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed)
+    {
+      int noRelayedBytes = -1;
+      byte[] buffer = new byte[MaxBufferSize];
+
+      // Unknow amount of data chunks is transferred from the tcpClient to the peer system because
+      // - HTTP headerByteArray "Transfer-Encoding" was set
+      if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && !mustBeProcessed)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayChunkedAndInjectDataS2C(): DataTransmissionMode.Chunked, processed:false");
+        noRelayedBytes = this.ForwardAndInjectChunkedNonprocessedDataToPeer(pluginInstruction, this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+      }
+
+      // Unknow amount of data chunks is transferred from the tcpClient to the peer system because
+      // - HTTP headerByteArray "Transfer-Encoding" was set
+      //else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && mustBeProcessed)
+      //{
+      //  Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayChunkedAndInjectDataS2C(): DataTransmissionMode.Chunked, processed:true");
+      //  noRelayedBytes = this.ForwardChunkedProcessedDataChunks(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+      //}
+
+      return noRelayedBytes;
+    }
+
+
+    public int RelayNonChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed)
+    {
+      int noRelayedBytes = -1;
+      byte[] buffer = new byte[MaxBufferSize];
+
+      // Unknow amount of data chunks is transferred from the tcpClient to the peer system because
+      // - HTTP headerByteArray "Transfer-Encoding" was set
+      if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.FixedContentLength && !mustBeProcessed)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayNonChunkedAndInjectDataS2C(): DataTransmissionMode.NonChunked, processed:false");
+noRelayedBytes = this.ForwardAndInjectNonChunkedNonprocessedDataToPeer(pluginInstruction, this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentLength);
+      }
+
+      // Unknow amount of data chunks is transferred from the tcpClient to the peer system because
+      // - HTTP headerByteArray "Transfer-Encoding" was set
+      //else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked && mustBeProcessed)
+      //{
+      //  Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayNonChunkedAndInjectDataS2C(): DataTransmissionMode.Chunked, processed:true");
+      //  noRelayedBytes = this.ForwardChunkedProcessedDataChunks(this.webServerStreamReader, this.clientStreamWriter, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+      //}
+
+      return noRelayedBytes;
+    }
+
 
     #endregion
 

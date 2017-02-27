@@ -1,11 +1,13 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
   using HttpReverseProxyLib;
+  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
   using System;
   using System.IO;
   using System.Text;
+  using System.Text.RegularExpressions;
 
 
   public class TcpClientRaw
@@ -85,7 +87,6 @@
       byte[] buffer = new byte[transferredContentLength];
       int totalTransferredBytes = 0;
       int bytesRead = 0;
-
 
       while (totalTransferredBytes < transferredContentLength)
       {
@@ -171,6 +172,142 @@
       return noBytesTransferred;
     }
 
+
+    public int ForwardAndInjectChunkedNonprocessedDataToPeer(PluginInstruction pluginInstruction, MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, byte[] serverNewlineBytes, SniffedDataChunk sniffedDataChunk = null)
+    {
+      int noBytesTransferred = 0;
+      int blockSize = 0;
+      int chunkCounter = 0;
+
+      while (true)
+      {
+        // Read chunk size
+        string chunkLenStr = inputStreamReader.ReadLine(false);
+
+        // Break out of the loop if it is the last data packet
+        if (string.IsNullOrEmpty(chunkLenStr))
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardAndInjectChunkedNonprocessedDataToPeer(): chunkLenStr isNullOrEmpty!!!");
+          break;
+        }
+
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardAndInjectChunkedNonprocessedDataToPeer(): ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+        blockSize = int.Parse(chunkLenStr, System.Globalization.NumberStyles.HexNumber);
+
+        // If the announced block size is > 0 analyze the data block
+        // and if the trigger tag was found inject the code.
+        // Subsequently relay the data block to the client system
+        // and continue with the next block
+        if (blockSize > 0)
+        {
+          this.InjectAndRelayChunk(pluginInstruction, inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, serverNewlineBytes, sniffedDataChunk);
+          noBytesTransferred += blockSize;
+
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardAndInjectChunkedNonprocessedDataToPeer(): blockSize > 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+
+        // If the announced block size is 0
+        // break out of the relay loop
+        }
+        else if (blockSize == 0 || chunkLenStr == "0")
+        {
+          this.RelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, serverNewlineBytes, sniffedDataChunk);
+          outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+          outputStreamWriter.Flush();
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardAndInjectChunkedNonprocessedDataToPeer(): blockSize == 0: ChunkNo:{0} chunkLenStr.Length:{1}, Content:|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
+          break;
+        }
+        else
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardAndInjectChunkedNonprocessedDataToPeer(): WOOPS!");
+          break;
+        }
+
+        chunkCounter++;
+      }
+
+      return noBytesTransferred;
+    }
+
+ 
+    public int ForwardAndInjectNonChunkedNonprocessedDataToPeer(PluginInstruction pluginInstruction, MyBinaryReader dataSenderStream, BinaryWriter dataRecipientStream, int transferredContentLength, SniffedDataChunk sniffedDataChunk = null)
+    {
+      int noBytesTransferred = 0;
+      byte[] dataBlock = new byte[transferredContentLength];
+      int totalTransferredBytes = 0;
+      int bytesRead = 0;
+
+      while (totalTransferredBytes < transferredContentLength)
+      {
+        // Read data from peer 1
+        int maxDataToTransfer = transferredContentLength - totalTransferredBytes;
+        bytesRead = dataSenderStream.Read(dataBlock, 0, maxDataToTransfer);
+
+        if (bytesRead <= 0)
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA), No data to transfer");
+          break;
+        }
+
+        // 2. Decode bytes to UTF8
+        string readableData = Encoding.UTF8.GetString(dataBlock);
+        MatchCollection matches = Regex.Matches(readableData, pluginInstruction.InstructionParameters.DataDict["tagRegex"]);
+        if (pluginInstruction.InstructionParameters.DataDict.ContainsKey("tagRegex") &&
+            pluginInstruction.InstructionParameters.DataDict["tagRegex"].Length > 0 &&
+            matches.Count > 0)
+        {
+          byte[] tmpDataBlock;
+          string foundTag = matches[0].Groups[1].Value;
+          string foundTagEscaped = Regex.Escape(foundTag);
+          string replacementData = pluginInstruction.InstructionParameters.DataDict["data"];
+
+          if (pluginInstruction.InstructionParameters.DataDict["position"] == "before")
+          {
+            replacementData = replacementData + " " + foundTag;
+          }
+          else
+          {
+            replacementData = foundTag + " " + replacementData;
+          }
+
+          readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
+          tmpDataBlock = Encoding.UTF8.GetBytes(readableData);
+          Logging.Instance.LogMessage(
+            this.requestObj.Id,
+            this.requestObj.ProxyProtocol,
+            Loglevel.Info,
+            "NonChunked.ForwardAndInjectNonChunkedNonprocessedDataToPeer(): Tag \"{0}\" detected, content of \"{1}\" injected",
+            pluginInstruction.InstructionParameters.DataDict["tag"],
+            Path.GetFileName(pluginInstruction.InstructionParameters.DataDict["file"]));
+
+          // Write data to peer 2
+          dataRecipientStream.Write(tmpDataBlock, 0, tmpDataBlock.Length);
+          dataRecipientStream.Flush();
+          noBytesTransferred += tmpDataBlock.Length;
+        }
+        else
+        {
+
+          // Write data to peer 2
+          dataRecipientStream.Write(dataBlock, 0, bytesRead);
+          dataRecipientStream.Flush();
+          noBytesTransferred += bytesRead;
+        }
+        if (sniffedDataChunk != null)
+        {
+          sniffedDataChunk.AppendData(dataBlock, bytesRead);
+        }
+
+        totalTransferredBytes += bytesRead;
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA, TodalDataToTransfer:{0}): Relaying data from: Client -> Server (bytesRead:{1} totalTransferredBytes:{2})", dataBlock.Length, bytesRead, totalTransferredBytes);
+      }
+
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedNonprocessedDataToPeer(2:DATA): Total amount of transferred data={0}", totalTransferredBytes);
+      return noBytesTransferred;
+    }
+
+
+
+
     #endregion
 
 
@@ -202,7 +339,6 @@
 
         if (blockSize > 0)
         {
-if (serverNewlineBytes == null) Console.WriteLine("serverNewlineBytes == null");
           this.ProcessAndRelayChunk(inputStreamReader, outputStreamWriter, blockSize, chunkLenStr, contentCharsetEncoding, serverNewlineBytes);
           noBytesTransferred += blockSize;
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardChunkedProcessedDataChunks(): blockSize > 0: ChunkNo={0} chunkLenStr.Length={1}, Content=|0x{2}|", chunkCounter, chunkLenStr.Length, chunkLenStr);
@@ -421,6 +557,73 @@ if (serverNewlineBytes == null) Console.WriteLine("serverNewlineBytes == null");
       outputStreamWriter.Flush();
 
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ProcessAndRelayChunk(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", chunkSize, serverDataPacket.ContentData.Length);
+    }
+
+
+    private void InjectAndRelayChunk(PluginInstruction pluginInstruction, MyBinaryReader inputStreamReader, BinaryWriter outputStreamWriter, int chunkSize, string chunkSizeHexString, byte[] serverNewlineBytes, SniffedDataChunk sniffedDataChunk = null)
+    {
+      int bytesRead = 0;
+      int dataVolume = 0;
+
+      // 1. Read data chunk
+      byte[] dataBlock = this.ReceiveChunk(chunkSize, inputStreamReader);
+      if (chunkSize != dataBlock.Length)
+      {
+        throw new Exception("Server did not send all data");
+      }
+
+      // 2. Decode bytes to UTF8
+      string readableData = Encoding.UTF8.GetString(dataBlock);
+      MatchCollection matches = Regex.Matches(readableData, pluginInstruction.InstructionParameters.DataDict["tagRegex"]);
+      if (pluginInstruction.InstructionParameters.DataDict.ContainsKey("tagRegex") &&
+          pluginInstruction.InstructionParameters.DataDict["tagRegex"].Length > 0 &&
+          matches.Count > 0)
+      {
+        string foundTag = matches[0].Groups[1].Value;
+        string foundTagEscaped = Regex.Escape(foundTag);
+        string replacementData = pluginInstruction.InstructionParameters.DataDict["data"];
+
+        if (pluginInstruction.InstructionParameters.DataDict["position"] == "before")
+        {
+          replacementData = replacementData + " " + foundTag;
+        }
+        else
+        {
+          replacementData = foundTag + " " + replacementData;
+        }
+
+        readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
+        dataBlock = Encoding.UTF8.GetBytes(readableData);
+        Logging.Instance.LogMessage(
+          this.requestObj.Id,
+          this.requestObj.ProxyProtocol,
+          Loglevel.Info,
+          "Chunked.InjectAndRelayChunk(): Tag \"{0}\" detected, content of \"{1}\" injected",
+          pluginInstruction.InstructionParameters.DataDict["tag"],
+          Path.GetFileName(pluginInstruction.InstructionParameters.DataDict["file"]));
+      }
+
+      // Write packet size to server data stream
+      byte[] chunkSizeDeclaration = Encoding.UTF8.GetBytes(chunkSizeHexString);
+      outputStreamWriter.Write(chunkSizeDeclaration, 0, chunkSizeDeclaration.Length);
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+
+      // Write application data to server data stream
+      outputStreamWriter.Write(dataBlock, 0, chunkSize);
+
+      // If a sniffer data chunk object is defined write application data to it
+      if (sniffedDataChunk != null)
+      {
+        sniffedDataChunk.AppendData(dataBlock, dataBlock.Length);
+      }
+
+
+      // Send trailing CRLF to finish chunk transmission
+      inputStreamReader.ReadLine();
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+
+      outputStreamWriter.Flush();
+      dataVolume += bytesRead;
     }
 
     #endregion

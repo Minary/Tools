@@ -18,7 +18,7 @@
     private static string logFileName = "HttpProxy.log";
     private object syncObj = new object();
     private List<string> logs = new List<string>();
-    private Loglevel logLevel;
+    private Loglevel currentlogLevel;
     private bool isInTestingMode;
 
     #endregion
@@ -28,7 +28,7 @@
 
     public static Logging Instance { get { return instance ?? (instance = GetInstance()); } set { } }
 
-    public Loglevel LoggingLevel { get { return this.logLevel; } set { this.logLevel = value; } }
+    public Loglevel CurrentLoggingLevel { get { return this.currentlogLevel; } set { this.currentlogLevel = value; } }
 
     public bool IsInTestingMode { get { return this.isInTestingMode; } set { this.isInTestingMode = value; } }
 
@@ -44,7 +44,7 @@
         return;
       }
 
-      if (logLevel < this.logLevel)
+      if (logLevel < this.currentlogLevel)
       {
         return;
       }
@@ -140,7 +140,7 @@ Console.WriteLine(logMessage);
     /// <param name="logLevel"></param>
     private Logging(Loglevel logLevel = Loglevel.Debug)
     {
-      this.logLevel = logLevel;
+      this.currentlogLevel = logLevel;
     }
 
 

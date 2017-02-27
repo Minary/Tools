@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxyLib.Interface
 {
+  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Class.Server;
   using System.Collections;
@@ -36,5 +37,10 @@
     void RelayDataC2S(bool mustBeProcessed, SniffedDataChunk dataChunk);
 
     int RelayDataS2C(bool mustBeProcessed);
+
+    int RelayChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed);
+
+    int RelayNonChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed);
+
   }
 }

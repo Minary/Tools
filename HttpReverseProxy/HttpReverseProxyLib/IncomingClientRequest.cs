@@ -429,7 +429,7 @@ Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.De
         if (requestObj.ClientRequestObj.ClientRequestContentLength > 0)
         {
 Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
-          return DataTransmissionMode.ContentLength;
+          return DataTransmissionMode.FixedContentLength;
         }
         else if (requestObj.ClientRequestObj.ClientRequestContentLength == 0)
         {
