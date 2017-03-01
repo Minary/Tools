@@ -97,9 +97,11 @@
     {
       string host = string.Empty;
       string path = string.Empty;
+      string fileContent = string.Empty;
       string injectionCodeFile = string.Empty;
       string tag = string.Empty;
-      string position = string.Empty;
+      string tagRegex = string.Empty;
+      TagPosition position = TagPosition.before;
 
       if (string.IsNullOrEmpty(configFileLine))
       {
@@ -114,10 +116,12 @@
       }
       
       tag = splitter[0];
-      position = splitter[1];
+      position = splitter[1].ToLower().Trim() == "before" ? TagPosition.before : TagPosition.after;
       injectionCodeFile = splitter[2];
       host = splitter[3]?.ToLower();
       path = splitter[4];
+
+      System.Console.WriteLine("Host={0} Position={1}", host, position.ToString());
 
       if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
       {
@@ -134,13 +138,12 @@
         throw new ProxyWarningException(string.Format("The injection code file parameter is invalid: {0}", injectionCodeFile));
       }
 
-
       if (injectCodeRecords.ContainsKey(host) &&
           injectCodeRecords[host].Path == path)
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
-      
+
       return new InjectCodeConfigRecord(host, path, injectionCodeFile, tag, position);
     }
 

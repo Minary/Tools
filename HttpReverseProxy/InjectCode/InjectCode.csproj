@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="DataTypes\InjectCodeConfigRecord.cs" />
+    <Compile Include="DataTypes\TagPosition.cs" />
     <Compile Include="InjectCode.cs" />
     <Compile Include="Interface\OnLoad.cs" />
     <Compile Include="Interface\OnPostClientHeaderRequest.cs" />
