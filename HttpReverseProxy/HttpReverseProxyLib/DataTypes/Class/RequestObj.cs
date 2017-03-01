@@ -118,7 +118,7 @@
     public void InitRequestValues()
     {
       // Reset client settings
-      this.ClientRequestObj.ClientRequestContentLength = 0;
+      this.ClientRequestObj.ContentLength = 0;
       this.ClientRequestObj.ClientRequestData = string.Empty;
       this.clientRequestObj.ClientRequestHeaders.Clear();
 

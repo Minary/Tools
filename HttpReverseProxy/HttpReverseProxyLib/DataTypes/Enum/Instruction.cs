@@ -8,7 +8,6 @@
     ReloadUrl = 3,
     RefreshUrl = 4,
     ReloadUrlWithHttps = 5,
-    SendBackLocalFile = 6,
-    InjectLocalFileIntoStream = 7
+    SendBackLocalFile = 6
   }
 }
