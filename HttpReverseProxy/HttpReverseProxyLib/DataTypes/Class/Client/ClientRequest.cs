@@ -22,7 +22,7 @@
     private MyBinaryReader clientBinaryReader;
     private BinaryWriter clientBinaryWriter;
 
-    private int clientRequestContentLength;
+    private int contentLength;
     private string clientRequestData;
 
     #endregion
@@ -48,7 +48,7 @@
 
     public BinaryWriter ClientBinaryWriter { get { return this.clientBinaryWriter; } set { this.clientBinaryWriter = value; } }
 
-    public int ClientRequestContentLength { get { return this.clientRequestContentLength; } set { this.clientRequestContentLength = value; } }
+    public int ContentLength { get { return this.contentLength; } set { this.contentLength = value; } }
 
     public string ClientRequestData { get { return this.clientRequestData; } set { this.clientRequestData = value; } }
 
@@ -62,7 +62,7 @@
       this.requestLine = new ClientRequestLine();
       this.defaultHost = defaultHost;
 
-      this.clientRequestContentLength = 0;
+      this.contentLength = 0;
       this.clientRequestHeaders = new Dictionary<string, List<string>>();
       this.contentTypeEncoding = new DataContentTypeEncoding();
       this.clientBinaryReader = null;

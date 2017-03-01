@@ -34,13 +34,9 @@
 
 
     // Client/Server data transfer
-    void RelayDataC2S(bool mustBeProcessed, SniffedDataChunk dataChunk);
+    int RelayDataC2S(bool mustBeProcessed, SniffedDataChunk dataChunk);
 
     int RelayDataS2C(bool mustBeProcessed);
-
-    int RelayChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed);
-
-    int RelayNonChunkedAndInjectDataS2C(PluginInstruction pluginInstruction, bool mustBeProcessed);
 
   }
 }

@@ -270,7 +270,7 @@
 
           case "content-length":
             int.TryParse(httpHeaders[1], out contentLen);
-            requestObj.ClientRequestObj.ClientRequestContentLength = contentLen;
+            requestObj.ClientRequestObj.ContentLength = contentLen;
             requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"].Add(httpHeaders[1]);
             break;
           case "content-type":
@@ -397,21 +397,21 @@
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Content-Length"))
         {
           string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"][0];
-          requestObj.ClientRequestObj.ClientRequestContentLength = int.Parse(contentLen);
+          requestObj.ClientRequestObj.ContentLength = int.Parse(contentLen);
         }
         else if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Transfer-Encoding"))
         {
-          requestObj.ClientRequestObj.ClientRequestContentLength = -1;
+          requestObj.ClientRequestObj.ContentLength = -1;
         }
         else
         {
-          requestObj.ClientRequestObj.ClientRequestContentLength = 0;
+          requestObj.ClientRequestObj.ContentLength = 0;
         }
       }
       catch (Exception ex)
       {
         Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "IncomingClientRequest.DetermineClientRequestContentLength(Exception): {0}", ex.Message);
-        requestObj.ClientRequestObj.ClientRequestContentLength = 0;
+        requestObj.ClientRequestObj.ContentLength = 0;
       }
     }
 
@@ -423,15 +423,15 @@
       if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Content-Length"))
       {
         string contentLen = requestObj.ClientRequestObj.ClientRequestHeaders["Content-Length"][0];
-        requestObj.ClientRequestObj.ClientRequestContentLength = int.Parse(contentLen);
+        requestObj.ClientRequestObj.ContentLength = int.Parse(contentLen);
 Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ContainsKey(Content-Length)");
 
-        if (requestObj.ClientRequestObj.ClientRequestContentLength > 0)
+        if (requestObj.ClientRequestObj.ContentLength > 0)
         {
 Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength > 0");
           return DataTransmissionMode.FixedContentLength;
         }
-        else if (requestObj.ClientRequestObj.ClientRequestContentLength == 0)
+        else if (requestObj.ClientRequestObj.ContentLength == 0)
         {
 Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.DetermineDataTransmissionModeC2S(): ClientRequestContentLength == 0");
           return DataTransmissionMode.NoDataToTransfer;
