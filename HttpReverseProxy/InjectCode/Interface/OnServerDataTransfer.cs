@@ -13,10 +13,11 @@
   {
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="pluginHost"></param>
-    public void OnPostServerDataResponse(RequestObj requestObj, DataPacket dataPacket)
+    /// <param name="requestObj"></param>
+    /// <param name="dataPacket"></param>
+    public void OnServerDataTransfer(RequestObj requestObj, DataPacket dataPacket)
     {
       if (requestObj == null)
       {
