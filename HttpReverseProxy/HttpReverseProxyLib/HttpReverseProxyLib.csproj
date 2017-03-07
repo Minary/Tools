@@ -45,7 +45,7 @@
     <Compile Include="DataTypes\Class\Client\ClientRequest.cs" />
     <Compile Include="DataTypes\Class\Client\ClientRequestLine.cs" />
     <Compile Include="DataTypes\Class\DataContentTypeEncoding.cs" />
-    <Compile Include="DataTypes\Class\DataPacket.cs" />
+    <Compile Include="DataTypes\Class\DataChunk.cs" />
     <Compile Include="DataTypes\Enum\DataTransmissionMode.cs" />
     <Compile Include="DataTypes\Class\HttpStatusDetails.cs" />
     <Compile Include="DataTypes\Enum\Instruction.cs" />

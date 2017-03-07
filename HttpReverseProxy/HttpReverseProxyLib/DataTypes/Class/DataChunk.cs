@@ -3,7 +3,7 @@
   using System.Text;
 
 
-  public class DataPacket
+  public class DataChunk
   {
 
     #region PRIVATE
@@ -25,7 +25,7 @@
 
     #region PUBLIC
 
-    public DataPacket(byte[] contentData, Encoding dataEncoding)
+    public DataChunk(byte[] contentData, Encoding dataEncoding)
     {
       this.contentData = contentData;
       this.dataEncoding = dataEncoding;

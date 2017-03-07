@@ -78,8 +78,6 @@
     <Compile Include="Lib\PluginCalls.cs" />
     <Compile Include="ToClient\Header\Redirect.cs" />
     <Compile Include="ToClient\Header\SendFile.cs" />
-    <Compile Include="ToClient\InjectCode\Chunked.cs" />
-    <Compile Include="ToClient\InjectCode\NonChunked.cs" />
     <Compile Include="ToClient\InstructionHandler.cs" />
     <Compile Include="ToClient\TcpClientBase.cs" />
     <Compile Include="ToServer\TcpClientBase.cs">
