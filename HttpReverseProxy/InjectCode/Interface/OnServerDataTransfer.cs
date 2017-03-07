@@ -16,15 +16,15 @@
     /// 
     /// </summary>
     /// <param name="requestObj"></param>
-    /// <param name="dataPacket"></param>
-    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataPacket)
+    /// <param name="dataChunk"></param>
+    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataChunk)
     {
       if (requestObj == null)
       {
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if (dataPacket == null)
+      if (dataChunk == null)
       {
         throw new ProxyWarningException("The request object is invalid");
       }
@@ -41,7 +41,7 @@
       }
       
       // 2. Decode bytes to UTF8
-      string readableData = Encoding.UTF8.GetString(dataPacket.ContentData);
+      string readableData = Encoding.UTF8.GetString(dataChunk.ContentData);
       MatchCollection matches = Regex.Matches(readableData, injectRecord.TagRegex);
       if (matches.Count > 0)
       {
@@ -63,7 +63,7 @@
         Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnPostServerDataResponse(): Injected code from file {0} {1} the tag {2}", Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag);
 
         // Write data back to datapacket
-        dataPacket.ContentData = tmpDataBlock = Encoding.UTF8.GetBytes(readableData);
+        dataChunk.ContentData = tmpDataBlock = Encoding.UTF8.GetBytes(readableData);
       }
 
       Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "InjectCode.OnPostServerDataResponse(): ");

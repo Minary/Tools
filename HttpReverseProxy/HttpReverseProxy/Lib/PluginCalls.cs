@@ -100,8 +100,8 @@
     /// 
     /// </summary>
     /// <param name="requestObj"></param>
-    /// <param name="dataPacket"></param>
-    public static void PostServerDataResponse(RequestObj requestObj, DataChunk dataPacket)
+    /// <param name="dataChunk"></param>
+    public static void PostServerDataResponse(RequestObj requestObj, DataChunk dataChunk)
     {
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
@@ -114,7 +114,7 @@
 
         try
         {
-          tmpPlugin.OnServerDataTransfer(requestObj, dataPacket);
+          tmpPlugin.OnServerDataTransfer(requestObj, dataChunk);
         }
         catch (Exception ex)
         {

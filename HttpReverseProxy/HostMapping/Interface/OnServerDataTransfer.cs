@@ -11,8 +11,8 @@
     /// 
     /// </summary>
     /// <param name="requestObj"></param>
-    /// <param name="dataPacket"></param>
-    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataPacket)
+    /// <param name="dataChunk"></param>
+    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataChunk)
     {
       if (requestObj == null)
       {
@@ -24,7 +24,7 @@
         throw new ProxyWarningException("The meta data object is invalid");
       }
 
-      if (dataPacket == null)
+      if (dataChunk == null)
       {
         throw new ProxyWarningException("The data packet is invalid");
       }

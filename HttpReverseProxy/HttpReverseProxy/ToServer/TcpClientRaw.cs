@@ -81,23 +81,23 @@
       }
 
       // Encode received bytes to the announced format
-      DataChunk serverDataPacket = new DataChunk(dataPacket, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding);
+      DataChunk serverDataChunk = new DataChunk(dataPacket, this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding);
 
       if (mustBeProcessed == true)
       {
-        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
+        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataChunk);
       }
 
       // Send data packet to recipient
-      outputStreamWriter.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
+      outputStreamWriter.Write(serverDataChunk.ContentData, 0, serverDataChunk.ContentData.Length);
       outputStreamWriter.Flush();
-      noBytesTransferred += serverDataPacket.ContentData.Length;
+      noBytesTransferred += serverDataChunk.ContentData.Length;
       Logging.Instance.LogMessage(
                                   this.requestObj.Id,
                                   this.requestObj.ProxyProtocol,
                                    Loglevel.Debug,
                                   "TcpClientRaw.ForwardNonchunkedDataToPeer2(): Data successfully relayed to client. ContentDataSize:{0})",
-                                  serverDataPacket.ContentData.Length);
+                                  serverDataChunk.ContentData.Length);
 
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedDataToPeer2(2:DATA): Total amount of transferred data={0}", totalTransferredBytes);
       return noBytesTransferred;
@@ -444,23 +444,23 @@
       }
 
       // Encode received bytes to the announced format
-      DataChunk serverDataPacket = new DataChunk(binaryDataBlock, contentCharsetEncoding);
+      DataChunk serverDataChunk = new DataChunk(binaryDataBlock, contentCharsetEncoding);
 
       // Send chunk size to recepient
-      string chunkSizeHexStringTmp = serverDataPacket.ContentData.Length.ToString("x");
+      string chunkSizeHexStringTmp = serverDataChunk.ContentData.Length.ToString("x");
       byte[] chunkSizeDeclaration = contentCharsetEncoding.GetBytes(chunkSizeHexStringTmp);
       outputStreamWriter.Write(chunkSizeDeclaration, 0, chunkSizeDeclaration.Length);
       outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
 
       // Send data packet to recipient
-      outputStreamWriter.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
+      outputStreamWriter.Write(serverDataChunk.ContentData, 0, serverDataChunk.ContentData.Length);
 
       // Send trailing newline to finish chunk transmission
       inputStreamReader.ReadLine();
       outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
       outputStreamWriter.Flush();
 
-      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ProcessAndRelayChunk(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", chunkSize, serverDataPacket.ContentData.Length);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ProcessAndRelayChunk(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", chunkSize, serverDataChunk.ContentData.Length);
     }
 
 
@@ -479,30 +479,30 @@
 
       // Encode received bytes to the announced format
       // string dataBlockString = contentCharsetEncoding.GetString(binaryDataBlock);
-      DataChunk serverDataPacket = new DataChunk(binaryDataBlock, contentCharsetEncoding);
+      DataChunk serverDataChunk = new DataChunk(binaryDataBlock, contentCharsetEncoding);
 
       // If response can be processed : do so.
       if (mustBeProcessed == true)
       {
-        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataPacket);
+        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataChunk);
       }
 
       // Send chunk size to recepient
-      string chunkSizeHexStringTmp = serverDataPacket.ContentData.Length.ToString("x");
+      string chunkSizeHexStringTmp = serverDataChunk.ContentData.Length.ToString("x");
       byte[] chunkSizeDeclaration = contentCharsetEncoding.GetBytes(chunkSizeHexStringTmp);
 
       outputStreamWriter.Write(chunkSizeDeclaration, 0, chunkSizeDeclaration.Length);
       outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
 
       // Send data packet to recipient
-      outputStreamWriter.Write(serverDataPacket.ContentData, 0, serverDataPacket.ContentData.Length);
+      outputStreamWriter.Write(serverDataChunk.ContentData, 0, serverDataChunk.ContentData.Length);
 
       // Send trailing newline to finish chunk transmission
       inputStreamReader.ReadLine();
       outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
       outputStreamWriter.Flush();
 
-      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.RelayChunk2(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", announcedChunkSize, serverDataPacket.ContentData.Length);
+      Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.RelayChunk2(): Transferred {0}/{1} bytes from SERVER -> CLIENT: ", announcedChunkSize, serverDataChunk.ContentData.Length);
       return totalBytesTransferred;
     }
 
