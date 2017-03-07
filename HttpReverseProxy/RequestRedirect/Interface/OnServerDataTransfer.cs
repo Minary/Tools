@@ -14,7 +14,7 @@
     /// </summary>
     /// <param name="requestObj"></param>
     /// <param name="dataPacket"></param>
-    public void OnServerDataTransfer(RequestObj requestObj, DataPacket dataPacket)
+    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataPacket)
     {
       if (requestObj == null)
       {

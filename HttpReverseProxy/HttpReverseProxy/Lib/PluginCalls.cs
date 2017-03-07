@@ -101,7 +101,7 @@
     /// </summary>
     /// <param name="requestObj"></param>
     /// <param name="dataPacket"></param>
-    public static void PostServerDataResponse(RequestObj requestObj, DataPacket dataPacket)
+    public static void PostServerDataResponse(RequestObj requestObj, DataChunk dataPacket)
     {
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
