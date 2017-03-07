@@ -241,32 +241,26 @@
     }
 
 
+
+    private void SendServerResponseToClientEx(PluginInstruction pluginInstruction)
+    {
+      // Send server response to client: Redirect
+      if (pluginInstruction.Instruction == Instruction.RedirectToNewUrl)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.RedirectToNewUrl");
+        return;
+      }
+
+      // Send server response to client: Inject code
+    }
+
+
     private void SendServerResponseToClient(PluginInstruction pluginInstruction)
     {
       // Send server response to client: Redirect
       if (pluginInstruction.Instruction == Instruction.RedirectToNewUrl)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.RedirectToNewUrl");
-
-
-      // Send server response to client: Inject code
-      }
-      else if (pluginInstruction.Instruction == Instruction.InjectLocalFileIntoStream)
-      {
-
-        // If the server data is transmitted in chunked mode go here.
-        if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.Chunked)
-        {
-          ToClient.InjectCode.Chunked injectIntoChunkedConnection = new ToClient.InjectCode.Chunked(this.requestObj);
-          injectIntoChunkedConnection.InjectIntoChunkedTransfer(pluginInstruction);
-
-        // If the server data has a fixed length go here.
-        }
-        else if (this.requestObj.ProxyDataTransmissionModeS2C == DataTransmissionMode.FixedContentLength)
-        {
-          ToClient.InjectCode.NonChunked injectIntoFixedContentLengthConnection = new ToClient.InjectCode.NonChunked(this.requestObj);
-          injectIntoFixedContentLengthConnection.InjectIntoNonChunkedTransfer(pluginInstruction);
-        }
 
 
       // Send server response to client: Regular server response
@@ -279,9 +273,10 @@
         bool mustBeProcessed = this.IsServerResponseDataProcessable();
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
 
-        this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
-        this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
-        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
+// MARKER: AT THIS POINT THE TOTAL DATA VOLUME IS NOT KNOWN -> Content-Length
+this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
+this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
 
         this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
         string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
@@ -430,7 +425,7 @@
       }
 
       // 2. Client request "Content-Length" is > UPPER_LIMIT
-      if (this.requestObj.ClientRequestObj.ClientRequestContentLength > this.dataDownloadUpperLimit)
+      if (this.requestObj.ClientRequestObj.ContentLength > this.dataDownloadUpperLimit)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.IsClientRequestDataProcessable(): The content length is greater than the upper limit (contentLength:{0}, UpperLimit:{1}", this.requestObj.ServerResponseObj.ContentLength, dataDownloadUpperLimit);
         return false;
