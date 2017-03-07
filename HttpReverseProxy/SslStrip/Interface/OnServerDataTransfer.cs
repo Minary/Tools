@@ -14,8 +14,8 @@
     /// 
     /// </summary>
     /// <param name="requestObj"></param>
-    /// <param name="dataPacket"></param>
-    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataPacket)
+    /// <param name="dataChunk"></param>
+    public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataChunk)
     {
       if (requestObj == null)
       {
@@ -27,7 +27,7 @@
         throw new ProxyWarningException("The meta data object is invalid");
       }
 
-      if (dataPacket == null)
+      if (dataChunk == null)
       {
         throw new ProxyWarningException("The data packet is invalid");
       }
@@ -49,7 +49,7 @@
       ConcurrentDictionary<string, string> cacheUrlMapping = new ConcurrentDictionary<string, string>();
       string strippedData = string.Empty;
 
-      this.sslStrippedData = dataPacket.DataEncoding.GetString(dataPacket.ContentData, 0, dataPacket.ContentData.Length);
+      this.sslStrippedData = dataChunk.DataEncoding.GetString(dataChunk.ContentData, 0, dataChunk.ContentData.Length);
       this.LocateAllTags(this.sslStrippedData, this.pluginConfig.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
 
       foreach (string tmpKey in foundHttpsTags.Keys)
@@ -61,7 +61,7 @@
       this.sslStrippedData = this.ReplaceRelevantTags(requestObj, this.sslStrippedData, foundHttpsTags);
 
       // 3. Encode content back to the charset the server reported (or default encoding)
-      dataPacket.ContentData = requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding.GetBytes(this.sslStrippedData);
+      dataChunk.ContentData = requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding.GetBytes(this.sslStrippedData);
 
       // 4. Keep SSL stripped URLs in cache
       foreach (string tmpKey in cacheUrlMapping.Keys)
