@@ -51,7 +51,7 @@
     <Compile Include="DataTypes\PluginConfig.cs" />
     <Compile Include="DataTypes\HtmlTagConfig.cs" />
     <Compile Include="DataTypes\SslStripConfigRecord.cs" />
-    <Compile Include="Interface\OnPostServerDataResponse.cs" />
+    <Compile Include="Interface\OnServerDataTransfer.cs" />
     <Compile Include="Interface\OnPostClientHeadersRequest.cs" />
     <Compile Include="Interface\OnLoad.cs" />
     <Compile Include="Interface\OnPostServerHeadersResponse.cs">
