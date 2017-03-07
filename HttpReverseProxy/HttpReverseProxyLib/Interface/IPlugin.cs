@@ -51,6 +51,6 @@
 
     PluginInstruction OnPostServerHeadersResponse(RequestObj requestObj);
 
-    void OnPostServerDataResponse(RequestObj requestObj, DataPacket datapacket);
+    void OnServerDataTransfer(RequestObj requestObj, DataChunk datapacket);
   }
 }

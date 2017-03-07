@@ -45,7 +45,7 @@
     <Compile Include="DataTypes\RequestRedirectContigRecord.cs" />
     <Compile Include="Interface\OnLoad.cs" />
     <Compile Include="Interface\OnPostClientHeaderRequest.cs" />
-    <Compile Include="Interface\OnPostServerDataResponse.cs" />
+    <Compile Include="Interface\OnServerDataTransfer.cs" />
     <Compile Include="Interface\OnPostServerHeadersResponse.cs" />
     <Compile Include="Interface\OnUnload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

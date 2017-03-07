@@ -114,7 +114,7 @@
 
         try
         {
-          tmpPlugin.OnPostServerDataResponse(requestObj, dataPacket);
+          tmpPlugin.OnServerDataTransfer(requestObj, dataPacket);
         }
         catch (Exception ex)
         {
