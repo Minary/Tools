@@ -48,10 +48,10 @@
     /// <param name="requestObj"></param>
     public void ReceiveClientRequestHeaders(RequestObj requestObj)
     {
-      // 1. Read the client request headers
+      // Read the client request headers
       this.ParseClientRequestHeaders(requestObj);
 
-      // 2. Handle the Host header
+      // Handle the Host header
       if (!requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
       {
         ClientNotificationException exception = new ClientNotificationException();
