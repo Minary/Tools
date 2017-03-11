@@ -70,7 +70,8 @@
       {
         // (Re) Initialize request object values like client request and server response headers
         pluginInstr = null;
-        this.requestObj.InitRequestValues();
+//this.requestObj.InitRequestValues();
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(): New {0} request", this.requestObj.ProxyProtocol.ToString());
 
         try
         {
@@ -258,11 +259,22 @@
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.DoNothing");
 
-        // 5.6 Determine whether response content type must be processed
+        // Determine whether response content type must be processed
         bool mustBeProcessed = this.IsServerResponseDataProcessable();
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
 
-// MARKER: AT THIS POINT THE TOTAL DATA VOLUME IS NOT KNOWN -> Content-Length
+        // Remove Content-Length header
+        if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
+        {
+          this.requestObj.ServerResponseObj.ResponseHeaders.Remove("Content-Length");
+        }
+
+        // Add Transfer-Encoding header
+        if (!this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
+        {
+          this.requestObj.ServerResponseObj.ResponseHeaders.Add("Transfer-Encoding", new List<string>() { "Chunked" });
+        }
+
 this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
 this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
 Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);

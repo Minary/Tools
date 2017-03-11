@@ -5,17 +5,19 @@
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Interface;
   using System;
+  using System.Collections.Generic;
   using System.IO;
   using System.Net;
   using System.Net.Security;
   using System.Net.Sockets;
+  using System.Reflection;
   using System.Security.Authentication;
   using System.Security.Cryptography.X509Certificates;
   using System.Text;
   using System.Threading;
 
 
-  public class HttpsReverseProxy : HttpReverseProxyBasis
+  public sealed class HttpsReverseProxy : HttpReverseProxyBasis, IPluginHost
   {
 
     #region MEMBERS
@@ -25,6 +27,7 @@
     private static RemoteCertificateValidationCallback remoteCertificateValidation = new RemoteCertificateValidationCallback(delegate { return true; });
     private TcpListener tcpListener;
     private Thread tcpListenerThread;
+    private Lib.PluginCalls pluginCalls;
 
     #endregion
 
@@ -41,6 +44,16 @@
       get { return IPAddress.Any; }
     }
 
+    public int ListeningPort
+    {
+      get { return Config.LocalHttpsServerPort; }
+    }
+
+    public List<IPlugin> LoadedPlugins
+    {
+      get { return Config.LoadedPlugins; }
+    }
+
     #endregion
 
 
@@ -50,6 +63,10 @@
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
+//this.pluginCalls = new Lib.PluginCalls();
+
+// Load all plugins
+//this.LoadAllPlugins();
 
       // Start listener
       serverCertificate2 = new X509Certificate2(certificateFilePath, string.Empty);
@@ -84,6 +101,47 @@
         this.tcpListenerThread.Abort();
         this.tcpListenerThread.Join();
       }
+
+      // Unload loaded plugins
+//this.UnloadAllPlugins();
+    }
+
+
+    public void LoadPlugin(string pluginFileFullPath)
+    {
+      Assembly pluginAssembly;
+
+      if ((pluginAssembly = Assembly.LoadFile(pluginFileFullPath)) == null)
+      {
+        throw new Exception("The plugin file could not be loaded");
+      }
+
+      try
+      {
+        string fileName = Path.GetFileName(pluginFileFullPath);
+        fileName = Path.GetFileNameWithoutExtension(fileName);
+
+        string pluginName = string.Format("HttpReverseProxy.Plugin.{0}.{0}", fileName);
+        Type objType = pluginAssembly.GetType(pluginName, false, false);
+        object tmpPluginObj = Activator.CreateInstance(objType, true);
+
+        if (!(tmpPluginObj is HttpReverseProxyLib.Interface.IPlugin))
+        {
+          throw new Exception("The plugin file does not support the required plugin interface");
+        }
+
+        IPlugin tmpPlugin = (IPlugin)tmpPluginObj;
+        if (Config.LoadedPlugins.Find(elem => elem.Config.Name == tmpPlugin.Config.Name) != null)
+        {
+          throw new Exception("This plugin was loaded already");
+        }
+
+        tmpPlugin.OnLoad(this);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine("An error occurred while loading HTTPS plugin file \"{0}\": {1}\r\n{2}", Path.GetFileName(pluginFileFullPath), ex.Message, ex.StackTrace);
+      }
     }
 
     #endregion
@@ -102,7 +160,7 @@
           TcpClient tcpClient = tcpListener.AcceptTcpClient();
           tcpClient.NoDelay = true;
 
-          while (!ThreadPool.QueueUserWorkItem(new WaitCallback(HttpsReverseProxy.InitiateClientRequestProcessing), tcpClient))
+          while (!ThreadPool.QueueUserWorkItem(new WaitCallback(HttpsReverseProxy.InitiateHttpsClientRequestProcessing), tcpClient))
           {
             ;
           }
@@ -207,6 +265,55 @@
       }
     }
 
+
+    /// <summary>
+    ///
+    /// </summary>
+    private void LoadAllPlugins()
+    {
+      string pluginsPath = Path.Combine(Directory.GetCurrentDirectory(), "plugins");
+      string[] pluginDirs;
+
+      if (!Directory.Exists(pluginsPath))
+      {
+        return;
+      }
+
+      pluginDirs = Directory.GetDirectories(pluginsPath);
+
+      // Iterate through all plugin directories
+      foreach (string tmpPluginDir in pluginDirs)
+      {
+        string[] pluginFiles = Directory.GetFiles(tmpPluginDir, "*.dll");
+
+        // Load all plugin files, instantiate an object and initialize plugin.
+        foreach (string pluginFileFullPath in pluginFiles)
+        {
+          try
+          {
+            this.LoadPlugin(pluginFileFullPath);
+          }
+          catch (Exception ex)
+          {
+            Console.WriteLine("An error occurred while loading the plugin \"{0}\": {1}", Path.GetFileNameWithoutExtension(pluginFileFullPath), ex.Message);
+          }
+        }
+      }
+    }
+
+
+    private void UnloadAllPlugins()
+    {
+      List<IPlugin> tmpPluginList = new List<IPlugin>();
+      tmpPluginList.AddRange(Config.LoadedPlugins);
+
+      foreach(IPlugin tmpPlugin in tmpPluginList)
+      {
+        tmpPlugin.OnUnload();
+        Config.LoadedPlugins.Remove(tmpPlugin);
+      }
+    }
+    
     #endregion
 
 
@@ -266,6 +373,34 @@
         Console.WriteLine("Remote certificate is null.");
       }
     }
+
+    #endregion
+
+
+    #region INTERFACE: IPluginHost
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="pluginData"></param>
+    public void RegisterPlugin(IPlugin pluginData)
+    {
+      if (pluginData != null)
+      {
+        lock (Config.LoadedPlugins)
+        {
+          List<IPlugin> foundPlugins = Config.LoadedPlugins.FindAll(elem => elem.Config.Name == pluginData.Config.Name);
+          if (foundPlugins == null || foundPlugins.Count <= 0)
+          {
+            Config.AddNewPlugin(pluginData);
+            Logging.Instance.LogMessage("HttpsReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
+          }
+        }
+      }
+    }
+
+
+    public Logging LoggingInst { get { return Logging.Instance; } set { } }
 
     #endregion
 
