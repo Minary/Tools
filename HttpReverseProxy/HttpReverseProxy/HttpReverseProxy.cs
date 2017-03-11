@@ -52,14 +52,8 @@
     #endregion
 
 
-    #region PUBLIC METHODS
+    #region PUBLIC
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="localServerPort"></param>
-    /// <param name="certificateFilePath"></param>
-    /// <returns></returns>
     public override bool Start(int localServerPort, string certificateFilePath = "")
     {
       // Initialize general values
@@ -140,7 +134,7 @@
       }
       catch (Exception ex)
       {
-        Console.WriteLine("An error occurred while loading plugin file \"{0}\": {1}\r\n{2}", Path.GetFileName(pluginFileFullPath), ex.Message, ex.StackTrace);
+        Console.WriteLine("An error occurred while loading HTTP plugin file \"{0}\": {1}\r\n{2}", Path.GetFileName(pluginFileFullPath), ex.Message, ex.StackTrace);
       }
     }
 

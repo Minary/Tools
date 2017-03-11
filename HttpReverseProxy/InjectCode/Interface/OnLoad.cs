@@ -21,6 +21,7 @@
 
       // Parse configuration file
       this.configurationFileFullPath = Path.Combine(this.pluginProperties.PluginDirectory, Plugin.InjectCode.Config.ConfigFileName);
+
       if (string.IsNullOrEmpty(this.configurationFileFullPath))
       {
         return;

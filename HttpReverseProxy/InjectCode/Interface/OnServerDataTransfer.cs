@@ -60,13 +60,14 @@
         }
 
         readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnPostServerDataResponse(): Injected code from file {0} {1} the tag {2}", Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag);
+        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnServerDataTransfer(): Injected code from file {0} {1} the tag {2}", Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag);
 
         // Write data back to datapacket
         dataChunk.ContentData = tmpDataBlock = Encoding.UTF8.GetBytes(readableData);
+        dataChunk.ContentDataLength = dataChunk.ContentData.Length;
       }
 
-      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "InjectCode.OnPostServerDataResponse(): ");
+      Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "InjectCode.OnServerDataTransfer(): ");
     }
   }
 }

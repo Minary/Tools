@@ -121,8 +121,6 @@
       host = splitter[3]?.ToLower();
       path = splitter[4];
 
-      System.Console.WriteLine("Host={0} Position={1}", host, position.ToString());
-
       if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
       {
         throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", host));
