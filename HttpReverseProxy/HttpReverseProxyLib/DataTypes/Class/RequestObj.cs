@@ -93,6 +93,9 @@
       // Server elements
       this.ServerResponseObj = new ServerResponse();
 
+
+      // Request object elements
+      this.InitRequestValues();
       this.proxyProtocol = proxyProtocol;
       this.IsServerKeepAlive = false;
       this.HttpLogData = string.Empty;
@@ -128,7 +131,8 @@
 
       this.ClientRequestObj.IsClientKeepAlive = false;
       this.ClientRequestObj.Host = string.Empty;
-      this.ClientRequestObj.Scheme = string.Empty;
+//this.ClientRequestObj.Scheme = string.Empty;
+//this.proxyProtocol = ProxyProtocol.Undefined;
 
       // Reset server settings
       this.ServerResponseObj.ContentLength = 0;

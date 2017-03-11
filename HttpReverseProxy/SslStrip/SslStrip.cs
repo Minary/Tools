@@ -177,8 +177,8 @@
       {
       }
 
-      // 2. Change scheme from http to https
-      requestObj.ClientRequestObj.Scheme = "https";
+// // 2. Change scheme from http to https
+// requestObj.ClientRequestObj.Scheme = "https";
 
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "SslStrip.ProcessHeadersSameRedirectLocation(): Redirecting from {0} to {1}", requestedLocation, redirectLocationHttps);
 

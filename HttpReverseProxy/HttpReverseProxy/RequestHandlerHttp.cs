@@ -244,20 +244,6 @@
     }
 
 
-
-    private void SendServerResponseToClientEx(PluginInstruction pluginInstruction)
-    {
-      // Send server response to client: Redirect
-      if (pluginInstruction.Instruction == Instruction.RedirectToNewUrl)
-      {
-        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Plugin instruction:Instruction.RedirectToNewUrl");
-        return;
-      }
-
-      // Send server response to client: Inject code
-    }
-
-
     private void SendServerResponseToClient(PluginInstruction pluginInstruction)
     {
       // Send server response to client: Redirect
@@ -368,7 +354,8 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
       // Reasons : Plugin.SslStripn: Http redirect cache record
       //           Plugin.SslStripn: Hsts cache record
       //           Plugin.SslStripn: SslStrip cache record
-      if (this.requestObj.ClientRequestObj.Scheme == "https")
+//if (this.requestObj.ClientRequestObj.Scheme == "https")
+      if (this.requestObj.ProxyProtocol == ProxyProtocol.Https)
       {
         this.requestObj.ServerRequestHandler = new ToServer.TcpClientSsl(this.requestObj, this.requestObj.ClientRequestObj.ClientBinaryReader, this.requestObj.ClientRequestObj.ClientBinaryWriter);
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ForwardClientRequestToServer(): Create HTTPS socket connection to {0}", this.requestObj.ClientRequestObj.Host);

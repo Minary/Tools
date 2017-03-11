@@ -49,7 +49,7 @@
       ConcurrentDictionary<string, string> cacheUrlMapping = new ConcurrentDictionary<string, string>();
       string strippedData = string.Empty;
 
-      this.sslStrippedData = dataChunk.DataEncoding.GetString(dataChunk.ContentData, 0, dataChunk.ContentData.Length);
+      this.sslStrippedData = dataChunk.DataEncoding.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
       this.LocateAllTags(this.sslStrippedData, this.pluginConfig.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
 
       foreach (string tmpKey in foundHttpsTags.Keys)
