@@ -158,6 +158,13 @@
 //        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedDataToPeer3(2:DATA, TotalDataToTransfer:{0}): Relaying data from: Client -> Server (bytesRead:{1} totalTransferredBytes:{2})", buffer.Length, bytesRead, totalTransferredBytes);
       }
 
+      // Send trailing "0 length" chunk
+      string chunkSizeZeroHexString = 0.ToString("x");
+      byte[] chunkSizeZeroDeclaration = contentCharsetEncoding.GetBytes(chunkSizeZeroHexString);
+      outputStreamWriter.Write(chunkSizeZeroDeclaration, 0, chunkSizeZeroDeclaration.Length);
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+      outputStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);
+
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedDataToPeer3(2:DATA): Total amount of transferred data={0}", totalTransferredBytes);
       return noBytesTransferred;
     }
