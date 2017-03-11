@@ -67,7 +67,7 @@
 
       Logging.Instance.LogMessage(id, ProxyProtocol.Undefined, Loglevel.Debug, "CacheRedirect.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
 
-      HostRecord tmpHost = new HostRecord("GET", tmpUriValue.Scheme, tmpUriValue.Host, tmpUriValue.PathAndQuery);
+      HostRecord tmpHost = new HostRecord("GET", ProxyProtocol.Https, tmpUriValue.Host, tmpUriValue.PathAndQuery);
       this.cache.Add(keyLocation, tmpHost);
     }
 

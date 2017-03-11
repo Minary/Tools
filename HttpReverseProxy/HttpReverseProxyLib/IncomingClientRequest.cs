@@ -60,7 +60,6 @@
       }
 
       requestObj.ClientRequestObj.Host = requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0];
-      requestObj.ClientRequestObj.Scheme = "http";
 
       // Parse Client request content type
       requestObj.ClientRequestObj.ContentTypeEncoding = this.DetermineClientRequestContentTypeEncoding(requestObj);
