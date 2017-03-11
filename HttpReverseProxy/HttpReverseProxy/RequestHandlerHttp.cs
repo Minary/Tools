@@ -156,6 +156,9 @@
         {
           this.requestObj.ClientRequestObj.ClientBinaryReader.BaseStream.ReadTimeout = 3000;
         }
+
+        // Reinitialize request object.
+        this.requestObj.InitRequestValues();
       }
     }
 

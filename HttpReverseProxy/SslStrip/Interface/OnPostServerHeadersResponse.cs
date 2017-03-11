@@ -130,7 +130,7 @@
                                     "SslStrip.ProcessServerResponseHeaders(): TYPE Http2Https3XXSameUrl \"{0}\" -> \"{1}\" OldScheme:{2}",
                                     requestObj.ClientRequestObj.GetRequestedUrl(),
                                     requestObj.ServerResponseObj.ResponseHeaders["Location"][0],
-                                    requestObj.ClientRequestObj.Scheme);
+                                    requestObj.ProxyProtocol.ToString().ToLower());
 
 
       // This should never happen!!
