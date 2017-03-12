@@ -263,17 +263,18 @@
         bool mustBeProcessed = this.IsServerResponseDataProcessable();
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): SERVER RESPONSE : {0}PROCESS", (mustBeProcessed ? string.Empty : "DONT "));
 
-        // Remove Content-Length header
+        // If the server response contains the "Content-Length: ..." header
+        // replace it by the "Transfer-Encoding: chunked" header
         if (this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Content-Length"))
         {
           this.requestObj.ServerResponseObj.ResponseHeaders.Remove("Content-Length");
+
+          if (!this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
+          {
+            this.requestObj.ServerResponseObj.ResponseHeaders.Add("Transfer-Encoding", new List<string>() { "Chunked" });
+          }
         }
 
-        // Add Transfer-Encoding header
-        if (!this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Transfer-Encoding"))
-        {
-          this.requestObj.ServerResponseObj.ResponseHeaders.Add("Transfer-Encoding", new List<string>() { "Chunked" });
-        }
 
 this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
 this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
