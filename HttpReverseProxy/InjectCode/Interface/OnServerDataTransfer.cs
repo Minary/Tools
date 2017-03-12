@@ -41,11 +41,10 @@
       }
       
       // 2. Decode bytes to UTF8
-      string readableData = Encoding.UTF8.GetString(dataChunk.ContentData);
+      string readableData = Encoding.UTF8.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
       MatchCollection matches = Regex.Matches(readableData, injectRecord.TagRegex);
       if (matches.Count > 0)
       {
-        byte[] tmpDataBlock;
         string foundTag = matches[0].Groups[1].Value;
         string foundTagEscaped = Regex.Escape(foundTag);
         string replacementData = injectRecord.InjectionCodeFileContent;
@@ -61,9 +60,9 @@
 
         readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
         Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnServerDataTransfer(): Injected code from file {0} {1} the tag {2}", Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag);
-
+        
         // Write data back to datapacket
-        dataChunk.ContentData = tmpDataBlock = Encoding.UTF8.GetBytes(readableData);
+        dataChunk.ContentData = Encoding.UTF8.GetBytes(readableData);
         dataChunk.ContentDataLength = dataChunk.ContentData.Length;
       }
 
