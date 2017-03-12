@@ -151,11 +151,12 @@
                                     this.requestObj.Id,
                                     this.requestObj.ProxyProtocol,
                                      Loglevel.Debug,
-                                    "TcpClientRaw.ForwardNonchunkedDataToPeer3(): Data successfully relayed to client. ContentDataSize:{0})",
-                                    serverDataChunk.ContentDataLength);
+                                    "TcpClientRaw.ForwardNonchunkedDataToPeer3(): Data successfully relayed to client. ContentDataLength:{0} chunkSizeHexStringTmp={1} noBytesTransferred={2}",
+                                    serverDataChunk.ContentDataLength,
+                                    chunkSizeHexStringTmp,
+                                    noBytesTransferred);
 
         totalTransferredBytes += bytesRead;
-//        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientRaw.ForwardNonchunkedDataToPeer3(2:DATA, TotalDataToTransfer:{0}): Relaying data from: Client -> Server (bytesRead:{1} totalTransferredBytes:{2})", buffer.Length, bytesRead, totalTransferredBytes);
       }
 
       // Send trailing "0 length" chunk
