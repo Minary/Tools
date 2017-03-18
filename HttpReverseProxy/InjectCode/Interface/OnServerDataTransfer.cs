@@ -28,12 +28,12 @@
       {
         throw new ProxyWarningException("The request object is invalid");
       }
-
+             
       if (HttpReverseProxy.Plugin.InjectCode.Config.InjectCodeRecords.ContainsKey(requestObj.ClientRequestObj.Host) == false)
       {
         return;
       }
-
+      
       DataTypes.InjectCodeConfigRecord injectRecord = HttpReverseProxy.Plugin.InjectCode.Config.InjectCodeRecords[requestObj.ClientRequestObj.Host];
       if (Regex.Match(requestObj.ClientRequestObj.RequestLine.Path, injectRecord.Path, RegexOptions.IgnoreCase).Success == false)
       {
@@ -44,18 +44,18 @@
       string readableData = Encoding.UTF8.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
       MatchCollection matches = Regex.Matches(readableData, injectRecord.TagRegex);
       if (matches.Count > 0)
-      {
+      { 
         string foundTag = matches[0].Groups[1].Value;
         string foundTagEscaped = Regex.Escape(foundTag);
         string replacementData = injectRecord.InjectionCodeFileContent;
 
         if (injectRecord.Position == DataTypes.TagPosition.before)
-        {
-          replacementData = replacementData + " " + foundTag;
+        { 
+          replacementData = replacementData + foundTag;
         }
         else
-        {
-          replacementData = foundTag + " " + replacementData;
+        { 
+          replacementData = foundTag + replacementData;
         }
 
         readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
