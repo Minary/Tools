@@ -11,9 +11,10 @@
   {
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="pluginHost"></param>
+    /// <param name="requestObj"></param>
+    /// <returns></returns>
     public PluginInstruction OnPostClientHeadersRequest(RequestObj requestObj)
     {
       PluginInstruction instruction = new PluginInstruction();
@@ -29,7 +30,7 @@
         return instruction;
       }
 
-      if (requestObj.ClientRequestObj.ClientRequestHeaders == null || 
+      if (requestObj.ClientRequestObj.ClientRequestHeaders == null ||
           requestObj.ClientRequestObj.ClientRequestHeaders.Count <= 0)
       {
         return instruction;
@@ -51,7 +52,7 @@
         if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Debug, "InjectFile.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"", host, path, tmpRecord.ReplacementResource);
+// this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Debug, "InjectFile.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"", host, path, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.SendBackLocalFile;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
           break;
