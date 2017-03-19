@@ -4,8 +4,10 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
+  using System;
   using System.Collections.Generic;
   using System.IO;
+  using System.Linq;
   using System.Text.RegularExpressions;
 
 
@@ -19,7 +21,7 @@
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private static Dictionary<string, InjectCodeConfigRecord> injectCodeRecords = new Dictionary<string, InjectCodeConfigRecord>();
+    private static List<InjectCodeConfigRecord> injectCodeRecords = new List<InjectCodeConfigRecord>();
 
     #endregion
 
@@ -34,7 +36,7 @@
 
     public static string PluginVersion { get { return pluginVersion; } set { } }
 
-    public static Dictionary<string, InjectCodeConfigRecord> InjectCodeRecords { get { return injectCodeRecords; } set { } }
+    public static List<InjectCodeConfigRecord> InjectCodeRecords { get { return injectCodeRecords; } set { } }
 
     #endregion
 
@@ -75,7 +77,7 @@
         try
         {
           InjectCodeConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
-          injectCodeRecords.Add(newRecord.Host.ToLower(), newRecord);
+          injectCodeRecords.Add(newRecord);
         }
         catch (ProxyWarningException pwex)
         {
@@ -95,8 +97,8 @@
 
     protected InjectCodeConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string host = string.Empty;
-      string path = string.Empty;
+      string hostRegex = string.Empty;
+      string pathRegex = string.Empty;
       string fileContent = string.Empty;
       string injectionCodeFile = string.Empty;
       string tag = string.Empty;
@@ -118,31 +120,48 @@
       tag = splitter[0];
       position = splitter[1].ToLower().Trim() == "before" ? TagPosition.before : TagPosition.after;
       injectionCodeFile = splitter[2];
-      host = splitter[3]?.ToLower();
-      path = splitter[4];
+      hostRegex = splitter[3]?.ToLower();
+      pathRegex = splitter[4];
 
-      if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
+      if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", host));
+        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", hostRegex));
       }
 
-      if (string.IsNullOrEmpty(path) || Regex.Match(host, @"[\r\n\s]").Success)
+      if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", path));
+        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", pathRegex));
       }
 
-      if (string.IsNullOrEmpty(injectionCodeFile) || Regex.Match(host, @"[\r\n\s]").Success)
+      if (string.IsNullOrEmpty(injectionCodeFile) || !File.Exists(injectionCodeFile))
       {
         throw new ProxyWarningException(string.Format("The injection code file parameter is invalid: {0}", injectionCodeFile));
       }
 
-      if (injectCodeRecords.ContainsKey(host) &&
-          injectCodeRecords[host].Path == path)
+      if (injectCodeRecords.Where(elem => elem.HostRegex.ToLower() == hostRegex.ToLower() &&
+                                          elem.PathRegex.ToLower() == pathRegex.ToLower()).ToList().Count > 0)
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
 
-      return new InjectCodeConfigRecord(host, path, injectionCodeFile, tag, position);
+      return new InjectCodeConfigRecord(hostRegex, pathRegex, injectionCodeFile, tag, position);
+    }
+
+
+    public bool IsRegexPatternValid(string pattern)
+    {
+      bool isValid = false;
+
+      try
+      {
+        new Regex(pattern);
+        isValid = true;
+      }
+      catch
+      {
+      }
+
+      return isValid;
     }
 
     #endregion

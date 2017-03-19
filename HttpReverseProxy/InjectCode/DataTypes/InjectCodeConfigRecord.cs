@@ -7,8 +7,8 @@
 
     #region MEMBERS
 
-    private string host;
-    private string path;
+    private string hostRegex;
+    private string pathRegex;
     private string injectionCodeFileContent;
     private string injectionCodeFile;
     private string tag;
@@ -20,9 +20,9 @@
 
     #region PROPERTIES
 
-    public string Host { get { return this.host; } set { this.host = value; } }
+    public string HostRegex { get { return this.hostRegex; } set { this.hostRegex = value; } }
 
-    public string Path { get { return this.path; } set { this.path = value; } }
+    public string PathRegex { get { return this.pathRegex; } set { this.pathRegex = value; } }
     
     public string InjectionCodeFile { get { return this.injectionCodeFile; } set { this.injectionCodeFile = value; } }
 
@@ -39,10 +39,10 @@
 
     #region PUBLIC
 
-    public InjectCodeConfigRecord(string host, string path, string injectionCodeFile, string tag, TagPosition position)
+    public InjectCodeConfigRecord(string hostRegex, string pathRegex, string injectionCodeFile, string tag, TagPosition position)
     {
-      this.host = host;
-      this.path = path;
+      this.hostRegex = hostRegex;
+      this.pathRegex = pathRegex;
       this.injectionCodeFile = injectionCodeFile;
       this.tag = tag;
       this.position = position;
