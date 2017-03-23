@@ -9,8 +9,8 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
 
     private string redirectType;
     private string redirectDescription;
-    private string host;
-    private string path;
+    private string hostRegex;
+    private string pathRegex;
     private string replacementResource;
 
     #endregion
@@ -22,9 +22,9 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
 
     public string RedirectDescription { get { return this.redirectDescription; } set { this.redirectDescription = value; } }
 
-    public string Host { get { return this.host; } set { this.host = value; } }
+    public string HostRegex { get { return this.hostRegex; } set { this.hostRegex = value; } }
 
-    public string Path { get { return this.path; } set { this.path = value; } }
+    public string PathRegex { get { return this.pathRegex; } set { this.pathRegex = value; } }
 
     public string ReplacementResource { get { return this.replacementResource; } set { this.replacementResource = value; } }
 
@@ -37,17 +37,17 @@ namespace HttpReverseProxy.Plugin.RequestRedirect.DataTypes
     {
       this.redirectType = string.Empty;
       this.redirectDescription = string.Empty;
-      this.host = string.Empty;
-      this.path = string.Empty;
+      this.hostRegex = string.Empty;
+      this.pathRegex = string.Empty;
       this.replacementResource = string.Empty;
     }
 
-    public RequestRedirectConfigRecord(string redirectType, string redirectDescription, string host, string path, string replacementResource)
+    public RequestRedirectConfigRecord(string redirectType, string redirectDescription, string hostRegex, string pathRegex, string replacementResource)
     {
       this.redirectType = redirectType;
       this.redirectDescription = redirectDescription;
-      this.host = host;
-      this.path = path;
+      this.hostRegex = hostRegex;
+      this.pathRegex = pathRegex;
       this.replacementResource = replacementResource;
     }
 

@@ -45,14 +45,11 @@
 
       foreach (DataTypes.RequestRedirectConfigRecord tmpRecord in HttpReverseProxy.Plugin.RequestRedirect.Config.RequestRedirectRecords)
       {
-        string hostSearchPattern = "^" + Regex.Escape(tmpRecord.Host) + "$";
-        string pathSearchPattern = "^" + Regex.Escape(tmpRecord.Path) + "$";
-
-        if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
-            Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
+        if (Regex.Match(host, tmpRecord.HostRegex, RegexOptions.IgnoreCase).Success &&
+            Regex.Match(path, tmpRecord.PathRegex, RegexOptions.IgnoreCase).Success)
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage("Inject", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" ---{2}--> \"{3}\"",
-            host, path, tmpRecord.RedirectType, tmpRecord.ReplacementResource);
+//this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" ---{2}--> \"{3}\"",
+//  host, path, tmpRecord.RedirectType, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.RedirectToNewUrl;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
           instruction.InstructionParameters.Status = tmpRecord.RedirectType;
