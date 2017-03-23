@@ -35,11 +35,9 @@
         return;
       }
 
-
       foreach(InjectCodeConfigRecord injectRecord in HttpReverseProxy.Plugin.InjectCode.Config.InjectCodeRecords)
       {
-        //
-        if (Regex.Match(requestObj.ClientRequestObj.Host, injectRecord.HostRegex, RegexOptions.IgnoreCase).Success == true ||
+        if (Regex.Match(requestObj.ClientRequestObj.Host, injectRecord.HostRegex, RegexOptions.IgnoreCase).Success == true &&
             Regex.Match(requestObj.ClientRequestObj.RequestLine.Path, injectRecord.PathRegex, RegexOptions.IgnoreCase).Success == true)
         {
           // 2. Decode bytes to UTF8
