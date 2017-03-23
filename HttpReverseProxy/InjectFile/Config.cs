@@ -84,8 +84,8 @@
 
     protected InjectFileConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string host = string.Empty;
-      string path = string.Empty;
+      string hostRegex = string.Empty;
+      string pathRegex = string.Empty;
       string replacementResource = string.Empty;
 
       if (string.IsNullOrEmpty(configFileLine))
@@ -100,31 +100,48 @@
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
       }
 
-      host = splitter[0]?.ToLower();
-      path = splitter[1];
+      hostRegex = splitter[0]?.ToLower();
+      pathRegex = splitter[1];
       replacementResource = splitter[2];
 
-      if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
+      if(string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", host));
+        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", hostRegex));
       }
 
-      if (string.IsNullOrEmpty(path) || Regex.Match(host, @"[\r\n\s]").Success)
+      if(string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", path));
+        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", pathRegex));
       }
 
-      if (string.IsNullOrEmpty(replacementResource) || Regex.Match(host, @"[\r\n\s]").Success)
+      if (string.IsNullOrEmpty(replacementResource) || Regex.Match(hostRegex, @"[\r\n\s]").Success)
       {
         throw new ProxyWarningException(string.Format("Replacement resource parameter is invalid: {0}", replacementResource));
       }
 
-      if (injectFileRecords.Exists(elem => elem.Host == host && elem.Path == path))
+      if (injectFileRecords.Exists(elem => elem.Host == hostRegex && elem.Path == pathRegex))
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
 
-      return new InjectFileConfigRecord(host, path, replacementResource);
+      return new InjectFileConfigRecord(hostRegex, pathRegex, replacementResource);
+    }
+
+
+    public bool IsRegexPatternValid(string pattern)
+    {
+      bool isValid = false;
+
+      try
+      {
+        new Regex(pattern);
+        isValid = true;
+      }
+      catch
+      {
+      }
+
+      return isValid;
     }
 
     #endregion
