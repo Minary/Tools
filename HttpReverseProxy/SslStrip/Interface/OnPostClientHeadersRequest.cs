@@ -16,6 +16,8 @@
     /// 2. If requested Url was detected to be redirected replace scheme, host and randomFileName by the redirection location
     /// 3. If requested host was flaged to use HTTPS because of HSTS, replace the http:// scheme by https
     /// </summary>
+    /// <param name="requestObj"></param>
+    /// <returns></returns>
     public PluginInstruction OnPostClientHeadersRequest(RequestObj requestObj)
     {
       PluginInstruction instruction = new PluginInstruction();
