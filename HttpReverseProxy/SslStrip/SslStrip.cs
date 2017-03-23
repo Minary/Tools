@@ -165,7 +165,7 @@
     /// <param name="requestObj"></param>
     private void ProcessHeadersSameRedirectLocation(RequestObj requestObj)
     {
-      // 1. Cache HTTP2HTTPS redirect Location
+      // Cache HTTP2HTTPS redirect Location
       string redirectLocationHttps = requestObj.ServerResponseObj.ResponseHeaders["Location"][0];
       string requestedLocation = requestObj.ClientRequestObj.GetRequestedUrl();
 
@@ -177,8 +177,8 @@
       {
       }
 
-// // 2. Change scheme from http to https
-// requestObj.ClientRequestObj.Scheme = "https";
+      // Change scheme from http to https
+      requestObj.ProxyProtocol = ProxyProtocol.Https;
 
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "SslStrip.ProcessHeadersSameRedirectLocation(): Redirecting from {0} to {1}", requestedLocation, redirectLocationHttps);
 
@@ -228,10 +228,11 @@
 
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="requestObj"></param>
     /// <param name="inputData"></param>
-    /// <param name="foundHttpsTags"></param>
+    /// <param name="tagList"></param>
     /// <returns></returns>
     private string ReplaceRelevantTags(RequestObj requestObj, string inputData, ConcurrentDictionary<string, string> tagList)
     {

@@ -46,11 +46,8 @@
 
       foreach (DataTypes.InjectFileConfigRecord tmpRecord in HttpReverseProxy.Plugin.InjectFile.Config.InjectFileRecords)
       {
-        string hostSearchPattern = "^" + Regex.Escape(tmpRecord.Host) + "$";
-        string pathSearchPattern = "^" + Regex.Escape(tmpRecord.Path) + "$";
-
-        if (Regex.Match(host, hostSearchPattern, RegexOptions.IgnoreCase).Success &&
-            Regex.Match(path, pathSearchPattern, RegexOptions.IgnoreCase).Success)
+        if (Regex.Match(host, tmpRecord.Host, RegexOptions.IgnoreCase).Success &&
+            Regex.Match(path, tmpRecord.Path, RegexOptions.IgnoreCase).Success)
         {
 // this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Debug, "InjectFile.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" -> \"{2}\"", host, path, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.SendBackLocalFile;
