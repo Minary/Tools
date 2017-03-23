@@ -86,8 +86,8 @@
     {
       string redirectType = string.Empty;
       string redirectDescription = string.Empty;
-      string host = string.Empty;
-      string path = string.Empty;
+      string hostRegex = string.Empty;
+      string pathRegex = string.Empty;
       string replacementResource = string.Empty;
 
       if (string.IsNullOrEmpty(configFileLine))
@@ -103,31 +103,58 @@
 
       redirectType = splitter[0];
       redirectDescription = splitter[1];
-      host = splitter[2].ToLower();
-      path = splitter[3];
+      hostRegex = splitter[2].ToLower();
+      pathRegex = splitter[3];
       replacementResource = splitter[4];
 
-      if (string.IsNullOrEmpty(host) || !Regex.Match(host, @"[\d\w_\-\.]").Success)
+      if (string.IsNullOrEmpty(redirectType))
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", host));
+        throw new ProxyWarningException("The redirect type is invalid");
       }
 
-      if (string.IsNullOrEmpty(path) || Regex.Match(host, @"[\r\n\s]").Success)
+      if(string.IsNullOrEmpty(redirectDescription))
       {
-        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", path));
+        throw new ProxyWarningException("The redirect description is invalid");
       }
 
-      if (string.IsNullOrEmpty(replacementResource) || Regex.Match(host, @"[\r\n\s]").Success)
+      if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Replacement resource parameter is invalid: {0}", replacementResource));
+        throw new ProxyWarningException(string.Format("The host parameter is invalid: {0}", hostRegex));
       }
 
-      if (requestRedirectRecords.Exists(elem => elem.Host == host && elem.Path == path))
+      if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
+      {
+        throw new ProxyWarningException(string.Format("The path parameter is invalid: {0}", pathRegex));
+      }
+
+      if (string.IsNullOrEmpty(replacementResource))
+      {
+        throw new ProxyWarningException(string.Format("The replacement resource parameter is invalid: {0}", replacementResource));
+      }
+
+      if (requestRedirectRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
       {
         throw new ProxyWarningException(string.Format("Record already exists"));
       }
 
-      return new RequestRedirectConfigRecord(redirectType, redirectDescription, host, path, replacementResource);
+      return new RequestRedirectConfigRecord(redirectType, redirectDescription, hostRegex, pathRegex, replacementResource);
+    }
+
+
+    public bool IsRegexPatternValid(string pattern)
+    {
+      bool isValid = false;
+
+      try
+      {
+        new Regex(pattern);
+        isValid = true;
+      }
+      catch
+      {
+      }
+
+      return isValid;
     }
 
     #endregion
