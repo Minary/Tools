@@ -37,10 +37,12 @@
         throw new ProxyWarningException("The server response content type is invalid");
       }
 
-      if (!this.pluginConfig.SearchPatterns.ContainsKey(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
+      if (Plugin.SslStrip.Config.SearchPatterns.ContainsKey(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType) == false)
       {
         return;
       }
+
+
 
       // 1. The content type is right.
       // Iterate through all configured tags and locate

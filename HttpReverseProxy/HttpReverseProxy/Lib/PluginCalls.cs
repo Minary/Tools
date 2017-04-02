@@ -42,7 +42,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, "PostClientHeadersRequest(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -85,7 +85,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, @"PostServerHeadersResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
 
@@ -101,7 +101,7 @@
     /// </summary>
     /// <param name="requestObj"></param>
     /// <param name="dataChunk"></param>
-    public static void PostServerDataResponse(RequestObj requestObj, DataChunk dataChunk)
+    public static void ServerDataTransfer(RequestObj requestObj, DataChunk dataChunk)
     {
       foreach (IPlugin tmpPlugin in Config.LoadedPlugins)
       {
@@ -118,7 +118,7 @@
         }
         catch (Exception ex)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, @"PostServerDataResponse(EXCEPTION) : {0} -> {1}\r\n{2}", tmpPlugin.Config.Name, ex.Message, ex.StackTrace);
         }
       }
     }

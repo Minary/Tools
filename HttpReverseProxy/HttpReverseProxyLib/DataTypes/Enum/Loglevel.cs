@@ -9,7 +9,7 @@ namespace HttpReverseProxyLib.DataTypes.Enum
   {
     Debug = 1,
     Info = 2,
-    Warnung = 3,
+    Warning = 3,
     Error = 4
   }
 }

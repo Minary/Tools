@@ -20,7 +20,7 @@
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private Dictionary<string, List<string>> searchPatterns = new Dictionary<string, List<string>>();
+    private static Dictionary<string, List<string>> searchPatterns = new Dictionary<string, List<string>>();
     private List<string> searchPatternTemplates = new List<string>()
                {
                                  @"<\s*a\s+[^>]*href\s*=\s*""(https://{0})([^""]*)""[^>]*>",
@@ -45,7 +45,7 @@
 
     public static string ConfigFileName { get { return configFileName; } set { } }
 
-    public Dictionary<string, List<string>> SearchPatterns { get { return this.searchPatterns; } set { } }
+    public static Dictionary<string, List<string>> SearchPatterns { get { return searchPatterns; } set { } }
 
     #endregion
 
@@ -89,15 +89,15 @@
         }
 
         // Generate regex per host/contentype
-        if (!this.searchPatterns.ContainsKey(configRecord.ContentType))
+        if (searchPatterns.ContainsKey(configRecord.ContentType) == false)
         {
-          this.searchPatterns.Add(configRecord.ContentType, new List<string>());
+          searchPatterns.Add(configRecord.ContentType, new List<string>());
         }
 
         foreach (string tmpTemplate in this.searchPatternTemplates)
         {
           string realPattern = string.Format(tmpTemplate, Regex.Escape(configRecord.Host));
-          this.searchPatterns[configRecord.ContentType].Add(realPattern);
+          searchPatterns[configRecord.ContentType].Add(realPattern);
         }
       }
     }

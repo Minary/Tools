@@ -76,7 +76,7 @@
 
       if (mustBeProcessed == true)
       {
-        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataChunk);
+        Lib.PluginCalls.ServerDataTransfer(this.requestObj, serverDataChunk);
       }
 
       // Send data packet to recipient
@@ -108,7 +108,7 @@
       byte[] buffer = new byte[MaxBufferSize];
       int totalTransferredBytes = 0;
       int bytesRead = 0;
-
+      
       while (totalTransferredBytes < transferredContentLength)
       {
         // Read data from peer 1
@@ -132,7 +132,7 @@
 
         if (mustBeProcessed == true)
         {
-          Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataChunk);
+          Lib.PluginCalls.ServerDataTransfer(this.requestObj, serverDataChunk);
         }
 
         // Send chunk size to recepient
@@ -350,7 +350,7 @@
       // If response can be processed : do so.
       if (mustBeProcessed == true)
       {
-        Lib.PluginCalls.PostServerDataResponse(this.requestObj, serverDataChunk);
+        Lib.PluginCalls.ServerDataTransfer(this.requestObj, serverDataChunk);
       }
 
       // Send chunk size to recepient

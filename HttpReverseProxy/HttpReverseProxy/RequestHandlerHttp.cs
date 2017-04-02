@@ -70,34 +70,33 @@
       {
         // (Re) Initialize request object values like client request and server response headers
         pluginInstr = null;
-//this.requestObj.InitRequestValues();
-        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(): New {0} request", this.requestObj.ProxyProtocol.ToString());
+        //this.requestObj.InitRequestValues();
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(): New {0} request to {1}{2}", this.requestObj.ProxyProtocol.ToString(), this.requestObj.ClientRequestObj.Host, this.requestObj.ClientRequestObj.RequestLine.Path);
 
         try
         {
-          // 1. Receive client data
+          // Receive client data
           this.ReadClientRequestHeaders();
 
-          // 2. Call post tcp-client request methodString of each loaded plugin
+          // Call post tcp-client request methodString of each loaded plugin
           bool mustBreakLoop = this.PostClientHeadersRequest();
           if (mustBreakLoop == true)
           {
             break;
           }
 
-          // 3. Re(re)quest server
+          // Re(re)quest server
           pluginInstr = this.SendClientRequestToServer();
 
-          // 4. Send server response to client
+          // Send server response to client
           this.SendServerResponseToClient(pluginInstr);
-
         }
         catch (ClientNotificationException cnex)
         {
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           string innerException = (cnex.InnerException != null) ? cnex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
           break;
         }
         catch (ProxyErrorException peex)
@@ -113,7 +112,7 @@
         catch (WebException wex)
         {
           string innerException = (wex.InnerException != null) ? wex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(WebException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, wex.Message, wex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(WebException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, wex.Message, wex.StackTrace);
           this.clientErrorHandler.ProcessWebException(this.requestObj, wex);
         }
         catch (System.IO.IOException ioex)
@@ -135,7 +134,7 @@
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           string innerException = (sex.InnerException != null) ? sex.InnerException.Message : "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);
           break;
         }
         catch (Exception ex)
@@ -212,7 +211,7 @@
       // Interrupt request if target system is within the private IP address ranges
       if (Network.Instance.IpPartOfPrivateNetwork(this.requestObj.ClientRequestObj.Host))
       {
-        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warnung, "HttpReverseProxy.ReadClientRequestHeaders(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ReadClientRequestHeaders(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
         throw new ClientNotificationException("The requested host is invalid");
       }
     }
@@ -275,14 +274,13 @@
           }
         }
 
-
-this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
-this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
-Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
-
+        this.requestObj.ServerRequestHandler.ForwardStatusLineS2C(this.requestObj.ServerResponseObj.StatusLine);
+        this.requestObj.ServerRequestHandler.ForwardHeadersS2C(this.requestObj.ServerResponseObj.ResponseHeaders, this.requestObj.ServerResponseObj.StatusLine.NewlineBytes);
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): Headers and terminating empty line ({0}) sent", this.requestObj.ServerResponseObj.StatusLine.NewlineType);
         this.requestObj.ServerResponseObj.NoTransferredBytes = this.requestObj.ServerRequestHandler.RelayDataS2C(mustBeProcessed);
         string redirectLocation = this.requestObj.ServerResponseObj.ResponseHeaders.ContainsKey("Location") ? "/" + this.requestObj.ServerResponseObj.ResponseHeaders["Location"][0] : string.Empty;
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.SendServerResponseToClient(): {0}{1}, {2}, {3} bytes", this.requestObj.ServerResponseObj.StatusLine.StatusCode, redirectLocation, this.requestObj.ProxyDataTransmissionModeS2C, this.requestObj.ServerResponseObj.NoTransferredBytes);
+
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.SendServerResponseToClient(): DONE! All data transferred to client");
       }
     }

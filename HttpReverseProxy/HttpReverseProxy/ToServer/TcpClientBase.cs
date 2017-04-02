@@ -367,8 +367,6 @@
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClienBase.RelayDataS2C(): DataTransmissionMode.NoDataToTransfer");
 
-
-
       // 2.0 Unknow amount of data chunks is transferred from the tcpClient to the peer system because
       // -   HTTP headerByteArray "Transfer-Encoding" was set
       }
