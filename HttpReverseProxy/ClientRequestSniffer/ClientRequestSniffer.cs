@@ -115,11 +115,11 @@
       }
       catch (System.TimeoutException tex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "ClientRequestSniffer.WriteToPipe(TimeOutException): {0}", tex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, "ClientRequestSniffer.WriteToPipe(TimeOutException): {0}", tex.Message);
       }
       catch (Exception ex)
       {
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "ClientRequestSniffer.WriteToPipe(Exception): {0}", ex.Message);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, "ClientRequestSniffer.WriteToPipe(Exception): {0}", ex.Message);
       }
 
       return retVal;

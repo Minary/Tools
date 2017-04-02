@@ -409,7 +409,7 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warnung, "IncomingClientRequest.DetermineClientRequestContentLength(Exception): {0}", ex.Message);
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Warning, "IncomingClientRequest.DetermineClientRequestContentLength(Exception): {0}", ex.Message);
         requestObj.ClientRequestObj.ContentLength = 0;
       }
     }

@@ -21,6 +21,7 @@
     #region PROPERTIES
 
     public static CacheSslStrip Instance { get { return instance ?? (instance = new CacheSslStrip()); } set { } }
+
     public Dictionary<string, HostRecord> SslStripCache { get { return this.cache; } set { } }
 
     #endregion
@@ -29,11 +30,11 @@
     #region PUBLIC
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
+    /// <param name="id"></param>
     /// <param name="keyLocation"></param>
     /// <param name="valueLocation"></param>
-    /// <param name="hstsEnabled"></param>
     public void AddElement(string id, string keyLocation, string valueLocation)
     {
       // Key value checks
