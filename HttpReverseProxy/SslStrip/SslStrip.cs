@@ -56,7 +56,7 @@
         Version = SslStripConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", SslStripConfig.PluginName),
         IsActive = true,
-        SupportedProtocols = ProxyProtocol.Http
+        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
     }
 
@@ -236,7 +236,7 @@
     /// <returns></returns>
     private string ReplaceRelevantTags(RequestObj requestObj, string inputData, ConcurrentDictionary<string, string> tagList)
     {
-      if (string.IsNullOrEmpty(inputData))
+      if (inputData == null)
       {
         throw new Exception("Input data is invalid");
       }
@@ -272,7 +272,7 @@
     /// <param name="foundHttpsTags"></param>
     private void LocateAllTags(string inputData, List<string> searchTagCatalog, ConcurrentDictionary<string, string> foundHttpsTags, ConcurrentDictionary<string, string> cacheRecords)
     {
-      if (string.IsNullOrEmpty(inputData))
+      if (inputData == null)
       {
         throw new Exception("Input data is invalid");
       }
