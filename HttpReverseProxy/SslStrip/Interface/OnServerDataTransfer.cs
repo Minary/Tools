@@ -52,23 +52,36 @@
       string strippedData = string.Empty;
 
       this.sslStrippedData = dataChunk.DataEncoding.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
-      this.LocateAllTags(this.sslStrippedData, this.pluginConfig.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
 
-      foreach (string tmpKey in foundHttpsTags.Keys)
+      // If the "ssl strip"data buffer is null/empty return
+      // as there is nothing to do with an empty buffer.
+      if (string.IsNullOrEmpty(this.sslStrippedData))
       {
-        Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Debug, "SslStrip.FoundHttpsHosts(): {0}: {1}", tmpKey, foundHttpsTags[tmpKey]);
+        return;
       }
 
-      // 2. Replace previously determined tags by the according replacement tag
+      this.LocateAllTags(this.sslStrippedData, Plugin.SslStrip.Config.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
+
+      // If there were no relevant tags found return.
+      if (foundHttpsTags == null || foundHttpsTags.Count <= 0)
+      {
+        return;
+      }
+
+      // Replace previously determined tags by the according replacement tag
       this.sslStrippedData = this.ReplaceRelevantTags(requestObj, this.sslStrippedData, foundHttpsTags);
 
-      // 3. Encode content back to the charset the server reported (or default encoding)
+      // Encode content back to the charset the server reported (or default encoding)
       dataChunk.ContentData = requestObj.ServerResponseObj.ContentTypeEncoding.ContentCharsetEncoding.GetBytes(this.sslStrippedData);
+      dataChunk.ContentDataLength = dataChunk.ContentData.Length;
 
-      // 4. Keep SSL stripped URLs in cache
+      // Keep SSL stripped URLs in cache
       foreach (string tmpKey in cacheUrlMapping.Keys)
       {
-        Cache.CacheSslStrip.Instance.AddElement(requestObj.Id, tmpKey, cacheUrlMapping[tmpKey]);
+        if (Cache.CacheSslStrip.Instance.SslStripCache.ContainsKey(tmpKey) == false)
+        {
+          Cache.CacheSslStrip.Instance.AddElement(requestObj.Id, tmpKey, cacheUrlMapping[tmpKey]);
+        }
       }
     }
   }
