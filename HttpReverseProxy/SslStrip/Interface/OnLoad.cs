@@ -29,6 +29,17 @@
       try
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Loaded {0} content type(s)", Plugin.SslStrip.Config.SearchPatterns.Count);
+
+        foreach (string contentType in Plugin.SslStrip.Config.SearchPatterns.Keys)
+        {
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Number patterns for content type \"{0}\": {1}", contentType, Plugin.SslStrip.Config.SearchPatterns[contentType].Count);
+
+          foreach (string pattern in Plugin.SslStrip.Config.SearchPatterns[contentType])
+          {
+            this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Pattern for content type \"{0}\": {1}", contentType, pattern);
+          }
+        }
       }
       catch (System.IO.FileNotFoundException)
       {
