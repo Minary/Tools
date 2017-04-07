@@ -265,21 +265,22 @@
 
 
     /// <summary>
-    ///
+    /// 
     /// </summary>
     /// <param name="inputData"></param>
-    /// <param name="searchTagCatalog"></param>
+    /// <param name="theTagStripRegex"></param>
     /// <param name="foundHttpsTags"></param>
-    private void LocateAllTags(string inputData, List<string> searchTagCatalog, ConcurrentDictionary<string, string> foundHttpsTags, ConcurrentDictionary<string, string> cacheRecords)
+    /// <param name="cacheRecords"></param>
+    private void LocateAllTags(string inputData, Regex theTagStripRegex, ConcurrentDictionary<string, string> foundHttpsTags, ConcurrentDictionary<string, string> cacheRecords)
     {
       if (inputData == null)
       {
         throw new Exception("Input data is invalid");
       }
 
-      if (searchTagCatalog == null || searchTagCatalog.Count <= 0)
+      if (theTagStripRegex == null)
       {
-        throw new Exception("Search tag list is invalid");
+        throw new Exception("Search regex catalog is invalid");
       }
 
       if (foundHttpsTags == null)
@@ -287,26 +288,22 @@
         throw new Exception("Tag cache is invalid");
       }
 
-      foreach (string regexSearchPattern in searchTagCatalog)
+      Match matches = theTagStripRegex.Match(inputData);
+
+      while (matches.Success)
       {
-        Regex itemRegex = new Regex(regexSearchPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        Match matches = itemRegex.Match(inputData);
+        string matchedHost = matches.Groups[1].Value;
+        string matchedPath = matches.Groups[2].Value;
 
-        while (matches.Success)
-        {
-          string matchedHost = matches.Groups[1].Value;
-          string matchedPath = matches.Groups[2].Value;
+        // Process tag and cache the http/https records
+        string newTag = Regex.Replace(matches.Groups[0].Value, "https://", "http://");
+        foundHttpsTags.TryAdd(matches.Groups[0].Value, newTag);
 
-          // Process tag and cache the http/https records
-          string newTag = Regex.Replace(matches.Groups[0].Value, "https://", "http://");
-          foundHttpsTags.TryAdd(matches.Groups[0].Value, newTag);
+        // Keep a copy of both URLs in the cache
+        cacheRecords.TryAdd(string.Format("{0}{1}", matchedHost.Replace("https://", "http://"), matchedPath), string.Format("{0}{1}", matchedHost, matchedPath));
 
-          // Keep a copy of both URLs in the cache
-          cacheRecords.TryAdd(string.Format("{0}{1}", matchedHost.Replace("https://", "http://"), matchedPath), string.Format("{0}{1}", matchedHost, matchedPath));
-
-          // Find next match
-          matches = matches.NextMatch();
-        }
+        // Find next match
+        matches = matches.NextMatch();
       }
     }
 

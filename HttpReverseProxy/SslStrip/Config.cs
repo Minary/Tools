@@ -20,17 +20,10 @@
     private static string pluginVersion = "0.1";
     private static string configFileName = "plugin.config";
 
-    private static Dictionary<string, List<string>> searchPatterns = new Dictionary<string, List<string>>();
-    private List<string> searchPatternTemplates = new List<string>()
-               {
-                                 @"<\s*a\s+[^>]*href\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*base\s+[^>]*href\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*link\s+[^>]*href\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*form\s+[^>]*action\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*script\s+[^>]*src\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*img\s+[^>]*src\s*=\s*""(https://{0})([^""]*)""[^>]*>",
-                                 @"<\s*i?frame\s+[^>]*src\s*=\s*""(https://{0})([^""]*)""[^>]*>"
-               };
+    private static Dictionary<string, Regex> searchPatterns = new Dictionary<string, Regex>();
+
+    private string theSslStripTagPattern = @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>";
+    private Regex searchPatternRegex;
 
     #endregion
 
@@ -45,7 +38,7 @@
 
     public static string ConfigFileName { get { return configFileName; } set { } }
 
-    public static Dictionary<string, List<string>> SearchPatterns { get { return searchPatterns; } set { } }
+    public static Dictionary<string, Regex> SearchPatterns { get { return searchPatterns; } set { } }
 
     #endregion
 
@@ -88,17 +81,9 @@
           continue;
         }
 
-        // Generate regex per host/contentype
-        if (searchPatterns.ContainsKey(configRecord.ContentType) == false)
-        {
-          searchPatterns.Add(configRecord.ContentType, new List<string>());
-        }
-
-        foreach (string tmpTemplate in this.searchPatternTemplates)
-        {
-          string realPattern = string.Format(tmpTemplate, Regex.Escape(configRecord.Host));
-          searchPatterns[configRecord.ContentType].Add(realPattern);
-        }
+        string realPattern = string.Format(this.theSslStripTagPattern, Regex.Escape(configRecord.Host));
+        this.searchPatternRegex = new Regex(this.theSslStripTagPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        searchPatterns[configRecord.ContentType] = this.searchPatternRegex;
       }
     }
 

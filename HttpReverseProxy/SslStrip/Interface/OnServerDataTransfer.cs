@@ -43,7 +43,6 @@
       }
 
 
-
       // 1. The content type is right.
       // Iterate through all configured tags and locate
       // them in the server data
