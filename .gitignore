@@ -48,7 +48,6 @@
 
 # Ignore directories that are not part of the solution/project basis files. 
 #
-Winpcap/
 ipch/
 
 **/bin/Release/*
