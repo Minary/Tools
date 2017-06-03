@@ -92,21 +92,19 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PcapDotNet.Base">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Base.dll</HintPath>
+      <HintPath>..\packages\PcapDotNet.0.10.2\lib\net40\PcapDotNet.Base.dll</HintPath>
     </Reference>
     <Reference Include="PcapDotNet.Core">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.dll</HintPath>
+      <HintPath>..\packages\PcapDotNet.0.10.2\lib\net40\PcapDotNet.Core.dll</HintPath>
     </Reference>
     <Reference Include="PcapDotNet.Core.Extensions">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Core.Extensions.dll</HintPath>
+      <HintPath>..\packages\PcapDotNet.0.10.2\lib\net40\PcapDotNet.Core.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="PcapDotNet.Packets">
-      <HintPath>..\packages\Pcap.Net.x86.1.0.4.1\lib\net45\PcapDotNet.Packets.dll</HintPath>
+      <HintPath>..\packages\PcapDotNet.0.10.2\lib\net40\PcapDotNet.Packets.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
