@@ -153,29 +153,33 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="APE.h" />
+    <ClInclude Include="ArpPoisoning.h" />
+    <ClInclude Include="Dns.h" />
+    <ClInclude Include="DnsForge.h" />
+    <ClInclude Include="DnsHelper.h" />
     <ClInclude Include="DnsPoisoning.h" />
     <ClInclude Include="DnsResponsePoisoning.h" />
+    <ClInclude Include="DnsStructs.h" />
     <ClInclude Include="getopt.h" />
-    <ClInclude Include="HttpInjection.h" />
+    <ClInclude Include="HttpPoisoning.h" />
     <ClInclude Include="LinkedListFirewallRules.h" />
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
     <ClInclude Include="LinkedListHttpInjections.h" />
-    <ClInclude Include="NetBase.h" />
-    <ClInclude Include="PacketCrafter.h" />
-    <ClInclude Include="Packets.h" />
+    <ClInclude Include="NetworkPackets.h" />
     <ClInclude Include="NetDns.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="LinkedListSystems.h" />
     <ClInclude Include="NetworkFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
-    <ClInclude Include="RequestSpoofingPacketCrafter.h" />
+    <ClInclude Include="DnsRequestPoisoning.h" />
     <ClInclude Include="SLRE.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ArpDepoisoning.c" />
     <ClCompile Include="APE.c" />
     <ClCompile Include="ArpPoisoning.c" />
-    <ClCompile Include="DnsParser.c" />
+    <ClCompile Include="DnsHelper.c" />
+    <ClCompile Include="DnsForge.c" />
     <ClCompile Include="DnsPoisoning.c" />
     <ClCompile Include="DnsResponsePoisoning.c" />
     <ClCompile Include="getopt.c" />
@@ -186,9 +190,9 @@
     <ClCompile Include="LinkedListHttpInjections.c" />
     <ClCompile Include="LinkedListSystems.c" />
     <ClCompile Include="NetworkFunctions.c" />
-    <ClCompile Include="PacketCrafter.c" />
+    <ClCompile Include="NetworkPackets.c" />
     <ClCompile Include="PacketProxy.c" />
-    <ClCompile Include="RequestSpoofingPacketCrafter.c" />
+    <ClCompile Include="DnsRequestPoisoning.c" />
     <ClCompile Include="SLRE.c" />
   </ItemGroup>
   <ItemGroup>

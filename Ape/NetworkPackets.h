@@ -1,7 +1,7 @@
-#ifndef __NETBASE__
-#define __NETBASE__
+#pragma once
 
 #include <Windows.h>
+#include <stdint.h>
 
 #define ETHERTYPE_ARP 0x0806
 #define ETHERTYPE_IP 0x0800
@@ -24,10 +24,7 @@
 #define MAX_IP_LEN 18
 
 
-/*
- * Type definitions
- *
- */
+
 typedef struct
 {
   unsigned char ether_dhost[BIN_MAC_LEN];  // dest Ethernet address
@@ -148,9 +145,7 @@ typedef struct pARPPacket
 
 
 
-/*
- * Function forward declarations
- *
- */
+//void GenerateUdpPacket(unsigned char * packet, unsigned short udpPacketLength, unsigned short srcPort, unsigned short dstPort);
+//unsigned short in_cksum(unsigned short * addr, int length);
+//DWORD WINAPI ForwardPackets(LPVOID lpParam);
 
-#endif

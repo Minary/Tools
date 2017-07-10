@@ -9,18 +9,18 @@
 #include <stdarg.h>
 
 #include "APE.h"
-#include "PacketProxy.h"
+#include "ArpPoisoning.h"
 #include "Interface.h"
 #include "LinkedListSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "LinkedListHttpInjections.h"
 #include "NetworkFunctions.h"
-#include "Packets.h"
-#include "HttpInjection.h"
+#include "HttpPoisoning.h"
 #include "DnsPoisoning.h"
 #include "DnsResponsePoisoning.h"
-
+#include "PacketProxy.h"
+#include "getopt.h"
 #pragma comment(lib, "wpcap.lib")
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Shlwapi.lib")
@@ -240,7 +240,6 @@ int main(int argc, char **argv)
 			goto END;
 		}
 
-
 		// MARKER : for unknown reasons I cant run this code inside a function -> crash!?!
 		//    ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
 		if (FILE_HOST_TARGETS != NULL && (fileHandle = fopen(FILE_HOST_TARGETS, "r")) != NULL)
@@ -253,9 +252,11 @@ int main(int argc, char **argv)
 
 			while (fgets(tempLine, sizeof(tempLine), fileHandle) != NULL)
 			{
-				while (tempLine[strlen(tempLine) - 1] == '\r' || tempLine[strlen(tempLine) - 1] == '\n')
-					tempLine[strlen(tempLine) - 1] = '\0';
-
+        // Ignore trailing CR/LF
+        while (tempLine[strlen(tempLine) - 1] == '\r' || tempLine[strlen(tempLine) - 1] == '\n')
+        {
+          tempLine[strlen(tempLine) - 1] = '\0';
+        }
 
 				// parse values and add them to the list.
 				if (sscanf(tempLine, "%[^,],%s", ipStr, macStr) == 2)
@@ -290,11 +291,11 @@ int main(int argc, char **argv)
 
     if (PathFileExists(FILE_HTTPINJECTION_RULES1))
     {
-      ParseHTMLInjectionConfigFile(FILE_HTTPINJECTION_RULES1);
+      ParseHtmlInjectionConfigFile(FILE_HTTPINJECTION_RULES1);
     }
     else if (PathFileExists(FILE_HTTPINJECTION_RULES2))
     {
-      ParseHTMLInjectionConfigFile(FILE_HTTPINJECTION_RULES2);
+      ParseHtmlInjectionConfigFile(FILE_HTTPINJECTION_RULES2);
     }
 
 
@@ -308,34 +309,36 @@ int main(int argc, char **argv)
 				ZeroMemory(dstIPStr, sizeof(dstIPStr));
 
 				// Remove all trailing NL/LF 
-				while (tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\r' || tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\n')
-					tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] = 0;
+        while (tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\r' || tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\n')
+        {
+          tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] = 0;
+        }
 
-				if ((funcRetVal = sscanf(tempBuffer, "%[^:]:%[^:]:%hu:%hu:%[^:]:%hu:%hu", protocol, srcIsStr, &srcPortLower, &srcPortUpper, dstIPStr, &dstPortLower, &dstPortUpper)) == 7)
+        if ((funcRetVal = sscanf(tempBuffer, "%[^:]:%[^:]:%hu:%hu:%[^:]:%hu:%hu", protocol, srcIsStr, &srcPortLower, &srcPortUpper, dstIPStr, &dstPortLower, &dstPortUpper)) != 7 ||
+            tempBuffer[0] == '#')
+        {
+          continue;
+        }
+
+				if ((tempNode = (PRULENODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RULENODE))) != NULL)
 				{
-					if (tempBuffer[0] != '#')
-					{
-						if ((tempNode = (PRULENODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RULENODE))) != NULL)
-						{
-							ZeroMemory(tempNode, sizeof(RULENODE));
+					ZeroMemory(tempNode, sizeof(RULENODE));
 
-							tempNode->DstIPBin = inet_addr(dstIPStr);
-							strncpy(tempNode->DstIPStr, dstIPStr, sizeof(tempNode->DstIPStr) - 1);
-							tempNode->DstPortLower = dstPortLower;
-							tempNode->DstPortUpper = dstPortUpper;
+					tempNode->DstIPBin = inet_addr(dstIPStr);
+					strncpy(tempNode->DstIPStr, dstIPStr, sizeof(tempNode->DstIPStr) - 1);
+					tempNode->DstPortLower = dstPortLower;
+					tempNode->DstPortUpper = dstPortUpper;
 
-							tempNode->SrcIPBin = inet_addr(srcIsStr);
-							strncpy(tempNode->SrcIPStr, srcIsStr, sizeof(tempNode->SrcIPStr) - 1);
-							tempNode->SrcPortLower = srcPortLower;
-							tempNode->SrcPortUpper = srcPortUpper;
+					tempNode->SrcIPBin = inet_addr(srcIsStr);
+					strncpy(tempNode->SrcIPStr, srcIsStr, sizeof(tempNode->SrcIPStr) - 1);
+					tempNode->SrcPortLower = srcPortLower;
+					tempNode->SrcPortUpper = srcPortUpper;
 
-							strncpy(tempNode->Protocol, protocol, sizeof(tempNode->Protocol) - 1);
-							snprintf(tempNode->Descr, sizeof(tempNode->Descr) - 1, "%s %s:(%d-%d) -> %s:(%d-%d)", tempNode->Protocol, tempNode->SrcIPStr, tempNode->SrcPortLower, tempNode->SrcPortUpper, tempNode->DstIPStr, tempNode->DstPortLower, tempNode->DstPortUpper);
+					strncpy(tempNode->Protocol, protocol, sizeof(tempNode->Protocol) - 1);
+					snprintf(tempNode->Descr, sizeof(tempNode->Descr) - 1, "%s %s:(%d-%d) -> %s:(%d-%d)", tempNode->Protocol, tempNode->SrcIPStr, tempNode->SrcPortLower, tempNode->SrcPortUpper, tempNode->DstIPStr, tempNode->DstPortLower, tempNode->DstPortUpper);
 
-							AddRuleToList(&gFWRulesList, tempNode);
-						}
-					}
-				}
+					AddRuleToList(&gFWRulesList, tempNode);
+				}				
 			}
 
 			fclose(fileHandle);
@@ -369,7 +372,6 @@ int main(int argc, char **argv)
 
 		// MARKER : CORRECT THREAD SHUTDOWN!!
 		printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");
-
 	}
 	else
 	{
@@ -389,10 +391,7 @@ END:
 }
 
 
-/*
- *
- *
- */
+
 void PrintUsage(char *pAppName)
 {
 	system("cls");
@@ -418,10 +417,7 @@ void PrintUsage(char *pAppName)
 
 
 
-/*
- *
- *
- */
+
 void Stringify(unsigned char *inputParam, int inputLenthParam, unsigned char *outputParam)
 {
 	int counter = 0;
@@ -447,12 +443,6 @@ void Stringify(unsigned char *inputParam, int inputLenthParam, unsigned char *ou
 
 
 
-
-
-/*
- *
- *
- */
 void LogMsg(int priorityParam, char *logMessageParam, ...)
 {
 	HANDLE fileHandle = INVALID_HANDLE_VALUE;
@@ -507,11 +497,6 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
 
 
 
-
-/*
- *
- *
- */
 BOOL APE_ControlHandler(DWORD pControlType)
 {
 
@@ -552,10 +537,7 @@ BOOL APE_ControlHandler(DWORD pControlType)
 
 
 
-/*
- *
- *
- */
+
 void WriteDepoisoningFile(void)
 {
 	int counter = 0;
@@ -599,7 +581,7 @@ void WriteDepoisoningFile(void)
 					systemList[counter].sysMacBin != NULL)
 				{
 					ZeroMemory(tempBuffer, sizeof(tempBuffer));
-					snprintf(tempBuffer, sizeof(tempBuffer) - 1, "%02x:%02x:%02x:%02x:%02x:%02x", systemList[counter].sysMacBin[0], systemList[counter].sysMacBin[1],
+					snprintf(tempBuffer, sizeof(tempBuffer) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", systemList[counter].sysMacBin[0], systemList[counter].sysMacBin[1],
 						systemList[counter].sysMacBin[2], systemList[counter].sysMacBin[3], systemList[counter].sysMacBin[4], systemList[counter].sysMacBin[5]);
 
 					fprintf(fileHandle, "%s,%s\n", systemList[counter].sysIpStr, tempBuffer);
@@ -616,10 +598,6 @@ void WriteDepoisoningFile(void)
 
 
 
-/*
- *
- *
- */
 void StartUnpoisoningProcess()
 {
 	char tempBuffer[MAX_BUF_SIZE + 1];
@@ -682,9 +660,9 @@ void ExecCommand(char *commandParam)
 void PrintConfig(SCANPARAMS scanParamsParam)
 {
 	printf("Local IP :\t%d.%d.%d.%d\n", scanParamsParam.localIpBin[0], scanParamsParam.localIpBin[1], scanParamsParam.localIpBin[2], scanParamsParam.localIpBin[3]);
-	printf("Local MAC :\t%02X-%02X-%02X-%02X-%02X-%02X\n", scanParamsParam.localMacBin[0], scanParamsParam.localMacBin[1], scanParamsParam.localMacBin[2],
+	printf("Local MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.localMacBin[0], scanParamsParam.localMacBin[1], scanParamsParam.localMacBin[2],
 		scanParamsParam.localMacBin[3], scanParamsParam.localMacBin[4], scanParamsParam.localMacBin[5]);
-	printf("GW MAC :\t%02X-%02X-%02X-%02X-%02X-%02X\n", scanParamsParam.gatewayMacBin[0], scanParamsParam.gatewayMacBin[1], scanParamsParam.gatewayMacBin[2],
+	printf("GW MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.gatewayMacBin[0], scanParamsParam.gatewayMacBin[1], scanParamsParam.gatewayMacBin[2],
 		scanParamsParam.gatewayMacBin[3], scanParamsParam.gatewayMacBin[4], scanParamsParam.gatewayMacBin[5]);
 	printf("GW IP :\t\t%d.%d.%d.%d\n", scanParamsParam.gatewayIpBin[0], scanParamsParam.gatewayIpBin[1], scanParamsParam.gatewayIpBin[2], scanParamsParam.gatewayIpBin[3]);
 	printf("Start IP :\t%d.%d.%d.%d\n", scanParamsParam.startIpBin[0], scanParamsParam.startIpBin[1], scanParamsParam.startIpBin[2], scanParamsParam.startIpBin[3]);
@@ -705,10 +683,7 @@ void PrintTimestamp(char *titleParam)
 }
 
 
-/*
- *
- *
- */
+
 int UserIsAdmin()
 {
 	BOOL retVal = FALSE;
@@ -728,10 +703,6 @@ int UserIsAdmin()
 
 
 
-/*
- *
- *
- */
 void AdminCheck(char *programNameParam)
 {
 

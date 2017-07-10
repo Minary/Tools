@@ -17,18 +17,14 @@
 
 
 
-
-/*
- *
- *
- */
 void MacBin2String(unsigned char macAddrParam[BIN_MAC_LEN], unsigned char *outputParam, int outputLengthParam)
 {
   if (outputParam && outputLengthParam > 0 && macAddrParam != NULL && outputLengthParam >= MAX_MAC_LEN)
   {
-    snprintf((char *)outputParam, outputLengthParam - 1, "%02X-%02X-%02X-%02X-%02X-%02X", macAddrParam[0], macAddrParam[1], macAddrParam[2], macAddrParam[3], macAddrParam[4], macAddrParam[5]);
+    snprintf((char *)outputParam, outputLengthParam - 1, "%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX", macAddrParam[0], macAddrParam[1], macAddrParam[2], macAddrParam[3], macAddrParam[4], macAddrParam[5]);
   }
 }
+
 
 void IpBin2String(unsigned char ipAddrParam[BIN_IP_LEN], unsigned char *outputParam, int outputLengthParam)
 {
@@ -40,27 +36,19 @@ void IpBin2String(unsigned char ipAddrParam[BIN_IP_LEN], unsigned char *outputPa
 
 
 
-/*
- *
- *
- */
 void MacString2Bin(unsigned char macAddrParam[BIN_MAC_LEN], unsigned char *inputParam, int inputLengthParam)
 {
   if (inputParam != NULL && inputLengthParam > 0 && macAddrParam != NULL)
   {
-    if (sscanf((char *)inputParam, "%02X:%02X:%02X:%02X:%02X:%02X", &macAddrParam[0], &macAddrParam[1], &macAddrParam[2], &macAddrParam[3], &macAddrParam[4], &macAddrParam[5]) != 6)
+    if (sscanf((char *)inputParam, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", &macAddrParam[0], &macAddrParam[1], &macAddrParam[2], &macAddrParam[3], &macAddrParam[4], &macAddrParam[5]) != 6)
     {
-      sscanf((char *)inputParam, "%02X-%02X-%02X-%02X-%02X-%02X", &macAddrParam[0], &macAddrParam[1], &macAddrParam[2], &macAddrParam[3], &macAddrParam[4], &macAddrParam[5]);
+      sscanf((char *)inputParam, "%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX", &macAddrParam[0], &macAddrParam[1], &macAddrParam[2], &macAddrParam[3], &macAddrParam[4], &macAddrParam[5]);
     }
   }
 }
 
 
 
-/*
- *
- *
- */
 int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, int inputLengthParam)
 {
   int retVal = 1;
@@ -74,7 +62,7 @@ int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, i
     return retVal;
   }
 
-  if (sscanf((char *)inputParam, "%d.%d.%d.%d", &ipParam[0], &ipParam[1], &ipParam[2], &ipParam[3]) != 4)
+  if (sscanf((char *)inputParam, "%hhd.%hhd.%hhd.%hhd", &ipParam[0], &ipParam[1], &ipParam[2], &ipParam[3]) != 4)
   {
     return retVal;
   }
@@ -94,11 +82,6 @@ int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, i
 
 
 
-
-/*
- *
- *
- */
 int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLengthParam)
 {
   int retVal = NOK;
@@ -123,71 +106,68 @@ int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLeng
 
 
 
-
-/*
- *
- *
- */
 void SetMacStatic(char *ifcAliasParam, char *ipAddrParam, char *macAddrParam)
 {
   char temp[MAX_BUF_SIZE + 1];
   char gatewayIpAddrString[MAX_BUF_SIZE + 1];
   char *tempPtr = NULL;
 
-  printf("SetMacStatic(0): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
+  printf("SetMacStatic(0): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
 
   //Set IP static
-  if (ifcAliasParam != NULL && ipAddrParam != NULL && macAddrParam != NULL)
+  if (ifcAliasParam == NULL ||
+      ipAddrParam == NULL ||
+      macAddrParam != NULL)
   {
-    ZeroMemory(temp, sizeof(temp));
-    ZeroMemory(gatewayIpAddrString, sizeof(gatewayIpAddrString));
-
-    // The arp tool needs '-' as octet separator
-    if (strchr(macAddrParam, ':'))
-    {
-      for (tempPtr = macAddrParam; tempPtr[0] != NULL; tempPtr++)
-      {
-        if (tempPtr[0] == ':')
-        {
-          tempPtr[0] = '-';
-        }
-      }
-    }
-
-    printf("SetMACStatic(1): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
-
-    snprintf(temp, sizeof(temp) - 1, "arp -d %s & netsh interface ip add neighbors \"%s\" %s %s", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
-    ExecCommand(temp);
+    goto END;
   }
+
+  ZeroMemory(temp, sizeof(temp));
+  ZeroMemory(gatewayIpAddrString, sizeof(gatewayIpAddrString));
+
+  // The arp tool needs '-' as octet separator
+  if (strchr(macAddrParam, ':'))
+  {
+    goto END;
+  }
+
+  for (tempPtr = macAddrParam; tempPtr[0] != NULL; tempPtr++)
+  {
+    if (tempPtr[0] == ':')
+    {
+      tempPtr[0] = '-';
+    }
+  }
+
+END:
+
+  printf("SetMACStatic(1): arp -d %s & netsh interface ip add neighbors \"%s\" %s %s\n\n", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
+  snprintf(temp, sizeof(temp) - 1, "arp -d %s & netsh interface ip add neighbors \"%s\" %s %s", ipAddrParam, ifcAliasParam, ipAddrParam, macAddrParam);
+  ExecCommand(temp);
 }
 
 
-/*
- *
- *
- */
+
 void RemoveMacFromCache(char *ifcAliasParam, char *ipAddrParam)
 {
   char tempBuffer[MAX_BUF_SIZE + 1];
 
-  if (ifcAliasParam != NULL && ipAddrParam != NULL)
+  if (ifcAliasParam == NULL || ipAddrParam == NULL)
   {
-    ZeroMemory(tempBuffer, sizeof(tempBuffer)-1);
-    snprintf(tempBuffer, sizeof(tempBuffer) - 1, "netsh interface ip delete neighbors \"%s\" %s", ifcAliasParam, ipAddrParam);
-    ExecCommand(tempBuffer);
-
-    ZeroMemory(tempBuffer, sizeof(tempBuffer)-1);
-    snprintf(tempBuffer, sizeof(tempBuffer) - 1, "arp -d %s", ipAddrParam);
-    ExecCommand(tempBuffer);
+    return;
   }
+
+  ZeroMemory(tempBuffer, sizeof(tempBuffer)-1);
+  snprintf(tempBuffer, sizeof(tempBuffer) - 1, "netsh interface ip delete neighbors \"%s\" %s", ifcAliasParam, ipAddrParam);
+  ExecCommand(tempBuffer);
+
+  ZeroMemory(tempBuffer, sizeof(tempBuffer)-1);
+  snprintf(tempBuffer, sizeof(tempBuffer) - 1, "arp -d %s", ipAddrParam);
+  ExecCommand(tempBuffer);
 }
 
 
 
-/*
- *
- *
- */
 void DumpPacket(unsigned char *pktDataParam, int pktLengthParam, char *titleStringParam, const struct pcap_pkthdr *pktHdrParam)
 {
   struct tm *time;
@@ -370,5 +350,4 @@ void DumpPacket(unsigned char *pktDataParam, int pktLengthParam, char *titleStri
     printf("OOOPS Protocol is %x\n", ethrHdrPtr->ether_type);
   }
 }
-
 

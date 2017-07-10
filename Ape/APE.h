@@ -1,10 +1,9 @@
-#ifndef __ARPPOISONINGENGINE__
-#define __ARPPOISONINGENGINE__
+#pragma once
 
 #include <windows.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "NetBase.h"
+#include "NetworkPackets.h"
 
 
 #define APE_VERSION "0.15"
@@ -14,7 +13,7 @@
 #define WITH_FIREWALL 0
 #define WITH_SNIFFER 0
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
 
 #define DBG_OFF    0
 #define DBG_INFO   1
@@ -122,6 +121,4 @@ void AdminCheck(char *programNameParam);
 void PrintUsage(char *applicationNameParam);
 void ParseTargetHostsConfigFile(char *targetsFileParam);
 void ParseDnsConfigFile();
-
-#endif
 

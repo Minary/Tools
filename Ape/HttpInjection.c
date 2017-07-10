@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 #include "APE.h"
-#include "HttpInjection.h"
+#include "HttpPoisoning.h"
 #include "LinkedListHttpInjections.h"
 
 
@@ -168,7 +168,7 @@ int ParseRequest(char *request, PHTTPREQ httpRequest)
  *
  *
  */
-void ParseHTMLInjectionConfigFile(char *configFile)
+void ParseHtmlInjectionConfigFile(char *configFile)
 {
   FILE *fileHandle = NULL;
   char tmpLine[MAX_BUF_SIZE + 1];

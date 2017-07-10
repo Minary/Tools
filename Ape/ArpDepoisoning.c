@@ -5,7 +5,7 @@
 #include <windows.h>
 
 #include "APE.h"
-#include "Packets.h"
+#include "ArpPoisoning.h"
 #include "NetworkFunctions.h"
 
 
@@ -24,7 +24,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
   char tempFleLine[MAX_BUF_SIZE + 1];
 
 
-  unsigned int remoteMacBin[BIN_MAC_LEN];
+  unsigned char remoteMacBin[BIN_MAC_LEN];
   unsigned int remoteIpBin[BIN_IP_LEN];
   unsigned char remoteMacStr[MAX_MAC_LEN + 1]; 
   unsigned int arpBroadcast[BIN_MAC_LEN];
@@ -80,7 +80,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
             if (sscanf((char *) tempFleLine, "%[^,],%s", remoteIpString, remoteMacStr) == 2 && strlen((char *) remoteIpString) > 0 && strlen((char *) remoteMacStr) > 0)
             {
               MacString2Bin(remoteMacBin, remoteMacStr,  MAX_MAC_LEN);
-              IpString2Bin(remoteIpBin, remoteIpString, MAX_IP_LEN);
+              IpString2Bin((char *)remoteIpBin, remoteIpString, MAX_IP_LEN);
 
               // Initialisation
               ZeroMemory(&arpPacket, sizeof(arpPacket));
@@ -99,15 +99,16 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
               // layer 3 : (Victim-MAC) 00-1b-77-53-5c-f8/192.168.100.117    ->   00-00-00-00-00-00/192.168.100.1
 
 			  LogMsg(DBG_INFO, "ArpDepoisoning(): %s/%s", remoteIpString, remoteMacStr);
-			  LogMsg(DBG_INFO, "ArpDepoisoning(): %d.%d.%d.%d/%02x-%02x-%02x-%02x-%02x-%02x", 
+			  LogMsg(DBG_INFO, "ArpDepoisoning(): %d.%d.%d.%d/%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX", 
 				  remoteIpString, remoteMacStr);
-              /*
-              * Send 3 ARP depoisoning packets.
-              */
+
+              // Send 3 ARP depoisoning packets.
               for (i = 0; i < 3; i++)
               {
                 if (SendArpPacket(interfaceHandle, &arpPacket) != 0)
+                {
                   LogMsg(DBG_ERROR, "ArpDepoisoning(): Unable to send ARP packet.");
+                }
 
                 Sleep(SLEEP_BETWEEN_ARPS);
               } 

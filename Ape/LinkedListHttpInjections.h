@@ -1,7 +1,4 @@
-
-#ifndef __LINKEDLISTHTTPINJECTIONS__
-#define __LINKEDLISTHTTPINJECTIONS__
-
+#pragma once
 
 #define MAX_NODE_COUNT5 1024
 #define BIN_IP_LEN5 4
@@ -9,11 +6,6 @@
 #define MAX_BUF_SIZE5 1024
 
 
-
-/*
- * Type declarations.
- *
- */
 
 typedef struct HTTPINJECTIONDATA 
 {
@@ -34,13 +26,8 @@ typedef struct HTTPINJECTIONNODE
 
 
 
-/*
- * Function forward declarations.
- *
- */
 PHTTPINJECTIONNODE InitHttpInjectionList();
 void AddItemToList(PPHTTPINJECTIONNODE pHTTPInjectionNodes, unsigned char *pRequestedHost, unsigned char *pRequestedURL, unsigned char *pRedirectedURL);
 PHTTPINJECTIONNODE GetNodeByRequestedUrl(PHTTPINJECTIONNODE pHTTPInjectionNodes, unsigned char *pRequestedHost, unsigned char *pRequestedURL);
 void EnumHttpInjectionNodes(PHTTPINJECTIONNODE pHTTPInjectionNodes);
 
-#endif
