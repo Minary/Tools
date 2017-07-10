@@ -1,19 +1,12 @@
-#ifndef __DNSPOISONING__
-#define __DNSPOISONING__
+#pragma once
 
-/* 
- * Type definitions
- *
- */
+#include <Windows.h>
+#include "APE.h" 
 
-
-
-/*
- * Function forward declarations
- *
- */
 void ParseDNSPoisoningConfigFile(char *pConfigFile);
 int DetermineSpoofingResponseData(PSCANPARAMS pParams);
 DWORD WINAPI DnsResponseSniffer(LPVOID lpParam);
 
-#endif
+void *DnsResponsePoisonerGetHost2Spoof(u_char *pData);
+unsigned char* Dns2Text(unsigned char* reader, unsigned char* buffer, int *count);
+int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam);

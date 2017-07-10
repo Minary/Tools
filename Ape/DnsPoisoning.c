@@ -7,16 +7,13 @@
 #include "DnsPoisoning.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "NetworkFunctions.h"
-#include "NetDns.h"
+#include "Dns.h"
 
 
 extern PHOSTNODE gHostsList;
 
 
-/*
- *
- *
- */
+
 void ParseDNSPoisoningConfigFile(char *configFileParam)
 {
   FILE *fileHandle = NULL;
@@ -34,7 +31,9 @@ void ParseDNSPoisoningConfigFile(char *configFileParam)
     while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
     {
       while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
+      {
         tmpLine[strlen(tmpLine) - 1] = '\0';
+      }
 
       // Parse values and add them to the list.
       if (sscanf(tmpLine, "%[^,],%s", hostname, spoofedIpAddr) == 2)
@@ -53,10 +52,7 @@ void ParseDNSPoisoningConfigFile(char *configFileParam)
 }
 
 
-/*
- *
- *
- */
+
 int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
 {
   int retVal = 0;
@@ -78,10 +74,7 @@ int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
 }
 
 
-/*
- *
- *
- */
+
 DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
 {
   DWORD retVal = 0;
@@ -99,7 +92,8 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
   PUDPHDR udpHdr = NULL;
   int ipHdrLen = 0;
   char *dnsData = NULL;
-  PDNS_HDR dnsHdr = NULL;
+//PDNS_HDR dnsHdr = NULL;
+PDNS_HEADER dnsHdr = NULL;
   char dstIp[MAX_BUF_SIZE + 1];
   char srcIp[MAX_BUF_SIZE + 1];
   int dstPort = -1;
@@ -141,7 +135,9 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
   while ((pcapRetVal = pcap_next_ex(ifcReadHandle, (struct pcap_pkthdr **) &packetHeader, &packetData)) >= 0)
   {
     if (pcapRetVal == 0)
+	{
       continue;
+	}
     else if (pcapRetVal < 0)
     {
       printf("Error reading the packets: %s\n", pcap_geterr(ifcReadHandle));
@@ -149,53 +145,66 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
     }
 
     ethrHdr = (PETHDR)packetData;
-    if (ethrHdr != NULL && htons(ethrHdr->ether_type) == ETHERTYPE_IP)
+	if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+	{
+      continue;
+	}
+
+    ipHdr = (PIPHDR)(packetData + 14);
+
+	if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+	{
+      continue;
+	}
+
+    ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+
+	if (ipHdrLen <= 0)
+	{
+      continue;
+	}
+
+    udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+    if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
     {
-      ipHdr = (PIPHDR)(packetData + 14);
+      continue;
+	}
 
-      if (ipHdr != NULL && ipHdr->proto == IP_PROTO_UDP)
-      {
-        ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+    dnsData = ((char*)udpHdr + sizeof(UDPHDR));
+//dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
+dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)];
+    
+	if (dnsHdr == NULL)
+	{
+      continue;
+	}
 
-        if (ipHdrLen > 0)
-        {
-          udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+	if (ntohs(dnsHdr->q_count) <= 0)
+	{
+      continue;
+	}
 
-          if (udpHdr != NULL && udpHdr->ulen > 0 && ntohs(udpHdr->sport) == UDP_DNS)
-          {
-            dnsData = ((char*)udpHdr + sizeof(UDPHDR));
-            dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
+    ZeroMemory(dstIp, sizeof(dstIp));
+    ZeroMemory(srcIp, sizeof(srcIp));
 
-            if (dnsHdr != NULL)
-            {
-              if (ntohs(dnsHdr->q_count) > 0)
-              {
-                ZeroMemory(dstIp, sizeof(dstIp));
-                ZeroMemory(srcIp, sizeof(srcIp));
+    IpBin2String((unsigned char *)&ipHdr->daddr, (unsigned char *)dstIp, sizeof(dstIp)-1);
+    IpBin2String((unsigned char *)&ipHdr->saddr, (unsigned char *)srcIp, sizeof(srcIp)-1);
+    dstPort = ntohs(udpHdr->dport);
+    srcPort = ntohs(udpHdr->sport);
 
-                IpBin2String((unsigned char *)&ipHdr->daddr, (unsigned char *)dstIp, sizeof(dstIp)-1);
-                IpBin2String((unsigned char *)&ipHdr->saddr, (unsigned char *)srcIp, sizeof(srcIp)-1);
-                dstPort = ntohs(udpHdr->dport);
-                srcPort = ntohs(udpHdr->sport);
+    urlTemp = (u_char*)malloc(2 * MAX_BUF_SIZE + 2);
+//urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HDR));
+urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HEADER));
 
-                urlTemp = (u_char*)malloc(2 * MAX_BUF_SIZE + 2);
-                urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HDR));
-                counter = 0;
-                for (counter = 0; urlPacket[counter] != 0; counter++)
-                {
-                  urlTemp[counter] = urlPacket[counter];
-                }
-
-                urlTemp[counter] = 0;
-                counter++;
-                //                res_header.ans_count
-                printf("DNS: %s:%d -> %s:%d id:0x%04x, icount:%d ...\n", srcIp, srcPort, dstIp, dstPort, dnsHdr->id, counter);
-              }
-            }
-          }
-        } 
-      } 
+    for (counter = 0; urlPacket[counter] != 0; counter++)
+    {
+      urlTemp[counter] = urlPacket[counter];
     }
+
+    urlTemp[counter] = 0;
+    counter++;
+
+    printf("DNS: %s:%d -> %s:%d id:0x%04x, icount:%d ...\n", srcIp, srcPort, dstIp, dstPort, dnsHdr->id, counter);
   }
 
 
@@ -204,6 +213,196 @@ END:
   if (ifcReadHandle)
   {
     pcap_close(ifcReadHandle);
+  }
+
+  return retVal;
+}
+
+
+
+unsigned char* Dns2Text(unsigned char* reader, unsigned char* buffer, int *count)
+{
+  unsigned char *name;
+  unsigned int p = 0;
+  unsigned int jumped = 0;
+  unsigned int offset;
+  int i;
+  int j;
+
+  *count = 1;
+  name = (unsigned char*)malloc(256);
+  name[0] = '\0';
+
+  // Read the names in 3www6google3com format
+  while (*reader != 0)
+  {
+    if (*reader >= 192)
+    {
+      offset = (*reader) * 256 + *(reader + 1) - 49152; //49152 = 11000000 00000000 ;)
+      reader = buffer + offset - 1;
+      jumped = 1; //we have jumped to another location so counting wont go up!
+    }
+    else
+    {
+      name[p++] = *reader;
+    }
+
+    reader = reader + 1;
+
+    if (jumped == 0)
+    {
+      *count += 1; //if we havent jumped to another location then we can count up    
+    }
+  }
+
+  name[p] = '\0'; //string complete
+
+  if (jumped == 1)
+  {
+    *count = *count + 1; //number of steps we actually moved forward in the packet
+  }
+
+
+  //now convert 3www6google3com0 to www.google.com
+  for (i = 0; i < (int)strlen((const char*)name); i++)
+  {
+    p = name[i];
+    for (j = 0; j < (int)p; j++)
+    {
+      name[i] = name[i + 1];
+      i++;
+    }
+
+    name[i] = '.';
+  }
+
+  name[i - 1] = '\0'; //remove the last dot
+
+  return name;
+}
+
+
+void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
+{
+  PETHDR ethrHdr = (PETHDR)dataParam;
+  PIPHDR ipHdr = NULL;
+  PUDPHDR udpHdr = NULL;
+  int ipHdrLen = 0;
+  char *data = NULL;
+  char *dnsData = NULL;
+  PHOSTNODE retVal = NULL;
+  PHOSTNODE tmpNode = NULL;
+  //PDNS_HDR dnsHdr = NULL;
+  PDNS_HEADER dnsHdr = NULL;
+  unsigned char *reader = NULL;
+  int stop;
+  unsigned char *peerName = NULL;
+
+
+  if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+  {
+    return retVal;
+  }
+
+  ipHdr = (PIPHDR)(dataParam + 14);
+
+  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+  {
+    return retVal;
+  }
+
+  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+
+  if (ipHdrLen <= 0)
+  {
+    return retVal;
+  }
+
+  udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+
+  if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
+  {
+    return retVal;
+  }
+
+  dnsData = ((char*)udpHdr + sizeof(UDPHDR));
+  //dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
+  dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)];
+
+  if (dnsHdr == NULL)
+  {
+    return retVal;
+  }
+
+  if (ntohs(dnsHdr->q_count) <= 0)
+  {
+    return retVal;
+  }
+
+  //reader = (unsigned char *)&dnsData[sizeof(DNS_HDR)];
+  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
+  stop = 0;
+  peerName = Dns2Text(reader, (unsigned char *)dnsHdr, &stop);
+
+  if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
+  {
+    retVal = tmpNode;
+  }
+
+  return retVal;
+}
+
+
+int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
+{
+  int retVal = OK;
+  PETHDR etherHdrPtr = NULL;
+  PIPHDR ipHdrPtr = NULL;     // ip header
+  PUDPHDR udpHdrPtr = NULL;   // udp header
+                              //PDNS_HDR dnsHdrPtr = NULL;  // dns header
+  PDNS_HEADER dnsHdrPtr = NULL;
+  char *data = NULL;
+  int ipHdrLength = 0;
+  int dataLength = 0;
+  int index1;
+  int count2;
+
+  etherHdrPtr = (PETHDR)packetParam;
+  ipHdrPtr = (PIPHDR)((unsigned char*)packetParam + sizeof(ETHDR));
+  ipHdrLength = (ipHdrPtr->ver_ihl & 0xf) * 4;
+  udpHdrPtr = (PUDPHDR)((unsigned char*)ipHdrPtr + ipHdrLength);
+  //dnsHdrPtr = (PDNS_HDR) ((unsigned char*) udpHdrPtr + sizeof(UDPHDR));
+  dnsHdrPtr = (PDNS_HEADER)((unsigned char*)udpHdrPtr + sizeof(UDPHDR));
+  //data = (char *)((unsigned char*)dnsHdrPtr + sizeof(DNS_HDR));
+  data = (char *)((unsigned char*)dnsHdrPtr + sizeof(DNS_HEADER));
+
+
+  // Extract host name
+  //if ((dataLength = packetLengthParam - (sizeof(ETHDR) + ipHdrLength + sizeof(UDPHDR) + sizeof(PDNS_HDR))) > 0)
+  if ((dataLength = packetLengthParam - (sizeof(ETHDR) + ipHdrLength + sizeof(UDPHDR) + sizeof(PDNS_HEADER))) > 0)
+  {
+    count2 = 0;
+
+    for (index1 = 1; index1 < dataLength && count2 < hostBufferLengthParam; index1++)
+    {
+      if (data[index1] > 31 && data[index1] < 127)
+      {
+        hostnameParam[count2++] = data[index1];
+      }
+      else if (data[index1] == '\0')
+      {
+        break;
+      }
+      else
+      {
+        hostnameParam[count2++] = '.';
+      }
+    }
+  }
+
+  if (count2 > 2)
+  {
+    retVal = OK;
   }
 
   return retVal;

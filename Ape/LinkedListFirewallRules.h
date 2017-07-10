@@ -1,5 +1,4 @@
-#ifndef __LINKEDLISTFWRULES__
-#define __LINKEDLISTFWRULES__
+#pragma once
 
 #define BIN_IP_LEN 4
 #define MINI_BUF_LEN 256
@@ -32,15 +31,10 @@ typedef struct RULENODESTRUCT
 } RULENODE, *PRULENODE, **PPRULENODE;
 //#pragma pack(pop)
 
-/*
- * Function forward declarations.
- *
- */
+
 PRULENODE InitFirewallRules();
 void AddRuleToList(PPRULENODE pRuleNodes, PRULENODE pTmpRuleNode);
-PRULENODE RuleNodeExists(PRULENODE allConNodesParam, char *nodeIdParam);
+//PRULENODE RuleNodeExists(PRULENODE allConNodesParam, char *nodeIdParam);
 int FirewallRulesCountNodes(PRULENODE allConNodesParam);
 void PrintAllFirewallRulesNodes(PRULENODE allFirewallRuleNodes);
 PRULENODE FirewallBlockRuleMatch(PRULENODE firewallRuleNodesParam, char *protocolParam, unsigned long srcIpParam, unsigned long dstIpParam, unsigned short srcPortParam, unsigned short dstPortParam);
-
-#endif

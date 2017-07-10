@@ -1,5 +1,4 @@
-#ifndef __NETWORKFUNCTIONS__
-#define __NETWORKFUNCTIONS__
+#pragma once
 
 #include <Windows.h>
 #include <iphlpapi.h>
@@ -13,5 +12,3 @@ int GetAliasByIfcIndex(int pIfcIndex, char *pAliasBuf, int pBufLen);
 void SetMacStatic(char *pIfcAlias, char *pIP, char *pMAC);
 void RemoveMacFromCache(char *pIfcAlias, char *pIPAddr);
 void DumpPacket(unsigned char *pPktData, int pPktLen, char *pTitlestring, const struct pcap_pkthdr *pPktHdr);
-
-#endif
