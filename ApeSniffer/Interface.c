@@ -67,9 +67,13 @@ int ListInterfaceDetails()
       for (counter = 0; counter < adapter->AddressLength; counter++)
       {
         if (counter == (adapter->AddressLength - 1))
+        {
           printf("%.2X\n", (int)adapter->Address[counter]);
+        }
         else
+        {
           printf("%.2X-", (int)adapter->Address[counter]);
+        }
       }
 
       printf("\tIndex: \t%d\n", adapter->Index);
@@ -77,30 +81,30 @@ int ListInterfaceDetails()
 
       switch (adapter->Type)
       {
-      case MIB_IF_TYPE_OTHER:
-        printf("Other\n");
-        break;
-      case MIB_IF_TYPE_ETHERNET:
-        printf("Ethernet\n");
-        break;
-      case MIB_IF_TYPE_TOKENRING:
-        printf("Token Ring\n");
-        break;
-      case MIB_IF_TYPE_FDDI:
-        printf("FDDI\n");
-        break;
-      case MIB_IF_TYPE_PPP:
-        printf("PPP\n");
-        break;
-      case MIB_IF_TYPE_LOOPBACK:
-        printf("Lookback\n");
-        break;
-      case MIB_IF_TYPE_SLIP:
-        printf("Slip\n");
-        break;
-      default:
-        printf("Unknown type %ld\n", adapter->Type);
-        break;
+        case MIB_IF_TYPE_OTHER:
+          printf("Other\n");
+          break;
+        case MIB_IF_TYPE_ETHERNET:
+          printf("Ethernet\n");
+          break;
+        case MIB_IF_TYPE_TOKENRING:
+          printf("Token Ring\n");
+          break;
+        case MIB_IF_TYPE_FDDI:
+          printf("FDDI\n");
+          break;
+        case MIB_IF_TYPE_PPP:
+          printf("PPP\n");
+          break;
+        case MIB_IF_TYPE_LOOPBACK:
+          printf("Lookback\n");
+          break;
+        case MIB_IF_TYPE_SLIP:
+          printf("Slip\n");
+          break;
+        default:
+          printf("Unknown type %ld\n", adapter->Type);
+          break;
       }
 
       printf("\tIP Address: \t%s\n", adapter->IpAddressList.IpAddress.String);
@@ -114,26 +118,33 @@ int ListInterfaceDetails()
         printf("\t  Lease Obtained: ");
 
         if (error = _localtime32_s(&timeStamp, (__time32_t*)&adapter->LeaseObtained))
+        {
           printf("Invalid Argument to _localtime32_s\n");
+        }
         else
         {
           if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timeStamp))
+          {
             printf("Invalid Argument to asctime_s\n");
+          }
           else
+          {
             printf("%s", tempBuffer);
+          }
         }
 
         printf("\t  Lease Expires:  ");
-
         if (error = _localtime32_s(&timeStamp, (__time32_t*)&adapter->LeaseExpires))
+        {
           printf("Invalid Argument to _localtime32_s\n");
+        }
+        else if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timeStamp))
+        {
+          printf("Invalid Argument to asctime_s\n");
+        }
         else
         {
-          // Convert to an ASCII representation 
-          if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timeStamp))
-            printf("Invalid Argument to asctime_s\n");
-          else
-            printf("%s", tempBuffer);
+          printf("%s", tempBuffer);
         }
       }
       else
@@ -160,17 +171,16 @@ int ListInterfaceDetails()
 
 END:
   if (adapterInfoPtr)
+  {
     HeapFree(GetProcessHeap(), 0, adapterInfoPtr);
+  }
 
   return retVal;
 }
 
 
 
-/*
-*
-*
-*/
+
 int GetInterfaceDetails(char *pIFCName, PSCANPARAMS pScanParams)
 {
   int retVal = 0;
@@ -267,16 +277,13 @@ int GetInterfaceName(char *pIFCName, char *pRealIFCName, int pBufLen)
   int counter = 0;
   int ifcNumber = 0;
 
-  /*
-  * Open device list.
-  */
+  // Open device list.
   if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
   {
     LogMsg(DBG_ERROR, "getIFCName() : Error in pcap_findalldevs_ex() : %s", tempBuffer);
     retVal = 1;
     goto END;
   }
-
 
   ZeroMemory(adapter, sizeof(adapter));
   counter = 0;
@@ -289,7 +296,6 @@ int GetInterfaceName(char *pIFCName, char *pRealIFCName, int pBufLen)
       break;
     }
   }
-
 
 END:
 
