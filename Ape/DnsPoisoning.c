@@ -4,17 +4,18 @@
 #include <windows.h>
 
 #include "APE.h"
+#include "DnsHelper.h"
 #include "DnsPoisoning.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "NetworkFunctions.h"
-#include "Dns.h"
+#include "DnsStructs.h"
 
 
 extern PHOSTNODE gHostsList;
 
 
 
-void ParseDNSPoisoningConfigFile(char *configFileParam)
+void ParseDnsPoisoningConfigFile(char *configFileParam)
 {
   FILE *fileHandle = NULL;
   int index = 0;
@@ -22,33 +23,35 @@ void ParseDNSPoisoningConfigFile(char *configFileParam)
   unsigned char hostname[MAX_BUF_SIZE + 1];
   unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
 
-  if (configFileParam != NULL && (fileHandle = fopen(configFileParam, "r")) != NULL)
+  if (configFileParam == NULL || (fileHandle = fopen(configFileParam, "r")) == NULL)
   {
+    return;
+  }
+
+  ZeroMemory(tmpLine, sizeof(tmpLine));
+  ZeroMemory(hostname, sizeof(hostname));
+  ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
+
+  while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
+  {
+    while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
+    {
+      tmpLine[strlen(tmpLine) - 1] = '\0';
+    }
+
+    // Parse values and add them to the list.
+    if (sscanf(tmpLine, "%[^,],%s", hostname, spoofedIpAddr) == 2)
+    {
+      AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);
+      LogMsg(DBG_INFO, "ParseDnsPoisoningConfigFile(): Host:%s -> SpoofedIP:%s", hostname, spoofedIpAddr);
+    }
+
     ZeroMemory(tmpLine, sizeof(tmpLine));
     ZeroMemory(hostname, sizeof(hostname));
     ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-
-    while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
-    {
-      while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
-      {
-        tmpLine[strlen(tmpLine) - 1] = '\0';
-      }
-
-      // Parse values and add them to the list.
-      if (sscanf(tmpLine, "%[^,],%s", hostname, spoofedIpAddr) == 2)
-      {
-        AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);
-        printf("Host:%s, SpoofedIP:%s\n", hostname, spoofedIpAddr);
-      }
-
-      ZeroMemory(tmpLine, sizeof(tmpLine));
-      ZeroMemory(hostname, sizeof(hostname));
-      ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-    }
-
-    fclose(fileHandle);
   }
+
+  fclose(fileHandle);
 }
 
 
@@ -65,7 +68,6 @@ int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
     // 1. Send DNS requests
     for (hostTmp = gHostsList; hostTmp != NULL && hostTmp->next != NULL; hostTmp = (PHOSTNODE)hostTmp->next)
     {
-      printf("DetermineSpoofingResponseData(): %s -> %s\n", hostTmp->sData.HostName, hostTmp->sData.SpoofedIP);
       Sleep(400);
     }
   }
@@ -92,8 +94,8 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
   PUDPHDR udpHdr = NULL;
   int ipHdrLen = 0;
   char *dnsData = NULL;
-//PDNS_HDR dnsHdr = NULL;
-PDNS_HEADER dnsHdr = NULL;
+  //PDNS_HDR dnsHdr = NULL;
+  PDNS_HEADER dnsHdr = NULL;
   char dstIp[MAX_BUF_SIZE + 1];
   char srcIp[MAX_BUF_SIZE + 1];
   int dstPort = -1;
@@ -109,24 +111,24 @@ PDNS_HEADER dnsHdr = NULL;
   // 0. Initialize sniffer
   if ((ifcReadHandle = pcap_open_live((char *)scanParams->interfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to open the adapter: %s", pcapErrorBuffer);
+    LogMsg(DBG_ERROR, "DnsResponseSniffer(): Unable to open the adapter: %s", pcapErrorBuffer);
     retVal = 1;
     goto END;
   }
 
-  _snprintf(filter, sizeof(filter)-1, "src port 53 and dst host %s", scanParams->localIpStr);
+  _snprintf(filter, sizeof(filter) - 1, "src port 53 and dst host %s", scanParams->localIpStr);
   netMask = 0xffffff;
 
   if (pcap_compile((pcap_t *)ifcReadHandle, &filterCode, (const char *)filter, 1, netMask) < 0)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to compile the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "DnsResponseSniffer(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
   if (pcap_setfilter((pcap_t *)ifcReadHandle, &filterCode) < 0)
   {
-    LogMsg(DBG_ERROR, "DetermineSpoofingResponseData(): Unable to set the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "DnsResponseSniffer(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
     goto END;
   }
@@ -135,9 +137,9 @@ PDNS_HEADER dnsHdr = NULL;
   while ((pcapRetVal = pcap_next_ex(ifcReadHandle, (struct pcap_pkthdr **) &packetHeader, &packetData)) >= 0)
   {
     if (pcapRetVal == 0)
-	{
+    {
       continue;
-	}
+    }
     else if (pcapRetVal < 0)
     {
       printf("Error reading the packets: %s\n", pcap_geterr(ifcReadHandle));
@@ -145,57 +147,52 @@ PDNS_HEADER dnsHdr = NULL;
     }
 
     ethrHdr = (PETHDR)packetData;
-	if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
-	{
+    if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+    {
       continue;
-	}
+    }
 
     ipHdr = (PIPHDR)(packetData + 14);
-
-	if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
-	{
+    if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+    {
       continue;
-	}
+    }
 
     ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
-
-	if (ipHdrLen <= 0)
-	{
+    if (ipHdrLen <= 0)
+    {
       continue;
-	}
+    }
 
     udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
     if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
     {
       continue;
-	}
+    }
 
     dnsData = ((char*)udpHdr + sizeof(UDPHDR));
-//dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
-dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)];
-    
-	if (dnsHdr == NULL)
-	{
-      continue;
-	}
+    dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)];
 
-	if (ntohs(dnsHdr->q_count) <= 0)
-	{
+    if (dnsHdr == NULL)
+    {
       continue;
-	}
+    }
+
+    if (ntohs(dnsHdr->q_count) <= 0)
+    {
+      continue;
+    }
 
     ZeroMemory(dstIp, sizeof(dstIp));
     ZeroMemory(srcIp, sizeof(srcIp));
 
-    IpBin2String((unsigned char *)&ipHdr->daddr, (unsigned char *)dstIp, sizeof(dstIp)-1);
-    IpBin2String((unsigned char *)&ipHdr->saddr, (unsigned char *)srcIp, sizeof(srcIp)-1);
+    IpBin2String((unsigned char *)&ipHdr->daddr, (unsigned char *)dstIp, sizeof(dstIp) - 1);
+    IpBin2String((unsigned char *)&ipHdr->saddr, (unsigned char *)srcIp, sizeof(srcIp) - 1);
     dstPort = ntohs(udpHdr->dport);
     srcPort = ntohs(udpHdr->sport);
 
     urlTemp = (u_char*)malloc(2 * MAX_BUF_SIZE + 2);
-//urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HDR));
-urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HEADER));
-
+    urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HEADER));
     for (counter = 0; urlPacket[counter] != 0; counter++)
     {
       urlTemp[counter] = urlPacket[counter];
@@ -219,69 +216,6 @@ END:
 }
 
 
-
-unsigned char* Dns2Text(unsigned char* reader, unsigned char* buffer, int *count)
-{
-  unsigned char *name;
-  unsigned int p = 0;
-  unsigned int jumped = 0;
-  unsigned int offset;
-  int i;
-  int j;
-
-  *count = 1;
-  name = (unsigned char*)malloc(256);
-  name[0] = '\0';
-
-  // Read the names in 3www6google3com format
-  while (*reader != 0)
-  {
-    if (*reader >= 192)
-    {
-      offset = (*reader) * 256 + *(reader + 1) - 49152; //49152 = 11000000 00000000 ;)
-      reader = buffer + offset - 1;
-      jumped = 1; //we have jumped to another location so counting wont go up!
-    }
-    else
-    {
-      name[p++] = *reader;
-    }
-
-    reader = reader + 1;
-
-    if (jumped == 0)
-    {
-      *count += 1; //if we havent jumped to another location then we can count up    
-    }
-  }
-
-  name[p] = '\0'; //string complete
-
-  if (jumped == 1)
-  {
-    *count = *count + 1; //number of steps we actually moved forward in the packet
-  }
-
-
-  //now convert 3www6google3com0 to www.google.com
-  for (i = 0; i < (int)strlen((const char*)name); i++)
-  {
-    p = name[i];
-    for (j = 0; j < (int)p; j++)
-    {
-      name[i] = name[i + 1];
-      i++;
-    }
-
-    name[i] = '.';
-  }
-
-  name[i - 1] = '\0'; //remove the last dot
-
-  return name;
-}
-
-
 void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
 {
   PETHDR ethrHdr = (PETHDR)dataParam;
@@ -292,7 +226,6 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
   char *dnsData = NULL;
   PHOSTNODE retVal = NULL;
   PHOSTNODE tmpNode = NULL;
-  //PDNS_HDR dnsHdr = NULL;
   PDNS_HEADER dnsHdr = NULL;
   unsigned char *reader = NULL;
   int stop;
@@ -305,31 +238,25 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
   }
 
   ipHdr = (PIPHDR)(dataParam + 14);
-
   if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
   {
     return retVal;
   }
 
   ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
-
   if (ipHdrLen <= 0)
   {
     return retVal;
   }
 
   udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-
   if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
   {
     return retVal;
   }
 
   dnsData = ((char*)udpHdr + sizeof(UDPHDR));
-  //dnsHdr = (PDNS_HDR)&dnsData[sizeof(DNS_HDR)];
-  dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)];
-
-  if (dnsHdr == NULL)
+  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
   {
     return retVal;
   }
@@ -339,14 +266,17 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
     return retVal;
   }
 
-  //reader = (unsigned char *)&dnsData[sizeof(DNS_HDR)];
   reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
   stop = 0;
-  peerName = Dns2Text(reader, (unsigned char *)dnsHdr, &stop);
 
-  if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
+  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) != NULL)
   {
-    retVal = tmpNode;
+    if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
+    {
+      retVal = tmpNode;
+    }
+
+    HeapFree(GetProcessHeap(), 0, peerName);
   }
 
   return retVal;

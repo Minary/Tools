@@ -1,5 +1,7 @@
 #pragma once
 
-unsigned char* ReadName(unsigned char* reader, unsigned char* buffer, int* count);
-void hexdump(void *mem, unsigned int len);
-void ChangeToDnsNameFormat(unsigned char* dns, unsigned char* host);
+#include <Windows.h>
+
+unsigned char* ChangeDnsNameToTextFormat(unsigned char* reader, unsigned char* buffer, int* count);
+void ChangeTextToDnsNameFormat(unsigned char* dns, unsigned char* host);
+void *DnsRequestPoisonerGetHost2Spoof(u_char *pData);

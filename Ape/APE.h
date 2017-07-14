@@ -79,6 +79,7 @@ typedef struct
 
 typedef struct SCANPARAMS
 {
+  unsigned char applicationName[MAX_BUF_SIZE + 1];
   unsigned char interfaceName[MAX_BUF_SIZE + 1];
   unsigned char interfaceAlias[MAX_BUF_SIZE + 1];
   unsigned char interfaceDescr[MAX_BUF_SIZE + 1];

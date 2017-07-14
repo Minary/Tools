@@ -319,8 +319,7 @@ void DumpPacket(unsigned char *pktDataParam, int pktLengthParam, char *titleStri
       icmpDataLength = totalLength - sizeof(IPHDR) - sizeof(ICMPHDR);
       memcpy(data, (unsigned char *) icmpHdr + sizeof(ICMPHDR), icmpDataLength);
       snprintf((char *) tcpFlags, sizeof(tcpFlags), "%d", icmpHdr->sequence);
-
-
+      
       if (icmpDataLength > 1590)
       {
         printf("[LEN %d too big]\n", icmpDataLength);

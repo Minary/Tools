@@ -6,15 +6,16 @@
 
 #include "APE.h"
 #include "DnsForge.h"
-#include "DnsResponsePoisoning.h"
+#include "DnsResponseSpoofing.h"
 #include "LinkedListSpoofedDnsHosts.h"
-#include "DnsResponsePoisoning.h"
-#include "NetDns.h"
+#include "DnsResponseSpoofing.h"
+#include "NetworkPackets.h"
 
 
 
 int BuildSpoofedDnsReplyPacket(unsigned char *pRawPacket, int pRawPacketLen, PHOSTNODE pNode, char *pOutputBuffer, int *pOutputBufferLen)
 {
+/*
   int dnsSpoofingPacketsize = 0;
   int etherPacketSize = sizeof(ETHDR);
   int ipPacketSize = sizeof(IPHDR);
@@ -93,7 +94,7 @@ int BuildSpoofedDnsReplyPacket(unsigned char *pRawPacket, int pRawPacketLen, PHO
 // WOW!!!
 //GenerateDnsPacket_A((unsigned char *)dnsAnswerHdr, dnsUrlCounter, dnsUrlA, transactionId, (char *)pNode->sData.SpoofedIP);
   *pOutputBufferLen = dnsSpoofingPacketsize;
-
+*/
   return 1;
 }
 

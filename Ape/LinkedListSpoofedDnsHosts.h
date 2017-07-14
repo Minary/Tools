@@ -1,5 +1,7 @@
 #pragma once
 
+#include "APE.h"
+
 #define MAX_NODE_COUNT 1024 
 
 
@@ -18,7 +20,6 @@ typedef struct
   struct HOSTNODE *prev;
   struct HOSTNODE *next;
 } HOSTNODE, *PHOSTNODE, **PPHOSTNODE;
-
 
 
 
