@@ -2,10 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "DNSHelper.h"
+
+#include "DnsHelper.h"
+#include "DnsStructs.h"
+#include "LinkedListSpoofedDnsHosts.h"
+#include "NetworkPackets.h"
+
+extern PHOSTNODE gHostsList;
 
 
-unsigned char* ReadName(unsigned char* reader, unsigned char* buffer, int* count)
+// convert 3www6google3com0 to www.google.com\0
+unsigned char* ChangeDnsNameToTextFormat(unsigned char* reader, unsigned char* buffer, int* count)
 {
   unsigned char *name;
   unsigned int p = 0, jumped = 0, offset;
@@ -58,8 +65,8 @@ unsigned char* ReadName(unsigned char* reader, unsigned char* buffer, int* count
 }
 
 
-//this will convert www.google.com to 3www6google3com ;got it :)
-void ChangeToDnsNameFormat(unsigned char* dns, unsigned char* host)
+// convert www.google.com\0 to 3www6google3com0
+void ChangeTextToDnsNameFormat(unsigned char* dns, unsigned char* host)
 {
   unsigned int lock = 0;
   unsigned int i = 0;
@@ -85,51 +92,83 @@ void ChangeToDnsNameFormat(unsigned char* dns, unsigned char* host)
 
 
 
-#ifndef HEXDUMP_COLS
-#define HEXDUMP_COLS 8
-#endif
-
-void hexdump(void *mem, unsigned int len)
+void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
 {
-  unsigned int i, j;
+  PETHDR ethrHdr = (PETHDR)dataParam;
+  PIPHDR ipHdr = NULL;
+  PUDPHDR updHdr = NULL;
+  int ipHdrLen = 0;
+  char *data = NULL;
+  char *dnsData = NULL;
+  PHOSTNODE retVal = NULL;
+  PHOSTNODE tmpNode = NULL;
+  PDNS_HEADER dnsHdr = NULL;
+  unsigned char *reader = NULL;
+  int stop;
+  unsigned char *peerName = NULL;
 
-  for (i = 0; i < len + ((len % HEXDUMP_COLS) ? (HEXDUMP_COLS - len % HEXDUMP_COLS) : 0); i++)
+
+printf("DnsRequestPoisonerGetHost2Spoof(): Start\n");
+  if (gHostsList->next == NULL || ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
   {
-    /* print offset */
-    if (i % HEXDUMP_COLS == 0)
-    {
-      printf("0x%06x: ", i);
-    }
-
-    /* print hex data */
-    if (i < len)
-    {
-      printf("%02x ", 0xFF & ((char*)mem)[i]);
-    }
-    else /* end of block, just aligning for ASCII dump */
-    {
-      printf("   ");
-    }
-
-    /* print ASCII dump */
-    if (i % HEXDUMP_COLS == (HEXDUMP_COLS - 1))
-    {
-      for (j = i - (HEXDUMP_COLS - 1); j <= i; j++)
-      {
-        if (j >= len) /* end of block, not really printing */
-        {
-          putchar(' ');
-        }
-        else if (isprint(((char*)mem)[j])) /* printable char */
-        {
-          putchar(0xFF & ((char*)mem)[j]);
-        }
-        else /* other char */
-        {
-          putchar('.');
-        }
-      }
-      putchar('\n');
-    }
+    return retVal;
   }
+
+printf("DnsRequestPoisonerGetHost2Spoof(0): \n");
+  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
+
+  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+  {
+    return retVal;
+  }
+
+  printf("DnsRequestPoisonerGetHost2Spoof(1.0): \n");
+  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+  printf("DnsRequestPoisonerGetHost2Spoof(1.1): ipHdrLen=%d\n", ipHdrLen);
+
+  if (ipHdrLen <= 0)
+  {
+    return retVal;
+  }
+  
+printf("DnsRequestPoisonerGetHost2Spoof(2): \n");
+  updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+
+  if (updHdr == NULL || updHdr->ulen <= 0 || ntohs(updHdr->dport) != 53)
+  {
+    return retVal;
+  }
+  
+printf("DnsRequestPoisonerGetHost2Spoof(3): \n");
+  dnsData = ((char*)updHdr + sizeof(UDPHDR));
+
+  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
+  {
+    return retVal;
+  }
+  
+printf("DnsRequestPoisonerGetHost2Spoof(4): \n");
+  if (ntohs(dnsHdr->q_count) <= 0)
+  {
+    return retVal;
+  }
+
+  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
+  stop = 0;
+  
+printf("DnsRequestPoisonerGetHost2Spoof(5): \n");
+  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) != NULL)
+  {
+printf("DnsRequestPoisonerGetHost2Spoof(5.1): peerName=%s\n", peerName);
+    if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
+    {
+printf("DnsRequestPoisonerGetHost2Spoof(5.2): \n");
+      retVal = tmpNode;
+    }
+
+    HeapFree(GetProcessHeap(), 0, peerName);
+  }
+
+  return retVal;
 }
+

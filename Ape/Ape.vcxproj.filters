@@ -9,9 +9,6 @@
     <ClCompile Include="DnsPoisoning.c">
       <Filter>Source files\DnsPoisoning</Filter>
     </ClCompile>
-    <ClCompile Include="DnsResponsePoisoning.c">
-      <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedListFirewallRules.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
@@ -29,9 +26,6 @@
     </ClCompile>
     <ClCompile Include="ArpPoisoning.c">
       <Filter>Source files\ArpPoisoning</Filter>
-    </ClCompile>
-    <ClCompile Include="DnsRequestPoisoning.c">
-      <Filter>Source files\DnsPoisoning</Filter>
     </ClCompile>
     <ClCompile Include="HttpInjection.c">
       <Filter>Source files\HttpPoisoning</Filter>
@@ -53,6 +47,24 @@
     </ClCompile>
     <ClCompile Include="NetworkPackets.c">
       <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsRequestSpoofing.c">
+      <Filter>Source files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsResponseSpoofing.c">
+      <Filter>Source files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging.cpp">
+      <Filter>Source files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeMITM.cpp">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeDePoisoning.cpp">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModePcapcpp.cpp">
+      <Filter>Source files\Modes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,19 +95,7 @@
     <ClInclude Include="DnsPoisoning.h">
       <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
-    <ClInclude Include="DnsRequestPoisoning.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsResponsePoisoning.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
     <ClInclude Include="DnsStructs.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="Dns.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="NetDns.h">
       <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
     <ClInclude Include="LinkedListSystems.h">
@@ -118,6 +118,24 @@
     </ClInclude>
     <ClInclude Include="NetworkPackets.h">
       <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsRequestSpoofing.h">
+      <Filter>Header files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsResponseSpoofing.h">
+      <Filter>Header files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Header files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="ModePcap.h">
+      <Filter>Header files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeDePoisoning.h">
+      <Filter>Header files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeMITM.h">
+      <Filter>Header files\Modes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +168,18 @@
     </Filter>
     <Filter Include="Source files\DnsPoisoning">
       <UniqueIdentifier>{92068d20-1442-49ea-aa07-03c7b4d66315}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Logging">
+      <UniqueIdentifier>{fb0b2fb3-cf3e-4742-8a77-7de002e6766f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Logging">
+      <UniqueIdentifier>{2f95d1f5-225d-4cac-b262-c3fb437cdafa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Modes">
+      <UniqueIdentifier>{f0c27761-12ea-4594-80f5-6db3a6066980}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Modes">
+      <UniqueIdentifier>{6fce116e-f826-4984-b88f-0ac7779bd073}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -65,9 +65,13 @@ int ListInterfaceDetails()
       for (counter = 0; counter < adapterPtr->AddressLength; counter++) 
       {
         if (counter == (adapterPtr->AddressLength - 1))
-          printf("%.2X\n", (int) adapterPtr->Address[counter]);
+        {
+          printf("%.2X\n", (int)adapterPtr->Address[counter]);
+        }
         else
-          printf("%.2X-", (int) adapterPtr->Address[counter]);
+        {
+          printf("%.2X-", (int)adapterPtr->Address[counter]);
+        }
       } 
 
       printf("\tIndex: \t%d\n", adapterPtr->Index);
@@ -111,34 +115,38 @@ int ListInterfaceDetails()
         printf("\t  DHCP Server: \t%s\n", adapterPtr->DhcpServer.IpAddress.String);
         printf("\t  Lease Obtained: ");
 
-        if (error = _localtime32_s(&timestamp, (__time32_t*) &adapterPtr->LeaseObtained))
-          printf("Invalid Argument to _localtime32_s\n");
-        else 
+        if (error = _localtime32_s(&timestamp, (__time32_t*)&adapterPtr->LeaseObtained))
         {
-          if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
-            printf("Invalid Argument to asctime_s\n");
-          else
-            printf("%s", tempBuffer);
+          printf("Invalid Argument to _localtime32_s\n");
+        }
+        else  if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
+        {
+          printf("Invalid Argument to asctime_s\n");
+        }
+        else
+        {
+          printf("%s", tempBuffer);
         }
 
         printf("\t  Lease Expires:  ");
 
-        if (error = _localtime32_s(&timestamp, (__time32_t*) &adapterPtr->LeaseExpires))
-          printf("Invalid Argument to _localtime32_s\n");
-        else 
+        if (error = _localtime32_s(&timestamp, (__time32_t*)&adapterPtr->LeaseExpires))
         {
-          // Convert to an ASCII representation 
-          if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
-            printf("Invalid Argument to asctime_s\n");
-          else
-            printf("%s", tempBuffer);
+          printf("Invalid Argument to _localtime32_s\n");
+        }
+        else if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
+        {
+          printf("Invalid Argument to asctime_s\n");
+        }
+        else
+        {
+          printf("%s", tempBuffer);
         }
       } 
       else
       {
         printf("\tDHCP Enabled: No\n");
       }
-
 
       if (adapterPtr->HaveWins) 
       {
@@ -181,7 +189,6 @@ int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
   PIP_ADAPTER_INFO adapterPtr = NULL;
   DWORD funcRetVal = 0;
   ULONG outputBufferLength = sizeof (IP_ADAPTER_INFO);
-
 
   if ((adapterInfoPtr = (IP_ADAPTER_INFO *) HeapAlloc(GetProcessHeap(), 0, sizeof (IP_ADAPTER_INFO))) == NULL)
   {

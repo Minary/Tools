@@ -154,24 +154,26 @@
   <ItemGroup>
     <ClInclude Include="APE.h" />
     <ClInclude Include="ArpPoisoning.h" />
-    <ClInclude Include="Dns.h" />
     <ClInclude Include="DnsForge.h" />
     <ClInclude Include="DnsHelper.h" />
     <ClInclude Include="DnsPoisoning.h" />
-    <ClInclude Include="DnsResponsePoisoning.h" />
+    <ClInclude Include="DnsResponseSpoofing.h" />
     <ClInclude Include="DnsStructs.h" />
     <ClInclude Include="getopt.h" />
     <ClInclude Include="HttpPoisoning.h" />
     <ClInclude Include="LinkedListFirewallRules.h" />
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
     <ClInclude Include="LinkedListHttpInjections.h" />
+    <ClInclude Include="Logging.h" />
+    <ClInclude Include="ModeDePoisoning.h" />
+    <ClInclude Include="ModeMITM.h" />
+    <ClInclude Include="ModePcap.h" />
     <ClInclude Include="NetworkPackets.h" />
-    <ClInclude Include="NetDns.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="LinkedListSystems.h" />
     <ClInclude Include="NetworkFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
-    <ClInclude Include="DnsRequestPoisoning.h" />
+    <ClInclude Include="DnsRequestSpoofing.h" />
     <ClInclude Include="SLRE.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,7 +183,7 @@
     <ClCompile Include="DnsHelper.c" />
     <ClCompile Include="DnsForge.c" />
     <ClCompile Include="DnsPoisoning.c" />
-    <ClCompile Include="DnsResponsePoisoning.c" />
+    <ClCompile Include="DnsResponseSpoofing.c" />
     <ClCompile Include="getopt.c" />
     <ClCompile Include="HttpInjection.c" />
     <ClCompile Include="Interface.c" />
@@ -189,10 +191,14 @@
     <ClCompile Include="LinkedListSpoofedDnsHosts.c" />
     <ClCompile Include="LinkedListHttpInjections.c" />
     <ClCompile Include="LinkedListSystems.c" />
+    <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="ModeDePoisoning.cpp" />
+    <ClCompile Include="ModeMITM.cpp" />
+    <ClCompile Include="ModePcapcpp.cpp" />
     <ClCompile Include="NetworkFunctions.c" />
     <ClCompile Include="NetworkPackets.c" />
     <ClCompile Include="PacketProxy.c" />
-    <ClCompile Include="DnsRequestPoisoning.c" />
+    <ClCompile Include="DnsRequestSpoofing.c" />
     <ClCompile Include="SLRE.c" />
   </ItemGroup>
   <ItemGroup>

