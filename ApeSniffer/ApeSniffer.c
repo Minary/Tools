@@ -41,9 +41,7 @@ int main(int argc, char* argv[])
   int action = 0;
 
 
-  /*
-  * Initialisation
-  */
+  // Initialisation
   if (!InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400) ||
     !InitializeCriticalSectionAndSpinCount(&gCSOutputPipe, 0x00000400) ||
     !InitializeCriticalSectionAndSpinCount(&gCSConnectionsList, 0x00000400))
@@ -52,42 +50,37 @@ int main(int argc, char* argv[])
     goto END;
   }
 
-
   LogMsg(DBG_LOW, "main() : Starting %s", argv[0]);
   ZeroMemory(&gScanParams, sizeof(gScanParams));
   gARGV = argv;
-
   gConnectionList = InitConnectionList();
-
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "lg:p:s:")) != -1)
   {
     switch (opt)
     {
-    case 'g':
-      strncpy(gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName) - 1);
-      action = 'g';
-      break;
-    case 'l':
-      action = 'l';
-      break;
-    case 'p':
-      strncpy(gScanParams.OutputPipeName, optarg, sizeof(gScanParams.OutputPipeName) - 1);
-      break;
-    case 's':
-      strncpy((char *)gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName));
-      GetInterfaceName(optarg, (char *)gScanParams.IFCName, sizeof(gScanParams.IFCName) - 1);
-      GetInterfaceDetails(optarg, &gScanParams);
-      action = 's';
-      break;
+      case 'g':
+        strncpy(gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName) - 1);
+        action = 'g';
+        break;
+      case 'l':
+        action = 'l';
+        break;
+      case 'p':
+        strncpy(gScanParams.OutputPipeName, optarg, sizeof(gScanParams.OutputPipeName) - 1);
+        break;
+      case 's':
+        strncpy((char *)gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName));
+        GetInterfaceName(optarg, (char *)gScanParams.IFCName, sizeof(gScanParams.IFCName) - 1);
+        GetInterfaceDetails(optarg, &gScanParams);
+        action = 's';
+        break;
     }
   }
 
 
-  /*
-   * List all interfaces
-   */
+  // List all interfaces
   if (action == 'l')
   {
     ListInterfaceDetails();
@@ -143,10 +136,6 @@ END:
 
 
 
-/*
- *
- *
- */
 void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *outputParam)
 {
   int counter = 0;
@@ -171,13 +160,6 @@ void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *o
 }
 
 
-
-
-
-/*
- *
- *
- */
 void LogMsg(int priorityParam, char *messageParam, ...)
 {
   HANDLE fileHandle = INVALID_HANDLE_VALUE;
@@ -235,17 +217,13 @@ void LogMsg(int priorityParam, char *messageParam, ...)
 }
 
 
-/*
- *
- *
- */
+
 void ExecCommand(char *commandParam)
 {
   STARTUPINFO startupInfoParam;
   PROCESS_INFORMATION processInfoParam;
   char tempBuffer[MAX_BUF_SIZE + 1];
   char *comspec = getenv("COMSPEC");
-
 
   // Build command string + execute it.
   if (commandParam == NULL)
