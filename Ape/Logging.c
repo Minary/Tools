@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include <stdio.h>
+
 #include "APE.h"
+#include "Logging.h"
 
 
 static HANDLE fileHandle = INVALID_HANDLE_VALUE;

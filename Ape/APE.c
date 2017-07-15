@@ -15,6 +15,7 @@
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "LinkedListHttpInjections.h"
+#include "Logging.h"
 #include "ModeDePoisoning.h"
 #include "ModeMITM.h"
 #include "NetworkFunctions.h"
@@ -86,8 +87,6 @@ int main(int argc, char **argv)
   char action = 0;
   int counter = 0;
   char *tempPtr = NULL;
-  char pcapFile[512] = { 0 };
-
   FILE *fileHandle = NULL;
 
   // Initialisation
@@ -132,7 +131,7 @@ int main(int argc, char **argv)
       break;
     case 'f':
       action = 'f';
-      strncpy(pcapFile, argv[2], sizeof(pcapFile) - 1);
+      strncpy(gScanParams.PcapFilePath, argv[2], sizeof(gScanParams.PcapFilePath) - 1);
       break;
     }
   }

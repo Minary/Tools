@@ -54,17 +54,17 @@
     <ClCompile Include="DnsResponseSpoofing.c">
       <Filter>Source files\DnsPoisoning</Filter>
     </ClCompile>
-    <ClCompile Include="Logging.cpp">
+    <ClCompile Include="ModeDePoisoning.c">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeMITM.c">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModePcap.c">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging.c">
       <Filter>Source files\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="ModeMITM.cpp">
-      <Filter>Source files\Modes</Filter>
-    </ClCompile>
-    <ClCompile Include="ModeDePoisoning.cpp">
-      <Filter>Source files\Modes</Filter>
-    </ClCompile>
-    <ClCompile Include="ModePcapcpp.cpp">
-      <Filter>Source files\Modes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

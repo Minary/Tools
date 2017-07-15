@@ -13,16 +13,6 @@
 #define WITH_FIREWALL 0
 #define WITH_SNIFFER 0
 
-#define DEBUG_LEVEL 1
-
-#define DBG_OFF    0
-#define DBG_INFO   1
-#define DBG_LOW    2
-#define DBG_MEDIUM 3
-#define DBG_HIGH   4
-#define DBG_ALERT  5
-#define DBG_ERROR  5
-
 
 #define FILE_HOST_TARGETS ".targethosts"
 #define FILE_FIREWALL_RULES1 ".fwrules"
@@ -31,7 +21,6 @@
 #define FILE_HTTPINJECTION_RULES1 ".injecturls"
 #define FILE_HTTPINJECTION_RULES2 "bin\\.injecturls"
 #define FILE_UNPOISON ".UNPOISON"
-#define DBG_LOGFILE "c:\\debug.log"
 #define HOSTS_FILE "hosts.txt"
 
 
@@ -98,6 +87,7 @@ typedef struct SCANPARAMS
   unsigned char localMacStr[MAX_MAC_LEN];
   unsigned char *PCAPPattern;
   unsigned char OutputPipeName[MAX_BUF_SIZE + 1];
+  unsigned char PcapFilePath[MAX_BUF_SIZE + 1];
   HANDLE PipeHandle;
   void *interfaceReadHandle;  // HACK! because of header hell :/
   void *interfaceWriteHandle; // HACK! because of header hell :/
