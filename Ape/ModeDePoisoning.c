@@ -7,6 +7,7 @@
 
 #include "APE.h"
 #include "LinkedListSystems.h"
+#include "Logging.h"
 #include "ModeDePoisoning.h"
 
 
@@ -19,7 +20,6 @@ extern char **gARGV;
 void InitializeDePoisoning()
 {
   AdminCheck(gScanParams.applicationName);
-
   if (gDEBUGLEVEL > DBG_INFO)
   {
     PrintConfig(gScanParams);

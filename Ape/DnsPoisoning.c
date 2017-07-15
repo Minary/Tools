@@ -6,9 +6,10 @@
 #include "APE.h"
 #include "DnsHelper.h"
 #include "DnsPoisoning.h"
-#include "LinkedListSpoofedDnsHosts.h"
-#include "NetworkFunctions.h"
 #include "DnsStructs.h"
+#include "LinkedListSpoofedDnsHosts.h"
+#include "Logging.h"
+#include "NetworkFunctions.h"
 
 
 extern PHOSTNODE gHostsList;

@@ -191,10 +191,10 @@
     <ClCompile Include="LinkedListSpoofedDnsHosts.c" />
     <ClCompile Include="LinkedListHttpInjections.c" />
     <ClCompile Include="LinkedListSystems.c" />
-    <ClCompile Include="Logging.cpp" />
-    <ClCompile Include="ModeDePoisoning.cpp" />
-    <ClCompile Include="ModeMITM.cpp" />
-    <ClCompile Include="ModePcapcpp.cpp" />
+    <ClCompile Include="Logging.c" />
+    <ClCompile Include="ModeDePoisoning.c" />
+    <ClCompile Include="ModeMITM.c" />
+    <ClCompile Include="ModePcap.c" />
     <ClCompile Include="NetworkFunctions.c" />
     <ClCompile Include="NetworkPackets.c" />
     <ClCompile Include="PacketProxy.c" />

@@ -3,11 +3,12 @@
 #include <Windows.h>
 
 #include "APE.h"
-#include "LinkedListSpoofedDNSHosts.h"
 #include "DnsForge.h"
 #include "DnsHelper.h"
 #include "DnsRequestSpoofing.h"
 #include "DnsStructs.h"
+#include "LinkedListSpoofedDNSHosts.h"
+#include "Logging.h"
 
 
 
