@@ -3,6 +3,6 @@
 #include "APE.h"
 
 
-void InitializeParsePcapDumpFile();
+int InitializeParsePcapDumpFile();
 BOOL OpenPcapFileHandle(PSCANPARAMS scanParams);
 BOOL OpenPcapInterfaceHandle(PSCANPARAMS scanParams);

@@ -5,48 +5,78 @@
 #include <windows.h>
 
 #include "APE.h"
+#include "LinkedListSystems.h"
+#include "LinkedListFirewallRules.h"
 #include "Logging.h"
 #include "ModePcap.h"
+#include "NetworkFunctions.h"
+#include "PacketProxy.h"
 
 
+extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
+extern PSYSNODE gSystemsList;
 
 
-void InitializeParsePcapDumpFile()
+int InitializeParsePcapDumpFile()
 {
   int funcRetVal;
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
   int retVal = -1;
-  SCANPARAMS scanParams;
+//  SCANPARAMS scanParams;
 
   printf("InitializeParsePcapDumpFile(0): Starting\n");
 
-  /*
-   * Initialisation. Parse parameters (Ifc, start IP, stop IP) and
-   * pack them in the scan configuration struct.
-   */
+  // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
+  // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.LocalIpBin, gScanParams.LocalIpStr, MAX_IP_LEN);
 
   MacBin2String(gScanParams.GatewayMacBin, gScanParams.GatewayMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.GatewayIpBin, gScanParams.GatewayIpStr, MAX_IP_LEN);
+  
+  // Set exit function to trigger depoisoning functions and command.
+  SetConsoleCtrlHandler((PHANDLER_ROUTINE)APE_ControlHandler, TRUE);
 
-  ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, &gScanParams, sizeof(scanParams));
+  // Set GW IP static.
+  SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)gScanParams.GatewayIpStr, (char *)gScanParams.GatewayMacStr);
+
+  if (gDEBUGLEVEL > DBG_INFO)
+  {
+    PrintConfig(gScanParams);
+  }
+
+  // 0 Add default GW to the gSystemsList
+  AddToSystemsList(&gSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
+
+  // 1. Parse target file
+  if (!PathFileExists(FILE_HOST_TARGETS))
+  {
+    printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+    goto END;
+  }
+
+  if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
+  {
+    printf("No target hosts were defined!\n");
+    goto END;
+  }
+    
+  WriteDepoisoningFile();
 
   LogMsg(2, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s\n", 
-    scanParams.InterfaceName, scanParams.PcapFilePath);
+    gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
   // Open Pcap input file
-  if (OpenPcapFileHandle(&scanParams) == FALSE)
+  if (OpenPcapFileHandle(&gScanParams) == FALSE)
   {
     retVal = -1;
     goto END;
   }
   
   // Open Pcap interface read/write
-  if (OpenPcapInterfaceHandle(&scanParams) == FALSE)
+  if (OpenPcapInterfaceHandle(&gScanParams) == FALSE)
   {
     retVal = -2;
     goto END;
@@ -54,19 +84,19 @@ void InitializeParsePcapDumpFile()
 
   // Start processing packets
   LogMsg(DBG_INFO, "CaptureIncomingPackets(): Pcap packet handling started ...");
-  while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.PcapFileHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex((pcap_t*)gScanParams.PcapFileHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
-      PacketForwarding_handler((unsigned char *)&scanParams, packetHeader, packetData);
+      PacketForwarding_handler((unsigned char *)&gScanParams, packetHeader, packetData);
     }
   }
   
 END:
 
-  if (scanParams.PcapFileHandle != NULL)
+  if (gScanParams.PcapFileHandle != NULL)
   {
-    pcap_close(scanParams.PcapFileHandle);
+    pcap_close(gScanParams.PcapFileHandle);
   }
 
   return retVal;

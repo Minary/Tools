@@ -154,13 +154,13 @@
   <ItemGroup>
     <ClInclude Include="APE.h" />
     <ClInclude Include="ArpPoisoning.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="DnsForge.h" />
     <ClInclude Include="DnsHelper.h" />
     <ClInclude Include="DnsPoisoning.h" />
     <ClInclude Include="DnsResponseSpoofing.h" />
     <ClInclude Include="DnsStructs.h" />
     <ClInclude Include="getopt.h" />
-    <ClInclude Include="HttpPoisoning.h" />
     <ClInclude Include="LinkedListFirewallRules.h" />
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
     <ClInclude Include="LinkedListHttpInjections.h" />
@@ -180,12 +180,12 @@
     <ClCompile Include="ArpDepoisoning.c" />
     <ClCompile Include="APE.c" />
     <ClCompile Include="ArpPoisoning.c" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="DnsHelper.c" />
     <ClCompile Include="DnsForge.c" />
     <ClCompile Include="DnsPoisoning.c" />
     <ClCompile Include="DnsResponseSpoofing.c" />
     <ClCompile Include="getopt.c" />
-    <ClCompile Include="HttpInjection.c" />
     <ClCompile Include="Interface.c" />
     <ClCompile Include="LinkedListFirewallRules.c" />
     <ClCompile Include="LinkedListSpoofedDnsHosts.c" />

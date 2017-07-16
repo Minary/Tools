@@ -216,11 +216,7 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
 
 
 
-/*
- *
- *
- */
-int SendArpPacket(pcap_t *interfaceHandleParam, PArpPacket arpPacketParam)
+int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
 {
   int retVal = NOK;
   unsigned char arpPacket[sizeof(ETHDR) + sizeof(ARPHDR)];

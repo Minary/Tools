@@ -6,9 +6,11 @@
 #include <stdio.h>
 
 #include "APE.h"
+#include "ArpPoisoning.h"
 #include "LinkedListSystems.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
+#include "NetworkFunctions.h"
 
 
 extern int gDEBUGLEVEL;
