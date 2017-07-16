@@ -69,9 +69,9 @@ int GenericSniffer(PSCANPARAMS scanParamsParam)
   ZeroMemory(&filterCode, sizeof(filterCode));
   ZeroMemory(bpfFilter, sizeof(bpfFilter));
 
-  if (scanParamsParam->PCAPPattern != NULL)
+  if (scanParamsParam->PcapPattern != NULL)
   {
-    snprintf(bpfFilter, sizeof(bpfFilter) - 1, "%s", scanParamsParam->PCAPPattern);
+    snprintf(bpfFilter, sizeof(bpfFilter) - 1, "%s", scanParamsParam->PcapPattern);
   }
 
   if (pcap_compile((pcap_t *)scanParamsParam->IfcReadHandle, &filterCode, bpfFilter, 1, netMask) < 0)

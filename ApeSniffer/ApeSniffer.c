@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     GetInterfaceDetails(argv[2], &gScanParams);
 
     if (argv[3] != NULL)
-      gScanParams.PCAPPattern = (unsigned char *)argv[3];
+      gScanParams.PcapPattern = (unsigned char *)argv[3];
 
     GenericSniffer(&gScanParams);
     goto END;

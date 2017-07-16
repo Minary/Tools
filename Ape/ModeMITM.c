@@ -55,28 +55,27 @@ void InitializeMITM()
   int funcRetVal = 0;
   PRULENODE tempNode = NULL;
 
-  AdminCheck(gScanParams.applicationName);
-  RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
+  AdminCheck(gScanParams.ApplicationName);
+  RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
-  RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
-  LogMsg(2, "main(): -x %s\n", gScanParams.interfaceName);
-
-
+  RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
+  LogMsg(2, "main(): -x %s\n", gScanParams.InterfaceName);
+  
   /*
    * Initialisation. Parse parameters (Ifc, start IP, stop IP) and
    * pack them in the scan configuration struct.
    */
-  MacBin2String(gScanParams.localMacBin, gScanParams.localMacStr, MAX_MAC_LEN);
-  IpBin2String(gScanParams.localIpBin, gScanParams.localIpStr, MAX_IP_LEN);
+  MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
+  IpBin2String(gScanParams.LocalIpBin, gScanParams.LocalIpStr, MAX_IP_LEN);
 
-  MacBin2String(gScanParams.gatewayMacBin, gScanParams.gatewayMacStr, MAX_MAC_LEN);
-  IpBin2String(gScanParams.gatewayIpBin, gScanParams.gatewayIpStr, MAX_IP_LEN);
+  MacBin2String(gScanParams.GatewayMacBin, gScanParams.GatewayMacStr, MAX_MAC_LEN);
+  IpBin2String(gScanParams.GatewayIpBin, gScanParams.GatewayIpStr, MAX_IP_LEN);
 
   // Set exit function to trigger depoisoning functions and command.
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)APE_ControlHandler, TRUE);
 
   // Set GW IP static.
-  SetMacStatic((char *)gScanParams.interfaceAlias, (char *)gScanParams.gatewayIpStr, (char *)gScanParams.gatewayMacStr);
+  SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)gScanParams.GatewayIpStr, (char *)gScanParams.GatewayMacStr);
 
   if (gDEBUGLEVEL > DBG_INFO)
   {
@@ -84,9 +83,8 @@ void InitializeMITM()
   }
 
   // 0 Add default GW to the gSystemsList
-  AddToSystemsList(&gSystemsList, gScanParams.gatewayMacBin, (char *)gScanParams.gatewayIpStr, gScanParams.gatewayIpBin);
-
-
+  AddToSystemsList(&gSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
+  
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
@@ -121,7 +119,7 @@ void InitializeMITM()
         AddToSystemsList(&gSystemsList, macBin, (char *)ipStr, ipBin);
         LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile(): New system added :  %s/%s", macStr, ipStr);
 
-        SetMacStatic((char *)gScanParams.interfaceAlias, (char *)ipStr, (char *)macStr);
+        SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)ipStr, (char *)macStr);
       }
 
       ZeroMemory(tempLine, sizeof(tempLine));

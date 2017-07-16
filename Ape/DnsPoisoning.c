@@ -110,14 +110,14 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
   ZeroMemory(filter, sizeof(filter));
 
   // 0. Initialize sniffer
-  if ((ifcReadHandle = pcap_open_live((char *)scanParams->interfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
+  if ((ifcReadHandle = pcap_open_live((char *)scanParams->InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
     LogMsg(DBG_ERROR, "DnsResponseSniffer(): Unable to open the adapter: %s", pcapErrorBuffer);
     retVal = 1;
     goto END;
   }
 
-  _snprintf(filter, sizeof(filter) - 1, "src port 53 and dst host %s", scanParams->localIpStr);
+  _snprintf(filter, sizeof(filter) - 1, "src port 53 and dst host %s", scanParams->LocalIpStr);
   netMask = 0xffffff;
 
   if (pcap_compile((pcap_t *)ifcReadHandle, &filterCode, (const char *)filter, 1, netMask) < 0)

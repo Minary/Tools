@@ -19,16 +19,16 @@ extern char **gARGV;
 
 void InitializeDePoisoning()
 {
-  AdminCheck(gScanParams.applicationName);
+  AdminCheck(gScanParams.ApplicationName);
   if (gDEBUGLEVEL > DBG_INFO)
   {
     PrintConfig(gScanParams);
   }
 
   ArpDePoisoning(&gScanParams);
-  RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
+  RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
-  RemoveMacFromCache((char *)gScanParams.interfaceName, "*");
+  RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
 }
 
 
@@ -46,8 +46,8 @@ void StartUnpoisoningProcess()
   // Remove GW ARP entry.
   ZeroMemory(tempBuffer, sizeof(tempBuffer));
   ZeroMemory(gatewayIpStr, sizeof(gatewayIpStr));
-  snprintf(gatewayIpStr, sizeof(gatewayIpStr) - 1, "%d.%d.%d.%d", gScanParams.gatewayIpBin[0], gScanParams.gatewayIpBin[1], gScanParams.gatewayIpBin[2], gScanParams.gatewayIpBin[3]);
-  RemoveMacFromCache((char *)gScanParams.interfaceAlias, gatewayIpStr);
+  snprintf(gatewayIpStr, sizeof(gatewayIpStr) - 1, "%d.%d.%d.%d", gScanParams.GatewayIpBin[0], gScanParams.GatewayIpBin[1], gScanParams.GatewayIpBin[2], gScanParams.GatewayIpBin[3]);
+  RemoveMacFromCache((char *)gScanParams.InterfaceAlias, gatewayIpStr);
 }
 
 
@@ -178,7 +178,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
 
   for (counter = 0, device = allDevices; device; device = device->next, counter++)
   {
-    if (StrStrI(device->name, (LPCSTR)scanParams.interfaceName))
+    if (StrStrI(device->name, (LPCSTR)scanParams.InterfaceName))
     {
       strcpy(adapter, device->name);
       break;
@@ -228,12 +228,12 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
     ZeroMemory(&arpPacket, sizeof(arpPacket));
     arpPacket.lReqType = ARP_REQUEST;
     // Set MAC values
-    CopyMemory(arpPacket.EthSrcMacBin, scanParams.localMacBin, BIN_MAC_LEN);
+    CopyMemory(arpPacket.EthSrcMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
     CopyMemory(arpPacket.EthDstMacBin, remoteMacBin, BIN_MAC_LEN);
 
     // Set ARP reply values
-    CopyMemory(arpPacket.ArpLocalMacBin, scanParams.gatewayMacBin, BIN_MAC_LEN);
-    CopyMemory(arpPacket.ArpLocalIpBin, scanParams.gatewayIpBin, BIN_IP_LEN);
+    CopyMemory(arpPacket.ArpLocalMacBin, scanParams.GatewayMacBin, BIN_MAC_LEN);
+    CopyMemory(arpPacket.ArpLocalIpBin, scanParams.GatewayIpBin, BIN_IP_LEN);
     CopyMemory(arpPacket.ArpDstIpBin, remoteIpBin, BIN_IP_LEN);
 
     // layer 2 : (Attacker-MAC) 00-16-ea-e0-77-b2    ->   (GW-MAC) 00-40-77-bb-55-10
@@ -253,7 +253,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
       Sleep(SLEEP_BETWEEN_ARPS);
     }
 
-    RemoveMacFromCache((char *)scanParams.interfaceAlias, (char *)remoteIpString);
+    RemoveMacFromCache((char *)scanParams.InterfaceAlias, (char *)remoteIpString);
     Sleep(SLEEP_BETWEEN_ARPS);
   }
 

@@ -219,30 +219,30 @@ int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
       if (StrStrI(adapterPtr->AdapterName, interfacenameParam))
       {
         // Get local MAC address
-        CopyMemory(scanParamsParam->localMacBin, adapterPtr->Address, BIN_MAC_LEN);
+        CopyMemory(scanParamsParam->LocalMacBin, adapterPtr->Address, BIN_MAC_LEN);
 
         // Get local IP address
         localIpBin = inet_addr(adapterPtr->IpAddressList.IpAddress.String);
-        CopyMemory(scanParamsParam->localIpBin, &localIpBin, 4);
+        CopyMemory(scanParamsParam->LocalIpBin, &localIpBin, 4);
 
         // Get gateway IP address
         gatewaiIpBin = inet_addr(adapterPtr->GatewayList.IpAddress.String);
-        CopyMemory(scanParamsParam->gatewayIpBin, &gatewaiIpBin, 4);
+        CopyMemory(scanParamsParam->GatewayIpBin, &gatewaiIpBin, 4);
 
         // Get gateway MAC address
-        CopyMemory(scanParamsParam->gatewayIpBin, &gatewaiIpBin, 4); // ????
+        CopyMemory(scanParamsParam->GatewayIpBin, &gatewaiIpBin, 4); // ????
         ZeroMemory(&gatewayMacBin, sizeof(gatewayMacBin));
         SendARP(gatewaiIpBin, 0, gatewayMacBin, &gatewayMacBinLength);
-        CopyMemory(scanParamsParam->gatewayMacBin, gatewayMacBin, 6);
+        CopyMemory(scanParamsParam->GatewayMacBin, gatewayMacBin, 6);
 
         // Get interface index.
-        scanParamsParam->index = adapterPtr->Index;
+        scanParamsParam->Index = adapterPtr->Index;
 
         // Get interface alias.
-        GetAliasByIfcIndex(scanParamsParam->index, (char *) scanParamsParam->interfaceAlias, sizeof(scanParamsParam->interfaceAlias)-1);
+        GetAliasByIfcIndex(scanParamsParam->Index, (char *) scanParamsParam->InterfaceAlias, sizeof(scanParamsParam->InterfaceAlias)-1);
 
         // Get interface description
-        CopyMemory(scanParamsParam->interfaceDescr, adapterPtr->Description, sizeof(scanParamsParam->interfaceDescr) - 1);
+        CopyMemory(scanParamsParam->InterfaceDescr, adapterPtr->Description, sizeof(scanParamsParam->InterfaceDescr) - 1);
 
         break;
       }
