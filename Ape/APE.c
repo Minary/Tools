@@ -9,20 +9,15 @@
 #include <stdarg.h>
 
 #include "APE.h"
-#include "ArpPoisoning.h"
+#include "Config.h"
 #include "Interface.h"
 #include "LinkedListSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
-#include "LinkedListHttpInjections.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
 #include "ModeMITM.h"
-#include "NetworkFunctions.h"
-#include "HttpPoisoning.h"
-#include "DnsPoisoning.h"
-#include "DnsResponseSpoofing.h"
-#include "PacketProxy.h"
+#include "ModePcap.h"
 #include "getopt.h"
 
 #pragma comment(lib, "wpcap.lib")
@@ -50,8 +45,8 @@ CRITICAL_SECTION gCSConnectionsList;
 // Linked lists
 PSYSNODE gSystemsList = NULL;
 PHOSTNODE gHostsList = NULL;
-PRULENODE gFWRulesList = NULL;
-PHTTPINJECTIONNODE gHttpInjectionList = NULL;
+PRULENODE gFwRulesList = NULL;
+//PHTTPINJECTIONNODE gHttpInjectionList = NULL;
 
 int gDEBUGLEVEL = DEBUG_LEVEL;
 
@@ -85,7 +80,7 @@ int main(int argc, char **argv)
   int retVal = 0;
   int opt = 0;
   char action = 0;
-  
+
   // Initialisation
   if (!InitializeCriticalSectionAndSpinCount(&gDBCritSection, 0x00000400) ||
     !InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400) ||
@@ -102,9 +97,9 @@ int main(int argc, char **argv)
   gARGV = argv;
 
   gSystemsList = InitSystemList();
-  gFWRulesList = InitFirewallRules();
+  gFwRulesList = InitFirewallRules();
   gHostsList = InitHostsList();
-  gHttpInjectionList = InitHttpInjectionList();
+//  gHttpInjectionList = InitHttpInjectionList();
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
@@ -155,30 +150,34 @@ int main(int argc, char **argv)
     goto END;
 
 
-  // ARP depoisening
+    // ARP depoisening
   }
   else if (action == 'd')
   {
     InitializeDePoisoning();
 
-  // Process data from pcap data dump file
+    // Process data from pcap data dump file
   }
   else if (action == 'f')
   {
     LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
-//
+
+    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
+    ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
     InitializeParsePcapDumpFile();
 
 
 
-  // Start ...
-  //  - ARP cache poisoning
-  //  - Firewall blocking
-  //  - DNS poisoning 
-  //  - forwarding data packets
+    // Start ...
+    //  - ARP cache poisoning
+    //  - Firewall blocking
+    //  - DNS poisoning 
+    //  - forwarding data packets
   }
   else if (action == 'x')
   {
+    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
+    ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
     InitializeMITM();
   }
   else
@@ -289,16 +288,3 @@ BOOL APE_ControlHandler(DWORD pControlType)
   }
 }
 
-
-
-void PrintConfig(SCANPARAMS scanParamsParam)
-{
-  printf("Local IP :\t%d.%d.%d.%d\n", scanParamsParam.LocalIpBin[0], scanParamsParam.LocalIpBin[1], scanParamsParam.LocalIpBin[2], scanParamsParam.LocalIpBin[3]);
-  printf("Local MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.LocalMacBin[0], scanParamsParam.LocalMacBin[1], scanParamsParam.LocalMacBin[2],
-    scanParamsParam.LocalMacBin[3], scanParamsParam.LocalMacBin[4], scanParamsParam.LocalMacBin[5]);
-  printf("GW MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.GatewayMacBin[0], scanParamsParam.GatewayMacBin[1], scanParamsParam.GatewayMacBin[2],
-    scanParamsParam.GatewayMacBin[3], scanParamsParam.GatewayMacBin[4], scanParamsParam.GatewayMacBin[5]);
-  printf("GW IP :\t\t%d.%d.%d.%d\n", scanParamsParam.GatewayIpBin[0], scanParamsParam.GatewayIpBin[1], scanParamsParam.GatewayIpBin[2], scanParamsParam.GatewayIpBin[3]);
-  printf("Start IP :\t%d.%d.%d.%d\n", scanParamsParam.StartIpBin[0], scanParamsParam.StartIpBin[1], scanParamsParam.StartIpBin[2], scanParamsParam.StartIpBin[3]);
-  printf("Stop IP :\t%d.%d.%d.%d\n", scanParamsParam.StopIpBin[0], scanParamsParam.StopIpBin[1], scanParamsParam.StopIpBin[2], scanParamsParam.StopIpBin[3]);
-}

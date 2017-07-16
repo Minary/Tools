@@ -109,10 +109,9 @@ void StartUnpoisoningProcess();
 void ExecCommand(char *cmd);
 void LogMsg(int priorityParam, char *msgParam, ...);
 void PrintConfig(SCANPARAMS scanParamsParam);
-void PrintTimestamp(char *titleParam);
 int UserIsAdmin();
 void AdminCheck(char *programNameParam);
 void PrintUsage(char *applicationNameParam);
-void ParseTargetHostsConfigFile(char *targetsFileParam);
-void ParseDnsConfigFile();
+int ParseTargetHostsConfigFile(char *targetsFile);
+int ParseFirewallConfigFile(char *firewallRulesFile);
 

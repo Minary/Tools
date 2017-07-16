@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "APE.h"
 #include "Logging.h"

@@ -27,7 +27,7 @@ PACKET_INFO, *PPACKET_INFO;
 
 
 
-void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pPktHeader, const u_char *pData);
+void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader, const u_char *data);
 DWORD WINAPI ForwardPackets(LPVOID lpParam);
 void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo);
 void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);

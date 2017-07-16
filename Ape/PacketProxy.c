@@ -11,7 +11,6 @@
 #include "DnsHelper.h"
 #include "DnsRequestSpoofing.h"
 #include "DnsResponseSpoofing.h"
-#include "HttpPoisoning.h"
 #include "LinkedListSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
@@ -21,7 +20,7 @@
 
 
 extern PSYSNODE gSystemsList;
-extern PRULENODE gFWRulesList;
+extern PRULENODE gFwRulesList;
 
 
 /*
@@ -128,7 +127,7 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
            packetInfo.dstPort, packetInfo.pktLen, packetInfo.suffix);
 
   // Firewall checks
-  if ((firewallRule = FirewallBlockRuleMatch(gFWRulesList, packetInfo.proto, packetInfo.srcIpBin, packetInfo.dstIpBin, packetInfo.srcPort, packetInfo.dstPort)) != NULL)
+  if ((firewallRule = FirewallBlockRuleMatch(gFwRulesList, packetInfo.proto, packetInfo.srcIpBin, packetInfo.dstIpBin, packetInfo.srcPort, packetInfo.dstPort)) != NULL)
   {
     ProcessFirewalledData(&packetInfo, scanParams);
   }

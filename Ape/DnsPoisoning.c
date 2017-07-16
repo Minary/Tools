@@ -1,6 +1,7 @@
 #define HAVE_REMOTE
 
 #include <pcap.h>
+#include <Shlwapi.h>
 #include <windows.h>
 
 #include "APE.h"
@@ -16,65 +17,25 @@ extern PHOSTNODE gHostsList;
 
 
 
-void ParseDnsPoisoningConfigFile(char *configFileParam)
-{
-  FILE *fileHandle = NULL;
-  int index = 0;
-  char tmpLine[MAX_BUF_SIZE + 1];
-  unsigned char hostname[MAX_BUF_SIZE + 1];
-  unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
 
-  if (configFileParam == NULL || (fileHandle = fopen(configFileParam, "r")) == NULL)
-  {
-    return;
-  }
-
-  ZeroMemory(tmpLine, sizeof(tmpLine));
-  ZeroMemory(hostname, sizeof(hostname));
-  ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-
-  while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
-  {
-    while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
-    {
-      tmpLine[strlen(tmpLine) - 1] = '\0';
-    }
-
-    // Parse values and add them to the list.
-    if (sscanf(tmpLine, "%[^,],%s", hostname, spoofedIpAddr) == 2)
-    {
-      AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);
-      LogMsg(DBG_INFO, "ParseDnsPoisoningConfigFile(): Host:%s -> SpoofedIP:%s", hostname, spoofedIpAddr);
-    }
-
-    ZeroMemory(tmpLine, sizeof(tmpLine));
-    ZeroMemory(hostname, sizeof(hostname));
-    ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-  }
-
-  fclose(fileHandle);
-}
-
-
-
-int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
-{
-  int retVal = 0;
-  PHOSTNODE hostTmp = NULL;
-  HANDLE dnsResponseThreadHandle = INVALID_HANDLE_VALUE;
-  DWORD dnsResponseThreadId = 0;
-
-  if ((dnsResponseThreadHandle = CreateThread(NULL, 0, DnsResponseSniffer, scanParams, 0, &dnsResponseThreadId)) != NULL)
-  {
-    // 1. Send DNS requests
-    for (hostTmp = gHostsList; hostTmp != NULL && hostTmp->next != NULL; hostTmp = (PHOSTNODE)hostTmp->next)
-    {
-      Sleep(400);
-    }
-  }
-
-  return retVal;
-}
+//int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
+//{
+//  int retVal = 0;
+//  PHOSTNODE hostTmp = NULL;
+//  HANDLE dnsResponseThreadHandle = INVALID_HANDLE_VALUE;
+//  DWORD dnsResponseThreadId = 0;
+//
+//  if ((dnsResponseThreadHandle = CreateThread(NULL, 0, DnsResponseSniffer, scanParams, 0, &dnsResponseThreadId)) != NULL)
+//  {
+//    // 1. Send DNS requests
+//    for (hostTmp = gHostsList; hostTmp != NULL && hostTmp->next != NULL; hostTmp = (PHOSTNODE)hostTmp->next)
+//    {
+//      Sleep(400);
+//    }
+//  }
+//
+//  return retVal;
+//}
 
 
 
