@@ -85,10 +85,7 @@ int main(int argc, char **argv)
   int retVal = 0;
   int opt = 0;
   char action = 0;
-  int counter = 0;
-  char *tempPtr = NULL;
-  FILE *fileHandle = NULL;
-
+  
   // Initialisation
   if (!InitializeCriticalSectionAndSpinCount(&gDBCritSection, 0x00000400) ||
     !InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400) ||
@@ -101,7 +98,7 @@ int main(int argc, char **argv)
 
   LogMsg(DBG_LOW, "main(): Starting %s", argv[0]);
   ZeroMemory(&gScanParams, sizeof(gScanParams));
-  strncpy(gScanParams.applicationName, argv[0], sizeof(gScanParams.applicationName));
+  strncpy(gScanParams.ApplicationName, argv[0], sizeof(gScanParams.ApplicationName));
   gARGV = argv;
 
   gSystemsList = InitSystemList();
@@ -109,32 +106,47 @@ int main(int argc, char **argv)
   gHostsList = InitHostsList();
   gHttpInjectionList = InitHttpInjectionList();
 
-
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
   {
     switch (opt)
     {
     case 'd':
-      strncpy((char *)gScanParams.interfaceName, optarg, sizeof(gScanParams.interfaceName));
-      GetInterfaceName(optarg, (char *)gScanParams.interfaceName, sizeof(gScanParams.interfaceName) - 1);
-      GetInterfaceDetails(optarg, &gScanParams);
+      if (argc == 3)
+      {
+        strncpy((char *)gScanParams.InterfaceName, optarg, sizeof(gScanParams.InterfaceName));
+        GetInterfaceName(optarg, (char *)gScanParams.InterfaceName, sizeof(gScanParams.InterfaceName) - 1);
+        GetInterfaceDetails(optarg, &gScanParams);
+      }
       break;
     case 'l':
-      action = 'l';
+      if (argc == 2)
+      {
+        action = 'l';
+      }
       break;
     case 'x':
-      action = 'x';
-      strncpy(gScanParams.interfaceName, optarg, sizeof(gScanParams.interfaceName) - 1);
-      GetInterfaceName(optarg, (char *)gScanParams.interfaceName, sizeof(gScanParams.interfaceName) - 1);
-      GetInterfaceDetails(optarg, &gScanParams);
+      if (argc == 3)
+      {
+        action = 'x';
+        strncpy(gScanParams.InterfaceName, optarg, sizeof(gScanParams.InterfaceName) - 1);
+        GetInterfaceName(optarg, (char *)gScanParams.InterfaceName, sizeof(gScanParams.InterfaceName) - 1);
+        GetInterfaceDetails(optarg, &gScanParams);
+      }
       break;
     case 'f':
-      action = 'f';
-      strncpy(gScanParams.PcapFilePath, argv[2], sizeof(gScanParams.PcapFilePath) - 1);
+      if (argc == 4)
+      {
+        action = 'f';
+        strncpy(gScanParams.PcapFilePath, argv[3], sizeof(gScanParams.PcapFilePath) - 1);
+        strncpy(gScanParams.InterfaceName, optarg, sizeof(gScanParams.InterfaceName) - 1);
+        GetInterfaceName(optarg, (char *)gScanParams.InterfaceName, sizeof(gScanParams.InterfaceName) - 1);
+        GetInterfaceDetails(optarg, &gScanParams);
+      }
       break;
     }
   }
+
 
   // List all interfaces
   if (action == 'l')
@@ -145,15 +157,16 @@ int main(int argc, char **argv)
 
   // ARP depoisening
   }
-  else if (argc == 3 && action == 'd')
+  else if (action == 'd')
   {
     InitializeDePoisoning();
 
   // Process data from pcap data dump file
   }
-  else if (argc >= 3 && action == 'f')
+  else if (action == 'f')
   {
-    LogMsg(2, "main(): -f %s \n", gScanParams.interfaceName);
+    LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
+//
     InitializeParsePcapDumpFile();
 
 
@@ -164,7 +177,7 @@ int main(int argc, char **argv)
   //  - DNS poisoning 
   //  - forwarding data packets
   }
-  else if (argc >= 3 && action == 'x')
+  else if (action == 'x')
   {
     InitializeMITM();
   }
@@ -195,7 +208,7 @@ void PrintUsage(char *pAppName)
   printf("List all interfaces               :  %s -l\n", pAppName);
   printf("Start poisoning and forwarding    :  %s -x IFC-Name\n", pAppName);
   printf("Start depoisoning target systems  :  %s -d IFC-Name\n", pAppName);
-  printf("Parse packets from pcap file      :  %s -f datadump.pcap\n", pAppName);
+  printf("Parse packets from pcap file      :  %s -f IFC-Name datadump.pcap\n", pAppName);
   printf("\n\n\nAdd the ARP cache poisoning target system IP and MAC addresses \nto the file .targethosts\n\n");
   printf("192.168.0.58,00:1B:77:53:5C:F8\n");
   printf("192.168.0.59,00:3A:21:3C:11:27\n");
@@ -280,12 +293,12 @@ BOOL APE_ControlHandler(DWORD pControlType)
 
 void PrintConfig(SCANPARAMS scanParamsParam)
 {
-  printf("Local IP :\t%d.%d.%d.%d\n", scanParamsParam.localIpBin[0], scanParamsParam.localIpBin[1], scanParamsParam.localIpBin[2], scanParamsParam.localIpBin[3]);
-  printf("Local MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.localMacBin[0], scanParamsParam.localMacBin[1], scanParamsParam.localMacBin[2],
-    scanParamsParam.localMacBin[3], scanParamsParam.localMacBin[4], scanParamsParam.localMacBin[5]);
-  printf("GW MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.gatewayMacBin[0], scanParamsParam.gatewayMacBin[1], scanParamsParam.gatewayMacBin[2],
-    scanParamsParam.gatewayMacBin[3], scanParamsParam.gatewayMacBin[4], scanParamsParam.gatewayMacBin[5]);
-  printf("GW IP :\t\t%d.%d.%d.%d\n", scanParamsParam.gatewayIpBin[0], scanParamsParam.gatewayIpBin[1], scanParamsParam.gatewayIpBin[2], scanParamsParam.gatewayIpBin[3]);
-  printf("Start IP :\t%d.%d.%d.%d\n", scanParamsParam.startIpBin[0], scanParamsParam.startIpBin[1], scanParamsParam.startIpBin[2], scanParamsParam.startIpBin[3]);
-  printf("Stop IP :\t%d.%d.%d.%d\n", scanParamsParam.stopIpBin[0], scanParamsParam.stopIpBin[1], scanParamsParam.stopIpBin[2], scanParamsParam.stopIpBin[3]);
+  printf("Local IP :\t%d.%d.%d.%d\n", scanParamsParam.LocalIpBin[0], scanParamsParam.LocalIpBin[1], scanParamsParam.LocalIpBin[2], scanParamsParam.LocalIpBin[3]);
+  printf("Local MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.LocalMacBin[0], scanParamsParam.LocalMacBin[1], scanParamsParam.LocalMacBin[2],
+    scanParamsParam.LocalMacBin[3], scanParamsParam.LocalMacBin[4], scanParamsParam.LocalMacBin[5]);
+  printf("GW MAC :\t%02hhX-%02hhX-%02hhX-%02hhX-%02hhX-%02hhX\n", scanParamsParam.GatewayMacBin[0], scanParamsParam.GatewayMacBin[1], scanParamsParam.GatewayMacBin[2],
+    scanParamsParam.GatewayMacBin[3], scanParamsParam.GatewayMacBin[4], scanParamsParam.GatewayMacBin[5]);
+  printf("GW IP :\t\t%d.%d.%d.%d\n", scanParamsParam.GatewayIpBin[0], scanParamsParam.GatewayIpBin[1], scanParamsParam.GatewayIpBin[2], scanParamsParam.GatewayIpBin[3]);
+  printf("Start IP :\t%d.%d.%d.%d\n", scanParamsParam.StartIpBin[0], scanParamsParam.StartIpBin[1], scanParamsParam.StartIpBin[2], scanParamsParam.StartIpBin[3]);
+  printf("Stop IP :\t%d.%d.%d.%d\n", scanParamsParam.StopIpBin[0], scanParamsParam.StopIpBin[1], scanParamsParam.StopIpBin[2], scanParamsParam.StopIpBin[3]);
 }

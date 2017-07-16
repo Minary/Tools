@@ -96,7 +96,7 @@ typedef struct SCANPARAMS
   unsigned char LocalIPStr[MAX_IP_LEN];
   unsigned char LocalMAC[BIN_MAC_LEN];
   unsigned char LocalMACStr[MAX_MAC_LEN];
-  unsigned char *PCAPPattern;
+  unsigned char *PcapPattern;
   unsigned char OutputPipeName[MAX_BUF_SIZE + 1];
   HANDLE PipeHandle;
   void *IfcReadHandle;  // HACK! because of header hell :/

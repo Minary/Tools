@@ -1,8 +1,9 @@
 #pragma once
 
-#include <windows.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <windows.h>
+
 #include "NetworkPackets.h"
 
 
@@ -68,29 +69,31 @@ typedef struct
 
 typedef struct SCANPARAMS
 {
-  unsigned char applicationName[MAX_BUF_SIZE + 1];
-  unsigned char interfaceName[MAX_BUF_SIZE + 1];
-  unsigned char interfaceAlias[MAX_BUF_SIZE + 1];
-  unsigned char interfaceDescr[MAX_BUF_SIZE + 1];
-  int index;
-  unsigned char gatewayIpBin[BIN_IP_LEN];
-  unsigned char gatewayIpStr[MAX_IP_LEN];
-  unsigned char gatewayMacBin[BIN_MAC_LEN];
-  unsigned char gatewayMacStr[MAX_MAC_LEN];
-  unsigned char startIpBin[BIN_IP_LEN];
-  unsigned long startIpNum;
-  unsigned char stopIpBin[BIN_IP_LEN];
-  unsigned long stopIpNum;
-  unsigned char localIpBin[BIN_IP_LEN];
-  unsigned char localIpStr[MAX_IP_LEN];
-  unsigned char localMacBin[BIN_MAC_LEN];
-  unsigned char localMacStr[MAX_MAC_LEN];
-  unsigned char *PCAPPattern;
+  unsigned char ApplicationName[MAX_BUF_SIZE + 1];
+  unsigned char InterfaceName[MAX_BUF_SIZE + 1];
+  unsigned char InterfaceAlias[MAX_BUF_SIZE + 1];
+  unsigned char InterfaceDescr[MAX_BUF_SIZE + 1];
+  int Index;
+  unsigned char GatewayIpBin[BIN_IP_LEN];
+  unsigned char GatewayIpStr[MAX_IP_LEN];
+  unsigned char GatewayMacBin[BIN_MAC_LEN];
+  unsigned char GatewayMacStr[MAX_MAC_LEN];
+  unsigned char StartIpBin[BIN_IP_LEN];
+  unsigned long StartIpNum;
+  unsigned char StopIpBin[BIN_IP_LEN];
+  unsigned long StopIpNum;
+  unsigned char LocalIpBin[BIN_IP_LEN];
+  unsigned char LocalIpStr[MAX_IP_LEN];
+  unsigned char LocalMacBin[BIN_MAC_LEN];
+  unsigned char LocalMacStr[MAX_MAC_LEN];
+  unsigned char *PcapPattern;
   unsigned char OutputPipeName[MAX_BUF_SIZE + 1];
   unsigned char PcapFilePath[MAX_BUF_SIZE + 1];
   HANDLE PipeHandle;
-  void *interfaceReadHandle;  // HACK! because of header hell :/
-  void *interfaceWriteHandle; // HACK! because of header hell :/
+  void *InterfaceReadHandle;  // HACK! because of header hell :/ Anyone?
+  void *InterfaceWriteHandle; // HACK! because of header hell :/ Anyone?
+
+  void *PcapFileHandle; // HACK! because of header hell :/ Anyone?
 } SCANPARAMS, *PSCANPARAMS;
 
 
