@@ -13,7 +13,7 @@
 #include "APE.h"
 #include "PacketProxy.h"
 #include "LinkedListSystems.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 
 
 
@@ -35,7 +35,6 @@ void IpBin2String(unsigned char ipAddrParam[BIN_IP_LEN], unsigned char *outputPa
 }
 
 
-
 void MacString2Bin(unsigned char macAddrParam[BIN_MAC_LEN], unsigned char *inputParam, int inputLengthParam)
 {
   if (inputParam != NULL && inputLengthParam > 0 && macAddrParam != NULL)
@@ -46,7 +45,6 @@ void MacString2Bin(unsigned char macAddrParam[BIN_MAC_LEN], unsigned char *input
     }
   }
 }
-
 
 
 int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, int inputLengthParam)
@@ -81,7 +79,6 @@ int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, i
 }
 
 
-
 int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLengthParam)
 {
   int retVal = NOK;
@@ -103,7 +100,6 @@ int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLeng
 
   return retVal;
 }
-
 
 
 void SetMacStatic(char *ifcAliasParam, char *ipAddrParam, char *macAddrParam)
@@ -147,7 +143,6 @@ END:
 }
 
 
-
 void RemoveMacFromCache(char *ifcAliasParam, char *ipAddrParam)
 {
   char tempBuffer[MAX_BUF_SIZE + 1];
@@ -165,7 +160,6 @@ void RemoveMacFromCache(char *ifcAliasParam, char *ipAddrParam)
   snprintf(tempBuffer, sizeof(tempBuffer) - 1, "arp -d %s", ipAddrParam);
   ExecCommand(tempBuffer);
 }
-
 
 
 void DumpPacket(unsigned char *pktDataParam, int pktLengthParam, char *titleStringParam, const struct pcap_pkthdr *pktHdrParam)
@@ -348,5 +342,37 @@ void DumpPacket(unsigned char *pktDataParam, int pktLengthParam, char *titleStri
   {
     printf("OOOPS Protocol is %x\n", ethrHdrPtr->ether_type);
   }
+}
+
+
+unsigned short in_cksum(unsigned short *addr, int length)
+{
+  register int sum = 0;
+  register unsigned short *w = addr;
+  register int numLeft = length;
+  unsigned short checkSum = 0;
+
+  // using a 32 bit accumulator (sum), u16_add sequential 16 bit words to it, 
+  // and at the end, fold back all the carry bits from the top 16 bits into
+  // the lower 16 bits.
+  while (numLeft > 1)
+  {
+    sum += *w++;
+    numLeft -= 2;
+  }
+
+  //handle odd byte
+  if (numLeft == 1)
+  {
+    *(unsigned char *)(&checkSum) = *(unsigned char *)w;
+    sum += checkSum;
+  }
+
+  // u16_add back carry outs from top 16 bits to low 16 bits 
+  sum = (sum >> 16) + (sum & 0xffff);    // u16_add high 16 to low 16 
+  sum += (sum >> 16);                     // u16_add carry 
+  checkSum = ~sum;                        // truncate to 16 bits
+
+  return checkSum;
 }
 

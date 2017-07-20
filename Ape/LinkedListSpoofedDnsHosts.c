@@ -39,8 +39,8 @@ void AddSpoofedIpToList(PPHOSTNODE hostNodesParam, unsigned char *hostNameParam,
 
   if ((tmpNode = (PHOSTNODE) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HOSTNODE))) != NULL)
   {
-    CopyMemory(tmpNode->sData.HostName, hostNameParam, sizeof(tmpNode->sData.HostName)-1);
-    CopyMemory(tmpNode->sData.SpoofedIP, spoofedIpParam, sizeof(tmpNode->sData.SpoofedIP)-1);
+    CopyMemory(tmpNode->HostData.HostName, hostNameParam, sizeof(tmpNode->HostData.HostName)-1);
+    CopyMemory(tmpNode->HostData.SpoofedIP, spoofedIpParam, sizeof(tmpNode->HostData.SpoofedIP)-1);
 
     tmpNode->prev = NULL;
     tmpNode->first = 0;
@@ -72,7 +72,7 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
   {
     if (tmpSys != NULL)
     {
-      if (!strncmp((char *)tmpSys->sData.HostName, (char *)hostnameParam, sizeof(tmpSys->sData.HostName) - 1))
+      if (!strncmp((char *)tmpSys->HostData.HostName, (char *)hostnameParam, sizeof(tmpSys->HostData.HostName) - 1))
       {
         retVal = tmpSys;
         break;

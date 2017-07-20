@@ -10,33 +10,10 @@
 #include "DnsStructs.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 
 
 extern PHOSTNODE gHostsList;
-
-
-
-
-//int DetermineSpoofingResponseData(PSCANPARAMS scanParams)
-//{
-//  int retVal = 0;
-//  PHOSTNODE hostTmp = NULL;
-//  HANDLE dnsResponseThreadHandle = INVALID_HANDLE_VALUE;
-//  DWORD dnsResponseThreadId = 0;
-//
-//  if ((dnsResponseThreadHandle = CreateThread(NULL, 0, DnsResponseSniffer, scanParams, 0, &dnsResponseThreadId)) != NULL)
-//  {
-//    // 1. Send DNS requests
-//    for (hostTmp = gHostsList; hostTmp != NULL && hostTmp->next != NULL; hostTmp = (PHOSTNODE)hostTmp->next)
-//    {
-//      Sleep(400);
-//    }
-//  }
-//
-//  return retVal;
-//}
-
 
 
 DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
@@ -163,9 +140,8 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
     urlTemp[counter] = 0;
     counter++;
 
-    printf("DNS: %s:%d -> %s:%d id:0x%04x, icount:%d ...\n", srcIp, srcPort, dstIp, dstPort, dnsHdr->id, counter);
+printf("DNS: %s:%d -> %s:%d id:0x%04x, icount:%d ...\n", srcIp, srcPort, dstIp, dstPort, dnsHdr->id, counter);
   }
-
 
 END:
 
@@ -177,82 +153,13 @@ END:
   return retVal;
 }
 
-
-void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
-{
-  PETHDR ethrHdr = (PETHDR)dataParam;
-  PIPHDR ipHdr = NULL;
-  PUDPHDR udpHdr = NULL;
-  int ipHdrLen = 0;
-  char *data = NULL;
-  char *dnsData = NULL;
-  PHOSTNODE retVal = NULL;
-  PHOSTNODE tmpNode = NULL;
-  PDNS_HEADER dnsHdr = NULL;
-  unsigned char *reader = NULL;
-  int stop;
-  unsigned char *peerName = NULL;
-
-
-  if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
-  {
-    return retVal;
-  }
-
-  ipHdr = (PIPHDR)(dataParam + 14);
-  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
-  {
-    return retVal;
-  }
-
-  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
-  if (ipHdrLen <= 0)
-  {
-    return retVal;
-  }
-
-  udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-  if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
-  {
-    return retVal;
-  }
-
-  dnsData = ((char*)udpHdr + sizeof(UDPHDR));
-  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
-  {
-    return retVal;
-  }
-
-  if (ntohs(dnsHdr->q_count) <= 0)
-  {
-    return retVal;
-  }
-
-  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
-  stop = 0;
-
-  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) != NULL)
-  {
-    if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
-    {
-      retVal = tmpNode;
-    }
-
-    HeapFree(GetProcessHeap(), 0, peerName);
-  }
-
-  return retVal;
-}
-
-
 int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
 {
   int retVal = OK;
   PETHDR etherHdrPtr = NULL;
   PIPHDR ipHdrPtr = NULL;     // ip header
-  PUDPHDR udpHdrPtr = NULL;   // udp header
-                              //PDNS_HDR dnsHdrPtr = NULL;  // dns header
-  PDNS_HEADER dnsHdrPtr = NULL;
+  PUDPHDR udpHdrPtr = NULL;   // udp header                              
+  PDNS_HEADER dnsHdrPtr = NULL; // dns header
   char *data = NULL;
   int ipHdrLength = 0;
   int dataLength = 0;

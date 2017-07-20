@@ -8,7 +8,7 @@
 #include "LinkedListSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "Logging.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 #include "PacketProxy.h"
 
 
@@ -96,7 +96,7 @@ void InitializeMITM()
   }
 
   // 2. Start POISONING the ARP caches.
-  if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, StartArpPoisoning, &gScanParams, 0, &gPOISONINGThreadID)) == NULL)
+  if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL)
   {
     LogMsg(DBG_ERROR, "main(): Can't start NetworkScanner thread : %d", GetLastError());
     goto END;

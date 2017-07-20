@@ -6,9 +6,7 @@
 #include "DnsHelper.h"
 #include "DnsStructs.h"
 #include "LinkedListSpoofedDnsHosts.h"
-#include "NetworkPackets.h"
-
-extern PHOSTNODE gHostsList;
+#include "NetworkStructs.h"
 
 
 // convert 3www6google3com0 to www.google.com\0
@@ -88,87 +86,5 @@ void ChangeTextToDnsNameFormat(unsigned char* dns, unsigned char* host)
   }
 
   *dns++ = '\0';
-}
-
-
-
-void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
-{
-  PETHDR ethrHdr = (PETHDR)dataParam;
-  PIPHDR ipHdr = NULL;
-  PUDPHDR updHdr = NULL;
-  int ipHdrLen = 0;
-  char *data = NULL;
-  char *dnsData = NULL;
-  PHOSTNODE retVal = NULL;
-  PHOSTNODE tmpNode = NULL;
-  PDNS_HEADER dnsHdr = NULL;
-  unsigned char *reader = NULL;
-  int stop;
-  unsigned char *peerName = NULL;
-
-
-printf("DnsRequestPoisonerGetHost2Spoof(): Start\n");
-  if (gHostsList->next == NULL || ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
-  {
-    return retVal;
-  }
-
-printf("DnsRequestPoisonerGetHost2Spoof(0): \n");
-  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
-
-  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
-  {
-    return retVal;
-  }
-
-  printf("DnsRequestPoisonerGetHost2Spoof(1.0): \n");
-  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
-  printf("DnsRequestPoisonerGetHost2Spoof(1.1): ipHdrLen=%d\n", ipHdrLen);
-
-  if (ipHdrLen <= 0)
-  {
-    return retVal;
-  }
-  
-printf("DnsRequestPoisonerGetHost2Spoof(2): \n");
-  updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-
-  if (updHdr == NULL || updHdr->ulen <= 0 || ntohs(updHdr->dport) != 53)
-  {
-    return retVal;
-  }
-  
-printf("DnsRequestPoisonerGetHost2Spoof(3): \n");
-  dnsData = ((char*)updHdr + sizeof(UDPHDR));
-
-  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
-  {
-    return retVal;
-  }
-  
-printf("DnsRequestPoisonerGetHost2Spoof(4): \n");
-  if (ntohs(dnsHdr->q_count) <= 0)
-  {
-    return retVal;
-  }
-
-  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
-  stop = 0;
-  
-printf("DnsRequestPoisonerGetHost2Spoof(5): \n");
-  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) != NULL)
-  {
-printf("DnsRequestPoisonerGetHost2Spoof(5.1): peerName=%s\n", peerName);
-    if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
-    {
-printf("DnsRequestPoisonerGetHost2Spoof(5.2): \n");
-      retVal = tmpNode;
-    }
-
-    HeapFree(GetProcessHeap(), 0, peerName);
-  }
-
-  return retVal;
 }
 

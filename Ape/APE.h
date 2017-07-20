@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <windows.h>
 
-#include "NetworkPackets.h"
+#include "NetworkStructs.h"
 
 
 #define APE_VERSION "0.15"

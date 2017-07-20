@@ -56,7 +56,7 @@ typedef struct
   unsigned short flags_fo;       // Flags (3 bits) + Fragment offset (13 bits)
   unsigned char  ttl;            // Time to live
   unsigned char  proto;          // Protocol
-  unsigned short crc;            // Header checksum
+  unsigned short checksum;            // Header checksum
   IPADDRESS      saddr;          // Source address
   IPADDRESS      daddr;          // Destination address
 } IPHDR, *PIPHDR;
@@ -96,7 +96,7 @@ typedef struct  //1060 bytes
   unsigned short tcp_len;  // 2 bytes     ->   12 bytes
   TCPHDR tcp;              // 20 bytes    ->   32 bytes 
   char payload[1025];      // 1025 bytes  -> 1057 bytes
-} PSEUDOHDR, *PPSEUDOHDR;  // 1060
+} PSEUDO_TCP_HDR, *PPSEUDO_TCP_HDR;  // 1060
 #pragma pack(pop)
 
 
@@ -105,7 +105,7 @@ typedef struct
   unsigned short sport;/*Source port */
   unsigned short dport;/*Destination port */
   unsigned short ulen;/*UDP length */
-  unsigned short sum; /*UDP checksum */
+  unsigned short checksum; /*UDP checksum */
 } UDPHDR, *PUDPHDR;
 
 
