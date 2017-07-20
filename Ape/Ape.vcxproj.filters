@@ -21,16 +21,10 @@
     <ClCompile Include="LinkedListSystems.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
-    <ClCompile Include="ArpDepoisoning.c">
-      <Filter>Source files\ArpPoisoning</Filter>
-    </ClCompile>
     <ClCompile Include="ArpPoisoning.c">
       <Filter>Source files\ArpPoisoning</Filter>
     </ClCompile>
     <ClCompile Include="Interface.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkFunctions.c">
       <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="PacketProxy.c">
@@ -41,9 +35,6 @@
     </ClCompile>
     <ClCompile Include="DnsForge.c">
       <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkPackets.c">
-      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="DnsRequestSpoofing.c">
       <Filter>Source files\DnsPoisoning</Filter>
@@ -63,8 +54,11 @@
     <ClCompile Include="Logging.c">
       <Filter>Source files\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="Config.cpp">
+    <ClCompile Include="Config.c">
       <Filter>Source files</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkHelperFunctions.c">
+      <Filter>Source files\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,9 +69,6 @@
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="Interface.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetworkFunctions.h">
       <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="PacketProxy.h">
@@ -113,9 +104,6 @@
     <ClInclude Include="ArpPoisoning.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkPackets.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="DnsRequestSpoofing.h">
       <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
@@ -136,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkStructs.h">
+      <Filter>Header files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkHelperFunctions.h">
+      <Filter>Header files\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +168,12 @@
     </Filter>
     <Filter Include="Header files\Modes">
       <UniqueIdentifier>{6fce116e-f826-4984-b88f-0ac7779bd073}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Network">
+      <UniqueIdentifier>{0ca1477f-69ca-4ac5-b1c0-62091eab2dc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files\Network">
+      <UniqueIdentifier>{078d708a-53c7-40a7-8124-942e3adb7370}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

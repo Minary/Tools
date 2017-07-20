@@ -9,7 +9,7 @@
 #include "LinkedListFirewallRules.h"
 #include "Logging.h"
 #include "ModePcap.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 #include "PacketProxy.h"
 
 
@@ -41,7 +41,6 @@ int InitializeParsePcapDumpFile()
 
   // Set GW IP static.
   SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)gScanParams.GatewayIpStr, (char *)gScanParams.GatewayMacStr);
-
   if (gDEBUGLEVEL > DBG_INFO)
   {
     PrintConfig(gScanParams);

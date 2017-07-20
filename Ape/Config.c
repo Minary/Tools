@@ -7,7 +7,7 @@
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSystems.h"
 #include "Logging.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 
 
 

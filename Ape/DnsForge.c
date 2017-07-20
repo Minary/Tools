@@ -88,7 +88,7 @@ PR_DATA Add_R_DATA(unsigned char *dataBuffer, PR_DATA responseHeader, unsigned i
 {
   PR_DATA responseDataPtr = NULL;
 
-  responseHeader->ttl = htons(0x011d);
+  responseHeader->ttl = htonl(0x0000011d);
   responseHeader->type = htons(TYPE_A);
   responseHeader->_class = htons(0x01);
   responseHeader->data_len = htons(0x0004);
@@ -164,10 +164,12 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
 
   // 1.1 DNS_HEADER
   requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_HEADER(responseBuffer, &requestHeaderData, &offset);
-  requestHeaderDataPtr->id = htons(transactionId);
+  requestHeaderDataPtr->id = transactionId;
   requestHeaderDataPtr->qr = 1; // this is a response
   requestHeaderDataPtr->ans_count = htons(1); // there is one answer
   
+  requestHeaderDataPtr->ra = 1;
+
   // 1.2 DNS host name
   dnsHostName = Add_DnsHost(responseBuffer, reqHostName, &offset);
   
@@ -215,9 +217,10 @@ PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short
 
   // 1.1 DNS_HEADER
   requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_HEADER(responseBuffer, &requestHeaderData, &offset);
-  requestHeaderDataPtr->id = htons(transactionId);
+  requestHeaderDataPtr->id = transactionId;
   requestHeaderDataPtr->qr = 1; // response
   requestHeaderDataPtr->ans_count = htons(2); // Two answers. CNAME and A
+  requestHeaderDataPtr->ra = 1;
 
   // 1.2 DNS host name
   dnsHostName = Add_DnsHost(responseBuffer, reqHostName, &offset);

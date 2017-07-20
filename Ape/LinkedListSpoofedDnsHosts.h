@@ -9,18 +9,16 @@ typedef struct
 {
   unsigned char HostName[MAX_BUF_SIZE + 1];
   unsigned char SpoofedIP[MAX_IP_LEN + 1];
-  void *DNSResponsePacket;
 } HOSTDATA;
 
 
 typedef struct 
 {
-  HOSTDATA sData;
+  HOSTDATA HostData;
   int first;
   struct HOSTNODE *prev;
   struct HOSTNODE *next;
 } HOSTNODE, *PHOSTNODE, **PPHOSTNODE;
-
 
 
 PHOSTNODE InitHostsList();

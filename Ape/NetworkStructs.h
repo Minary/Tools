@@ -53,7 +53,7 @@ typedef struct
   unsigned short flags_fo;       // Flags (3 bits) + Fragment offset (13 bits)
   unsigned char  ttl;            // Time to live
   unsigned char  proto;          // Protocol
-  unsigned short crc;            // Header checksum
+  unsigned short checksum;            // Header checksum
   IPADDRESS      saddr;          // Source address
   IPADDRESS      daddr;          // Destination address
 } IPHDR, *PIPHDR;
@@ -93,7 +93,7 @@ typedef struct  //1060 bytes
   unsigned short tcp_len;  // 2 bytes     ->   12 bytes
   TCPHDR tcp;              // 20 bytes    ->   32 bytes 
   char payload[1025];      // 1025 bytes  -> 1057 bytes
-} PSEUDOHDR, *PPSEUDOHDR;  // 1060
+} PSEUDO_TCP_HDR, *PPSEUDO_TCP_HDR;  // 1060
 #pragma pack(pop)
 
 
@@ -102,11 +102,23 @@ typedef struct
   unsigned short sport;/*Source port */
   unsigned short dport;/*Destination port */
   unsigned short ulen;/*UDP length */
-  unsigned short sum; /*UDP checksum */
+  unsigned short checksum; /*UDP checksum */
 } UDPHDR, *PUDPHDR;
 
 
-typedef struct icmpheader
+typedef struct 
+{
+  IPADDRESS saddr;
+  IPADDRESS daddr;
+  unsigned char unused;
+  unsigned char protocol;
+  unsigned short udplen;
+} UDP_PSEUDO_HDR, *PUDP_PSEUDO_HDR;
+
+
+
+
+typedef struct
 {
   unsigned char  type;
   unsigned char  code;
@@ -116,7 +128,7 @@ typedef struct icmpheader
   unsigned	short data;
 } ICMPHDR, *PICMPHDR;  
 
-typedef struct arphdr   
+typedef struct   
 {   
   unsigned short  htype;   // format of hardware address 
   unsigned short  ptype;   // format of protocol address
@@ -130,7 +142,7 @@ typedef struct arphdr
 } ARPHDR, *PARPHDR; 
 
 
-typedef struct pARPPacket
+typedef struct
 {
   char IFCName[1024];
   int lReqType;
@@ -142,10 +154,4 @@ typedef struct pARPPacket
   unsigned char ArpDstMacBin[BIN_MAC_LEN];
   unsigned char ArpDstIpBin[BIN_IP_LEN];
 } ArpPacket, *PArpPacket;
-
-
-
-//void GenerateUdpPacket(unsigned char * packet, unsigned short udpPacketLength, unsigned short srcPort, unsigned short dstPort);
-//unsigned short in_cksum(unsigned short * addr, int length);
-//DWORD WINAPI ForwardPackets(LPVOID lpParam);
 

@@ -10,7 +10,7 @@
 #include "LinkedListSystems.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 
 
 extern int gDEBUGLEVEL;
@@ -62,40 +62,36 @@ void WriteDepoisoningFile(void)
   FILE *fileHandle = NULL;
   char tempBuffer[MAX_BUF_SIZE + 1];
   char srcMacStr[MAX_BUF_SIZE + 1];
-  PSYSNODE systemListPtr = gSystemsList;
-
+  PSYSNODE systemListPtr = NULL;
 
   // Get a copy of all systems found in the network.
-  while (systemListPtr != NULL)
+  for (systemListPtr = gSystemsList;  systemListPtr != NULL; systemListPtr = systemListPtr->next)
   {
     ZeroMemory(srcMacStr, sizeof(srcMacStr));
     MacBin2String(systemListPtr->data.sysMacBin, (unsigned char *)srcMacStr, sizeof(srcMacStr));
-    LogMsg(DBG_INFO, "WriteDepoisoningFile(): %s/%s", systemListPtr->data.sysIpStr, srcMacStr);
 
     if (strnlen((char *)systemListPtr->data.sysIpStr, MAX_IP_LEN) > 0)
     {
+      LogMsg(DBG_INFO, "WriteDepoisoningFile(): %s/%s", systemListPtr->data.sysIpStr, srcMacStr);
       CopyMemory(systemList[numberSystems].sysIpStr, systemListPtr->data.sysIpStr, MAX_IP_LEN);
       CopyMemory(systemList[numberSystems].sysMacBin, systemListPtr->data.sysMacBin, BIN_MAC_LEN);
       numberSystems++;
-    }
-
-    systemListPtr = systemListPtr->next;
+    }    
   }
 
   // Depoison the victim systems
   if (numberSystems <= 0)
   {
-    return;
+    goto END;
   }
 
-  LogMsg(DBG_INFO, "WriteDepoisoningFile(): Depoison  %d systems", numberSystems);
+  LogMsg(DBG_INFO, "WriteDepoisoningFile(): Depoison %d systems", numberSystems);
   if ((fileHandle = fopen(FILE_UNPOISON, "w")) == NULL)
   {
-    return;
+    goto END;
   }
-  counter = 0;
-
-  while (counter < numberSystems && counter < MAX_SYSTEMS_COUNT)
+  
+  for (counter = 0; counter < numberSystems && counter < MAX_SYSTEMS_COUNT; counter++)
   {
     if (systemList[counter].sysIpStr != NULL && 
         strnlen((char *)systemList[counter].sysIpStr, MAX_IP_LEN) > 0 &&
@@ -107,11 +103,15 @@ void WriteDepoisoningFile(void)
 
       fprintf(fileHandle, "%s,%s\n", systemList[counter].sysIpStr, tempBuffer);
     }
-
-    counter++;
   }
 
-  fclose(fileHandle);
+END:
+
+  if (fileHandle != NULL)
+  {
+    fclose(fileHandle);
+  }
+
 }
 
 

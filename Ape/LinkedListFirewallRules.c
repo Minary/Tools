@@ -6,7 +6,7 @@
 
 
 #include "APE.h"
-#include "NetworkFunctions.h"
+#include "NetworkHelperFunctions.h"
 #include "LinkedListFirewallRules.h"
 
 extern CRITICAL_SECTION gCSFirewallRules;
