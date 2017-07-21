@@ -7,7 +7,7 @@
 
 #include "APE.h"
 #include "ArpPoisoning.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
 #include "NetworkHelperFunctions.h"
@@ -15,7 +15,7 @@
 
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
-extern PSYSNODE gSystemsList;
+extern PSYSNODE gTargetSystemsList;
 extern char **gARGV;
 
 
@@ -65,7 +65,7 @@ void WriteDepoisoningFile(void)
   PSYSNODE systemListPtr = NULL;
 
   // Get a copy of all systems found in the network.
-  for (systemListPtr = gSystemsList;  systemListPtr != NULL; systemListPtr = systemListPtr->next)
+  for (systemListPtr = gTargetSystemsList;  systemListPtr != NULL; systemListPtr = systemListPtr->next)
   {
     ZeroMemory(srcMacStr, sizeof(srcMacStr));
     MacBin2String(systemListPtr->data.sysMacBin, (unsigned char *)srcMacStr, sizeof(srcMacStr));

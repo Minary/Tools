@@ -16,7 +16,7 @@
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
-#include "ModeMITM.h"
+#include "ModeMitm.h"
 #include "ModePcap.h"
 #include "getopt.h"
 
@@ -40,8 +40,8 @@ extern char *optarg;
 CRITICAL_SECTION csSystemsLL;
 
 // Linked lists
-PSYSNODE gSystemsList = NULL;
-PHOSTNODE gHostsList = NULL;
+PSYSNODE gTargetSystemsList = NULL;
+PHOSTNODE gDnsSpoofingList = NULL;
 PRULENODE gFwRulesList = NULL;
 
 int gDEBUGLEVEL = DEBUG_LEVEL;
@@ -89,9 +89,9 @@ int main(int argc, char **argv)
   strncpy(gScanParams.ApplicationName, argv[0], sizeof(gScanParams.ApplicationName));
   gARGV = argv;
 
-  gSystemsList = InitSystemList();
+  gTargetSystemsList = InitSystemList();
   gFwRulesList = InitFirewallRules();
-  gHostsList = InitHostsList();
+  gDnsSpoofingList = InitHostsList();
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
@@ -156,6 +156,7 @@ int main(int argc, char **argv)
 
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
+    
     InitializeParsePcapDumpFile();
 
 
@@ -170,6 +171,7 @@ int main(int argc, char **argv)
   {
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
+
     InitializeMITM();
   }
   else

@@ -174,7 +174,7 @@ PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN
 *
 *
 */
-PSYSNODE GetNodeByMAC(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
+PSYSNODE GetNodeByMac(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
 {
   PSYSNODE retVal = NULL;
   PSYSNODE tempSys;

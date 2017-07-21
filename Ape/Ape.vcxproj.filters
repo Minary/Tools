@@ -15,9 +15,6 @@
     <ClCompile Include="LinkedListSpoofedDnsHosts.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
-    <ClCompile Include="LinkedListSystems.c">
-      <Filter>Source files\LinkedList</Filter>
-    </ClCompile>
     <ClCompile Include="ArpPoisoning.c">
       <Filter>Source files\ArpPoisoning</Filter>
     </ClCompile>
@@ -42,9 +39,6 @@
     <ClCompile Include="ModeDePoisoning.c">
       <Filter>Source files\Modes</Filter>
     </ClCompile>
-    <ClCompile Include="ModeMITM.c">
-      <Filter>Source files\Modes</Filter>
-    </ClCompile>
     <ClCompile Include="ModePcap.c">
       <Filter>Source files\Modes</Filter>
     </ClCompile>
@@ -56,6 +50,12 @@
     </ClCompile>
     <ClCompile Include="NetworkHelperFunctions.c">
       <Filter>Source files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeMitm.c">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListTargetSystems.c">
+      <Filter>Source files\LinkedList</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,9 +86,6 @@
     <ClInclude Include="DnsStructs.h">
       <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
-    <ClInclude Include="LinkedListSystems.h">
-      <Filter>Header files\LinkedList</Filter>
-    </ClInclude>
     <ClInclude Include="LinkedListFirewallRules.h">
       <Filter>Header files\LinkedList</Filter>
     </ClInclude>
@@ -113,9 +110,6 @@
     <ClInclude Include="ModeDePoisoning.h">
       <Filter>Header files\Modes</Filter>
     </ClInclude>
-    <ClInclude Include="ModeMITM.h">
-      <Filter>Header files\Modes</Filter>
-    </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Header files</Filter>
     </ClInclude>
@@ -124,6 +118,12 @@
     </ClInclude>
     <ClInclude Include="NetworkHelperFunctions.h">
       <Filter>Header files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListTargetSystems.h">
+      <Filter>Header files\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeMitm.h">
+      <Filter>Header files\Modes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@
 #include "NetworkHelperFunctions.h"
 
 
-extern PHOSTNODE gHostsList;
+extern PHOSTNODE gDnsSpoofingList;
 
 
 DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)

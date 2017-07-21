@@ -3,7 +3,8 @@
 #include <time.h>
 
 #include "APE.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
+#include "Logging.h"
 
 
 extern CRITICAL_SECTION csSystemsLL;
@@ -40,33 +41,33 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 
 PSYSNODE InitSystemList()
 {
-  PSYSNODE firstSysNode = NULL;
+  PSYSNODE listHead = NULL;
 
   EnterCriticalSection(&csSystemsLL);
-  if ((firstSysNode = (PSYSNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(SYSNODE))) != NULL)
+  if ((listHead = (PSYSNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(SYSNODE))) != NULL)
   {
-    firstSysNode->first = 1;
-    firstSysNode->next = NULL;
-    firstSysNode->prev = NULL;
+    listHead->isTail = TRUE;
+    listHead->next = NULL;
+    listHead->prev = NULL;
   }
 
   LeaveCriticalSection(&csSystemsLL);
 
-  return firstSysNode;
+  return listHead;
 }
 
 
 
-void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
+void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
 {
   PSYSNODE tmpNode = NULL;
   char tmpBuf[MAX_BUF_SIZE + 1];
-  char lSMAC[MAX_BUF_SIZE + 1];
+  char srcMac[MAX_BUF_SIZE + 1];
   struct tm *newTime;
   time_t clock;
 
   EnterCriticalSection(&csSystemsLL);
-  if (sysNodesParam == NULL || *sysNodesParam == NULL || sysMacParam == NULL || sysIpParam == NULL)
+  if (listHead == NULL || *listHead == NULL || sysMacParam == NULL || sysIpParam == NULL)
   {
     goto END;
   }
@@ -82,33 +83,33 @@ void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC
     tmpBuf[strlen(tmpBuf) - 1] = '\0';
   }
 
-  ZeroMemory(lSMAC, sizeof(lSMAC));
-  snprintf(lSMAC, sizeof(lSMAC) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", sysMacParam[0], sysMacParam[1], sysMacParam[2], sysMacParam[3], sysMacParam[4], sysMacParam[5]);
+  ZeroMemory(srcMac, sizeof(srcMac));
+  snprintf(srcMac, sizeof(srcMac) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", sysMacParam[0], sysMacParam[1], sysMacParam[2], sysMacParam[3], sysMacParam[4], sysMacParam[5]);
 
   // Entry already exists. Update IP and timestamp.
-  //    if ((lTmpNode = GetNodeByMAC(*pSysNodes, pSysMAC)) != NULL)
-  if ((tmpNode = GetNodeByIp(*sysNodesParam, sysIpBinParam)) != NULL)
+  if ((tmpNode = GetNodeByIp(*listHead, sysIpBinParam)) != NULL)
   {
     CopyMemory(tmpNode->data.TimeStamp, tmpBuf, sizeof(tmpBuf));
     CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);
     CopyMemory(tmpNode->data.sysIpBin, sysIpBinParam, BIN_IP_LEN);
 
-    // Entry doesn't exist. Create it.
+  // Entry doesn't exist. Create it.
   }
   else if ((tmpNode = (PSYSNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(SYSNODE))) != NULL)
   {
-    printf("AddToSystemsList():  New system found  %s/%s\n", lSMAC, sysIpParam);
+    LogMsg(DBG_INFO, "AddToSystemsList():  New target system added: %s/%s", srcMac, sysIpParam);
 
     CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);
     CopyMemory(tmpNode->data.sysMacBin, sysMacParam, BIN_MAC_LEN);
     CopyMemory(tmpNode->data.sysIpBin, sysIpBinParam, BIN_IP_LEN);
     CopyMemory(tmpNode->data.TimeStamp, tmpBuf, sizeof(tmpBuf));
 
+    // Set the new record at the head of the list
     tmpNode->prev = NULL;
-    tmpNode->first = 0;
-    tmpNode->next = *sysNodesParam;
-    ((PSYSNODE)*sysNodesParam)->prev = tmpNode;
-    *sysNodesParam = tmpNode;
+    tmpNode->isTail = FALSE;
+    tmpNode->next = *listHead;
+    ((PSYSNODE)*listHead)->prev = tmpNode;
+    *listHead = tmpNode;
   }
 
 END:
@@ -117,14 +118,14 @@ END:
 
 
 
-PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN])
+PSYSNODE GetNodeByIp(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
   PSYSNODE tmpSys;
   int count = 0;
 
   EnterCriticalSection(&csSystemsLL);
-  if ((tmpSys = sysNodesParam) == NULL)
+  if ((tmpSys = listHead) == NULL)
   {
     goto END;
   }
@@ -156,14 +157,14 @@ END:
 
 
 
-PSYSNODE GetNodeByMAC(PSYSNODE sysNodesParam, unsigned char macParam[BIN_MAC_LEN])
+PSYSNODE GetNodeByMac(PSYSNODE listHead, unsigned char macParam[BIN_MAC_LEN])
 {
   PSYSNODE retVal = NULL;
   PSYSNODE tmpSys;
   int count = 0;
 
   EnterCriticalSection(&csSystemsLL);
-  if (macParam == NULL || (tmpSys = sysNodesParam) == NULL)
+  if (macParam == NULL || (tmpSys = listHead) == NULL)
   {
     goto END;
   }
@@ -171,7 +172,6 @@ PSYSNODE GetNodeByMAC(PSYSNODE sysNodesParam, unsigned char macParam[BIN_MAC_LEN
   // Go to the end of the list
   for (count = 0; count < MAX_SYSTEMS_COUNT; count++)
   {
-
     if (tmpSys != NULL)
     {
       if (!memcmp(tmpSys->data.sysMacBin, macParam, BIN_MAC_LEN))
@@ -194,17 +194,14 @@ END:
 }
 
 
-
-int CountNodes(PSYSNODE sysNodesParam)
+void PrintTargetSystems(PSYSNODE listHead)
 {
-  int retVal = 0;
+  PSYSNODE listPos;
 
-  while (sysNodesParam != NULL)
+  for (listPos = listHead; listPos != NULL && listPos->isTail == FALSE; listPos = listPos->next)
   {
-    sysNodesParam = sysNodesParam->next;
-    retVal++;
+    LogMsg(DBG_DEBUG, "PrintTargetSystems(): Target system: %s / %02x-%02x-%02x-%02x-%02x-%02x", listPos->data.sysIpStr,
+      listPos->data.sysMacBin[0], listPos->data.sysMacBin[1], listPos->data.sysMacBin[2],
+      listPos->data.sysMacBin[3], listPos->data.sysMacBin[4], listPos->data.sysMacBin[5]);
   }
-
-  return retVal;
 }
-

@@ -5,8 +5,9 @@
 #include <windows.h>
 
 #include "APE.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
+#include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "ModePcap.h"
 #include "NetworkHelperFunctions.h"
@@ -15,7 +16,8 @@
 
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
-extern PSYSNODE gSystemsList;
+extern PSYSNODE gTargetSystemsList;
+extern PHOSTNODE gDnsSpoofingList;
 
 
 int InitializeParsePcapDumpFile()
@@ -47,7 +49,7 @@ int InitializeParsePcapDumpFile()
   }
 
   // 0 Add default GW to the gSystemsList
-  AddToSystemsList(&gSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
+  AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
 
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
@@ -61,6 +63,9 @@ int InitializeParsePcapDumpFile()
     printf("No target hosts were defined!\n");
     goto END;
   }
+
+  PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
+  PrintTargetSystems(gTargetSystemsList);
     
   WriteDepoisoningFile();
 

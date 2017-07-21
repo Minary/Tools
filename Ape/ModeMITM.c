@@ -5,8 +5,9 @@
 #include "APE.h"
 #include "ArpPoisoning.h"
 #include "DnsPoisoning.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
+#include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
 #include "PacketProxy.h"
@@ -14,7 +15,8 @@
 
 extern int gDEBUGLEVEL;
 extern RULENODE gFwRulesList;
-extern PSYSNODE gSystemsList;
+extern PSYSNODE gTargetSystemsList;
+extern PHOSTNODE gDnsSpoofingList;
 extern SCANPARAMS gScanParams;
 
 extern DWORD gRESENDThreadID;
@@ -38,11 +40,6 @@ extern HANDLE gPOISONINGThreadHandle;
 
 void InitializeMITM()
 {
-  unsigned char ipStr[MAX_IP_LEN];
-  unsigned char macStr[MAX_MAC_LEN];
-  unsigned char ipBin[BIN_IP_LEN];
-  unsigned char macBin[BIN_MAC_LEN];
-
   AdminCheck(gScanParams.ApplicationName);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
@@ -69,7 +66,7 @@ void InitializeMITM()
   }
 
   // 0 Add default GW to the gSystemsList
-  AddToSystemsList(&gSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
+  AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
   
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
@@ -84,6 +81,9 @@ void InitializeMITM()
     goto END;
   }
   
+  PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
+  PrintTargetSystems(gTargetSystemsList);
+
   WriteDepoisoningFile();
 
 

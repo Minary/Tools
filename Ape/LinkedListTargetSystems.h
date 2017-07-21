@@ -1,5 +1,6 @@
 #pragma once
 
+#include "APE.h"
 
 typedef struct 
 {
@@ -14,7 +15,7 @@ typedef struct SYSNODE
 {
   SYSDATA data;
 
-  int first;
+  BOOL isTail;
   struct SYSNODE *prev;
   struct SYSNODE *next;
 } SYSNODE, *PSYSNODE, **PPSYSNODE;
@@ -24,5 +25,5 @@ PSYSNODE InitSystemList();
 int GetListCopy(PSYSNODE pNodes, PSYSTEMNODE pSysArray);
 void AddToSystemsList(PPSYSNODE pSysNodes, unsigned char pSysMAC[BIN_MAC_LEN], char *pSysIP, unsigned char pSysIPBin[BIN_IP_LEN]);
 PSYSNODE GetNodeByIp(PSYSNODE pSysNodes, unsigned char pIPBin[BIN_IP_LEN]);
-PSYSNODE GetNodeByMAC(PSYSNODE pSysNodes, unsigned char pMAC[BIN_MAC_LEN]);
-int CountNodes(PSYSNODE pSysNodes);
+PSYSNODE GetNodeByMac(PSYSNODE pSysNodes, unsigned char pMAC[BIN_MAC_LEN]);
+void PrintTargetSystems(PSYSNODE listHead);
