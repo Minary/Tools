@@ -11,7 +11,7 @@
 #include "APE.h"
 #include "Config.h"
 #include "Interface.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
@@ -37,10 +37,7 @@ extern char *optarg;
  * Global variables
  *
  */
-CRITICAL_SECTION gDBCritSection;
 CRITICAL_SECTION csSystemsLL;
-CRITICAL_SECTION gCSOutputPipe;
-CRITICAL_SECTION gCSConnectionsList;
 
 // Linked lists
 PSYSNODE gSystemsList = NULL;
@@ -81,10 +78,7 @@ int main(int argc, char **argv)
   char action = 0;
 
   // Initialisation
-  if (!InitializeCriticalSectionAndSpinCount(&gDBCritSection, 0x00000400) ||
-    !InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400) ||
-    !InitializeCriticalSectionAndSpinCount(&gCSOutputPipe, 0x00000400) ||
-    !InitializeCriticalSectionAndSpinCount(&gCSConnectionsList, 0x00000400))
+  if (!InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400))
   {
     retVal = 1;
     goto END;
@@ -185,11 +179,7 @@ int main(int argc, char **argv)
 
 END:
 
-  DeleteCriticalSection(&gDBCritSection);
   DeleteCriticalSection(&csSystemsLL);
-  DeleteCriticalSection(&gCSOutputPipe);
-  DeleteCriticalSection(&gCSConnectionsList);
-
   LogMsg(DBG_LOW, "main(): Stopping %s", argv[0]);
 
   return retVal;
