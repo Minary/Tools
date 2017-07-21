@@ -15,7 +15,7 @@ extern int gDEBUGLEVEL;
 extern char gTempFilesDir[MAX_BUF_SIZE + 1];
 extern CRITICAL_SECTION gCSOutputPipe;
 extern PCONNODE gConnectionList;
-PSYSNODE gSystemsList;
+PSYSNODE gTargetSystemsList;
 
 SCANPARAMS gCurrentScanParams;
 HANDLE gOutputPipe = INVALID_HANDLE_VALUE;
@@ -218,7 +218,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   //
   if (memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) == 0 && ipHdrPtrParam->proto == IP_PROTO_TCP)
   {
-    readlDstSystem = GetNodeByIp(gSystemsList, ethrHdr->ether_dhost);
+    readlDstSystem = GetNodeByIp(gTargetSystemsList, ethrHdr->ether_dhost);
     Mac2String(ethrHdr->ether_dhost, dstMacStr, sizeof(dstMacStr) - 1);
 
     ZeroMemory(&system, sizeof(system));
@@ -247,7 +247,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   }
   else if (memcmp(&ipHdrPtrParam->saddr, scanParams.LocalIP, BIN_IP_LEN) != 0 && memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) != 0)
   {
-    readlDstSystem = GetNodeByIp(gSystemsList, ethrHdr->ether_dhost);
+    readlDstSystem = GetNodeByIp(gTargetSystemsList, ethrHdr->ether_dhost);
     {
       Mac2String(ethrHdr->ether_dhost, dstMacStr, sizeof(dstMacStr) - 1);
 

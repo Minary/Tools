@@ -4,10 +4,11 @@
 #include <windows.h>
 #include <Shlwapi.h>
 
-
 #include "APE.h"
 #include "NetworkHelperFunctions.h"
 #include "LinkedListFirewallRules.h"
+#include "Logging.h"
+
 
 extern CRITICAL_SECTION gCSFirewallRules;
 
@@ -15,33 +16,38 @@ extern CRITICAL_SECTION gCSFirewallRules;
 
 PRULENODE InitFirewallRules()
 {
-  PRULENODE firstSysNode = NULL;
+  PRULENODE listTail = NULL;
 
-  //  EnterCriticalSection(&gCSFirewallRules);
-  if ((firstSysNode = (PRULENODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RULENODE))) != NULL)
+  if ((listTail = (PRULENODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RULENODE))) != NULL)
   {
-    firstSysNode->first = 1;
-    firstSysNode->next = NULL;
-    firstSysNode->prev = NULL;
+    listTail->isTail = TRUE;
+    listTail->next = NULL;
+    listTail->prev = NULL;
   }
 
-  //  LeaveCriticalSection(&gCSFirewallRules);
-
-  return firstSysNode;
+  return listTail;
 }
 
 
 
-void AddRuleToList(PPRULENODE ruleNodesParam, PRULENODE newRuleNodeParam)
+void AddRuleToList(PPRULENODE listHead, PRULENODE newRule)
 {
-  if (newRuleNodeParam != NULL)
+  if (newRule == NULL)
   {
-    newRuleNodeParam->prev = NULL;
-    newRuleNodeParam->first = 0;
-    newRuleNodeParam->next = *ruleNodesParam;
-    ((PRULENODE)*ruleNodesParam)->prev = newRuleNodeParam;
-    *ruleNodesParam = newRuleNodeParam;
+    goto END;
   }
+
+  newRule->prev = NULL;
+  newRule->isTail = FALSE;
+  newRule->next = *listHead;
+
+  // Set the new record at the head of the list
+  ((PRULENODE)*listHead)->prev = newRule;
+  *listHead = newRule;
+
+END:
+
+  return;
 }
 
 
@@ -50,14 +56,11 @@ int FirewallRulesCountNodes(PRULENODE allConNodesParam)
 {
   int retVal = 0;
 
-//  EnterCriticalSection(&gCSFirewallRules);
   while (allConNodesParam != NULL)
   {
     allConNodesParam = allConNodesParam->next;
     retVal++;
   }
-  
-//  EnterCriticalSection(&gCSFirewallRules);
 
   return retVal;
 }
@@ -65,10 +68,14 @@ int FirewallRulesCountNodes(PRULENODE allConNodesParam)
 
 void PrintAllFirewallRulesNodes(PRULENODE allFirewallRuleNodes)
 {
-  while (allFirewallRuleNodes != NULL && allFirewallRuleNodes->first == 0)
+  PRULENODE tmpRule;
+
+  for (tmpRule = allFirewallRuleNodes; tmpRule != NULL && tmpRule->isTail == FALSE; tmpRule = tmpRule->next)
   {
-    printf("%s %s:(%d-%d) -> %s:(%d-%d)   %d\n", allFirewallRuleNodes->Protocol, allFirewallRuleNodes->SrcIPStr, allFirewallRuleNodes->SrcPortLower, allFirewallRuleNodes->SrcPortUpper, allFirewallRuleNodes->DstIPStr, allFirewallRuleNodes->DstPortLower, allFirewallRuleNodes->DstPortUpper, allFirewallRuleNodes->first);
-    allFirewallRuleNodes = allFirewallRuleNodes->next;
+    LogMsg(DBG_INFO, "AddToSystemsList():  %s %s:(%d-%d) -> %s:(%d-%d)   %d\n",
+      tmpRule->Protocol, tmpRule->SrcIPStr, tmpRule->SrcPortLower,
+      tmpRule->SrcPortUpper, tmpRule->DstIPStr, tmpRule->DstPortLower,
+      tmpRule->DstPortUpper, tmpRule->isTail);
   }
 }
 
@@ -84,28 +91,38 @@ PRULENODE FirewallBlockRuleMatch(PRULENODE firewallRuleNodesParam, char *protoco
     goto END;
   }
 
-  for (; firewallRuleNodesParam != NULL && firewallRuleNodesParam->first == 0; firewallRuleNodesParam = firewallRuleNodesParam->next)
+  for (; firewallRuleNodesParam != NULL && firewallRuleNodesParam->isTail == FALSE; firewallRuleNodesParam = firewallRuleNodesParam->next)
   {
     // 1. Protocol
     if (protocolParam != NULL && strncmp(protocolParam, firewallRuleNodesParam->Protocol, 4))
+    {
       continue;
+    }
 
     // 2. Source IP      
     if (firewallRuleNodesParam->SrcIPBin != 0 && srcIpParam != firewallRuleNodesParam->SrcIPBin)
+    {
       continue;
+    }
 
     // 3. Source port
 
     if ((firewallRuleNodesParam->SrcPortLower != 0 && firewallRuleNodesParam->SrcPortUpper != 0) && (srcPortParam < firewallRuleNodesParam->SrcPortLower || srcPortParam > firewallRuleNodesParam->SrcPortUpper))
+    {
       continue;
+    }
 
     // 4. Destination IP      
     if (firewallRuleNodesParam->DstIPBin != 0 && dstIpParam != firewallRuleNodesParam->DstIPBin)
+    {
       continue;
+    }
 
     // 5. Destination port      
     if ((firewallRuleNodesParam->DstPortLower != 0 && firewallRuleNodesParam->DstPortUpper != 0) && (dstPortParam < firewallRuleNodesParam->DstPortLower || dstPortParam > firewallRuleNodesParam->DstPortUpper))
+    {
       continue;
+    }
 
     retVal = firewallRuleNodesParam;
     break;

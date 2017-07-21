@@ -11,7 +11,7 @@
 #include "DnsHelper.h"
 #include "DnsRequestSpoofing.h"
 #include "DnsResponseSpoofing.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
@@ -19,7 +19,7 @@
 #include "PacketProxy.h"
 
 
-extern PSYSNODE gSystemsList;
+extern PSYSNODE gTargetSystemsList;
 extern PRULENODE gFwRulesList;
 
 
@@ -140,7 +140,7 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
 
   // Destination is victim system
   }
-  else if ((realDstSys = GetNodeByIp(gSystemsList, (unsigned char *) &packetInfo.ipHdr->daddr)) != NULL)
+  else if ((realDstSys = GetNodeByIp(gTargetSystemsList, (unsigned char *) &packetInfo.ipHdr->daddr)) != NULL)
   {
     ProcessData2Victim(&packetInfo, realDstSys, scanParams);
 

@@ -8,13 +8,13 @@
 
 #include "APE.h"
 #include "ArpPoisoning.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
 
 
 extern int gDEBUGLEVEL;
-extern PSYSNODE gSystemsList;
+extern PSYSNODE gTargetSystemsList;
 
 
 
@@ -54,7 +54,7 @@ DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
     LogMsg(DBG_LOW, "ArpPoisoningLoop(): ARP Poisoning round %d", roundCounter);
     ZeroMemory(systemList, sizeof(systemList));
 
-    if ((numberSystems = GetListCopy(gSystemsList, systemList)) > 0)
+    if ((numberSystems = GetListCopy(gTargetSystemsList, systemList)) > 0)
     {
       LogMsg(DBG_LOW, "ArpPoisoningLoop(): New ARP poisoning round with %d system(s)", numberSystems);
 

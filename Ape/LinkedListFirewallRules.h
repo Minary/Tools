@@ -7,15 +7,13 @@
  * Type declarations.
  *
  */
-//#pragma pack(push, 1)
+
 typedef struct RULENODESTRUCT
 {
-  int first;
+  BOOL isTail;
 
-//  char SrcIPBin[BIN_IP_LEN];
   unsigned long SrcIPBin;
   char SrcIPStr[MAX_IP_LEN + 1];
-//  char DstIPBin[BIN_IP_LEN];
   unsigned long DstIPBin;
   char DstIPStr[MAX_IP_LEN + 1];
 
@@ -29,12 +27,10 @@ typedef struct RULENODESTRUCT
   struct RULENODESTRUCT *prev;
   struct RULENODESTRUCT *next;
 } RULENODE, *PRULENODE, **PPRULENODE;
-//#pragma pack(pop)
 
 
 PRULENODE InitFirewallRules();
-void AddRuleToList(PPRULENODE pRuleNodes, PRULENODE pTmpRuleNode);
-//PRULENODE RuleNodeExists(PRULENODE allConNodesParam, char *nodeIdParam);
-int FirewallRulesCountNodes(PRULENODE allConNodesParam);
-void PrintAllFirewallRulesNodes(PRULENODE allFirewallRuleNodes);
-PRULENODE FirewallBlockRuleMatch(PRULENODE firewallRuleNodesParam, char *protocolParam, unsigned long srcIpParam, unsigned long dstIpParam, unsigned short srcPortParam, unsigned short dstPortParam);
+void AddRuleToList(PPRULENODE listHead, PRULENODE pTmpRuleNode);
+int FirewallRulesCountNodes(PRULENODE allConNodlistHeadesParam);
+void PrintAllFirewallRulesNodes(PRULENODE listHead);
+PRULENODE FirewallBlockRuleMatch(PRULENODE listHead, char *protocolParam, unsigned long srcIpParam, unsigned long dstIpParam, unsigned short srcPortParam, unsigned short dstPortParam);

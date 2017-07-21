@@ -165,11 +165,11 @@
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="ModeDePoisoning.h" />
-    <ClInclude Include="ModeMITM.h" />
+    <ClInclude Include="ModeMitm.h" />
     <ClInclude Include="ModePcap.h" />
     <ClInclude Include="NetworkStructs.h" />
     <ClInclude Include="Interface.h" />
-    <ClInclude Include="LinkedListSystems.h" />
+    <ClInclude Include="LinkedListTargetSystems.h" />
     <ClInclude Include="NetworkHelperFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
     <ClInclude Include="DnsRequestSpoofing.h" />
@@ -187,10 +187,10 @@
     <ClCompile Include="Interface.c" />
     <ClCompile Include="LinkedListFirewallRules.c" />
     <ClCompile Include="LinkedListSpoofedDnsHosts.c" />
-    <ClCompile Include="LinkedListSystems.c" />
+    <ClCompile Include="LinkedListTargetSystems.c" />
     <ClCompile Include="Logging.c" />
     <ClCompile Include="ModeDePoisoning.c" />
-    <ClCompile Include="ModeMITM.c" />
+    <ClCompile Include="ModeMitm.c" />
     <ClCompile Include="ModePcap.c" />
     <ClCompile Include="NetworkHelperFunctions.c" />
     <ClCompile Include="PacketProxy.c" />

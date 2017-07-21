@@ -5,15 +5,14 @@
 #include "APE.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "LinkedListFirewallRules.h"
-#include "LinkedListSystems.h"
+#include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
 
 
-
 extern PRULENODE gFwRulesList;
-extern PSYSNODE gSystemsList;
-extern PHOSTNODE gHostsList;
+extern PSYSNODE gTargetSystemsList;
+extern PHOSTNODE gDnsSpoofingList;
 
 
 void PrintConfig(SCANPARAMS scanParamsParam)
@@ -74,7 +73,7 @@ int ParseTargetHostsConfigFile(char *targetsFile)
       MacString2Bin(macBin, macStr, strnlen((char *)macStr, sizeof(macStr) - 1));
       IpString2Bin(ipBin, ipStr, strnlen((char *)ipStr, sizeof(ipStr) - 1));
 
-      AddToSystemsList(&gSystemsList, macBin, (char *)ipStr, ipBin);
+      AddToSystemsList(&gTargetSystemsList, macBin, (char *)ipStr, ipBin);
       retVal++;
       LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile(): New system added :  %s/%s", macStr, ipStr);
     }
@@ -224,14 +223,14 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
     {
       if (StrCmpI(responseType, "A") == 0)
       {
-        AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);        
+        AddSpoofedIpToList(&gDnsSpoofingList, hostname, spoofedIpAddr);        
       }
       else if (StrCmpI(responseType, "CNAME") == 0 &&
                StrChr(spoofedIpAddr, ',') != NULL)
       {
         strncpy(tmpLine, spoofedIpAddr, sizeof(tmpLine) - 1);
         sscanf(tmpLine, "%[^,],%s", spoofedIpAddr, cnameHost);
-        AddSpoofedCnameToList(&gHostsList, hostname, cnameHost, spoofedIpAddr);
+        AddSpoofedCnameToList(&gDnsSpoofingList, hostname, cnameHost, spoofedIpAddr);
       }
 
       retVal++;
@@ -251,9 +250,6 @@ END:
     fclose(fileHandle);
   }
 
-PrintDnsSpoofingRulesNodes(gHostsList);
-printf("ParseDnsPoisoningFile(): END\n");
-exit(0);
   return retVal;
 }
 

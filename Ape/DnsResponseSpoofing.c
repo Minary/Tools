@@ -12,7 +12,7 @@
 #include "NetworkStructs.h"
 
 
-extern PHOSTNODE gHostsList;
+extern PHOSTNODE gDnsSpoofingList;
 
 
 BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoofedIp, char *srcIp, char *dstIp, char *hostName)
@@ -178,7 +178,7 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
   int stop;
   unsigned char *peerName = NULL;
 
-  if (gHostsList->next == NULL || ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+  if (gDnsSpoofingList->next == NULL || ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
   {
     goto END;
   }
@@ -220,7 +220,7 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
     goto END;
   }
 
-  if ((tmpNode = GetNodeByHostname(gHostsList, peerName)) != NULL)
+  if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
   {
     retVal = tmpNode;
   }

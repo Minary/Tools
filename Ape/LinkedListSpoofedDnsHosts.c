@@ -24,7 +24,7 @@ PHOSTNODE InitHostsList()
 }
 
 
-void AddSpoofedIpToList(PPHOSTNODE hostListHead, unsigned char *hostNameParam, unsigned char *spoofedIpParam)
+void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
@@ -37,14 +37,14 @@ void AddSpoofedIpToList(PPHOSTNODE hostListHead, unsigned char *hostNameParam, u
     tmpNode->isTail = FALSE;
 
     // Insert new record at the beginning of the list
-    tmpNode->next = (PHOSTNODE) *hostListHead;
-    ((PHOSTNODE)*hostListHead)->prev = (PHOSTNODE) tmpNode;
-    *hostListHead = tmpNode;
+    tmpNode->next = (PHOSTNODE) *listHead;
+    ((PHOSTNODE)*listHead)->prev = (PHOSTNODE) tmpNode;
+    *listHead = tmpNode;
   }
 }
 
 
-void AddSpoofedCnameToList(PPHOSTNODE hostListHead, unsigned char *hostNameParam, unsigned char *cnameHost, unsigned char *spoofedIpParam)
+void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *cnameHost, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
@@ -58,9 +58,9 @@ void AddSpoofedCnameToList(PPHOSTNODE hostListHead, unsigned char *hostNameParam
     tmpNode->isTail = FALSE;
 
     // Insert new record at the beginning of the list
-    tmpNode->next = (PHOSTNODE) *hostListHead;
-    ((PHOSTNODE)*hostListHead)->prev = (PHOSTNODE) tmpNode;
-    *hostListHead = tmpNode;
+    tmpNode->next = (PHOSTNODE) *listHead;
+    ((PHOSTNODE)*listHead)->prev = (PHOSTNODE) tmpNode;
+    *listHead = tmpNode;
   }
 }
 
@@ -99,23 +99,23 @@ END:
 
 
 
-void PrintDnsSpoofingRulesNodes(PHOSTNODE dnsSpoofingNodesList)
+void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
 {
   PHOSTNODE listPos;
 
-  for (listPos = dnsSpoofingNodesList; listPos != NULL && listPos->isTail == FALSE; listPos = listPos->next)
+  for (listPos = listHead; listPos != NULL && listPos->isTail == FALSE; listPos = listPos->next)
   {
     if (listPos->HostData.type == RESP_A)
     {
-      printf("Type:A\t%s -> %s\n", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s -> %s", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
     }
     else if (listPos->HostData.type == RESP_CNAME)
     {
-      printf("Type:CNAME\t%s -> %s -> %s\n", listPos->HostData.HostName, listPos->HostData.CnameHost, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s -> %s -> %s", listPos->HostData.HostName, listPos->HostData.CnameHost, listPos->HostData.SpoofedIP);
     }
     else
     {
-      printf("INVALID\t%s -> %s\n", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): INVALID\t%s -> %s", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
     }
   }
 }
