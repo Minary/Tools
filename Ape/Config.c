@@ -62,6 +62,7 @@ int ParseTargetHostsConfigFile(char *targetsFile)
 
   while (fgets(tempLine, sizeof(tempLine), fileHandle) != NULL)
   {
+    // Remove trailing CR/LF
     while (tempLine[strlen(tempLine) - 1] == '\r' || tempLine[strlen(tempLine) - 1] == '\n')
     {
       tempLine[strlen(tempLine) - 1] = '\0';
@@ -133,7 +134,7 @@ int ParseFirewallConfigFile(char *firewallRulesFile)
     ZeroMemory(srcIpStr, sizeof(srcIpStr));
     ZeroMemory(dstIPStr, sizeof(dstIPStr));
 
-    // Remove all trailing NL/LF 
+    // Remove trailing CR/LF
     while (tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\r' || tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\n')
     {
       tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] = 0;
@@ -151,7 +152,6 @@ int ParseFirewallConfigFile(char *firewallRulesFile)
     }
 
     ZeroMemory(tempNode, sizeof(RULENODE));
-
     tempNode->DstIPBin = inet_addr(dstIPStr);
     strncpy(tempNode->DstIPStr, dstIPStr, sizeof(tempNode->DstIPStr) - 1);
     tempNode->DstPortLower = dstPortLower;
@@ -186,7 +186,9 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   FILE *fileHandle = NULL;
   char tmpLine[MAX_BUF_SIZE + 1];
   unsigned char hostname[MAX_BUF_SIZE + 1];
+  unsigned char responseType[MAX_BUF_SIZE + 1];
   unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
+  unsigned char cnameHost[MAX_BUF_SIZE + 1];
 
   if (configFileParam == NULL)
   {
@@ -206,25 +208,40 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   ZeroMemory(tmpLine, sizeof(tmpLine));
   ZeroMemory(hostname, sizeof(hostname));
   ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
+  ZeroMemory(responseType, sizeof(responseType));
+  ZeroMemory(cnameHost, sizeof(cnameHost));
 
   while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
   {
+    // Remove trailing CR/LF
     while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
     {
       tmpLine[strlen(tmpLine) - 1] = '\0';
     }
 
     // Parse values and add them to the list.
-    if (sscanf(tmpLine, "%[^,],%s", hostname, spoofedIpAddr) == 2)
+    if (sscanf(tmpLine, "%[^,],%[^,],%s", hostname, responseType, spoofedIpAddr) == 3)
     {
-      AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);
-      LogMsg(DBG_INFO, "ParseDnsPoisoningConfigFile(): Host:%s -> SpoofedIP:%s", hostname, spoofedIpAddr);
+      if (StrCmpI(responseType, "A") == 0)
+      {
+        AddSpoofedIpToList(&gHostsList, hostname, spoofedIpAddr);        
+      }
+      else if (StrCmpI(responseType, "CNAME") == 0 &&
+               StrChr(spoofedIpAddr, ',') != NULL)
+      {
+        strncpy(tmpLine, spoofedIpAddr, sizeof(tmpLine) - 1);
+        sscanf(tmpLine, "%[^,],%s", spoofedIpAddr, cnameHost);
+        AddSpoofedCnameToList(&gHostsList, hostname, cnameHost, spoofedIpAddr);
+      }
+
+      retVal++;
     }
 
-    retVal++;
     ZeroMemory(tmpLine, sizeof(tmpLine));
     ZeroMemory(hostname, sizeof(hostname));
     ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
+    ZeroMemory(responseType, sizeof(responseType));
+    ZeroMemory(cnameHost, sizeof(cnameHost));
   }
 
 END:
@@ -234,6 +251,9 @@ END:
     fclose(fileHandle);
   }
 
+PrintDnsSpoofingRulesNodes(gHostsList);
+printf("ParseDnsPoisoningFile(): END\n");
+exit(0);
   return retVal;
 }
 

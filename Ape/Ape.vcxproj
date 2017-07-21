@@ -163,7 +163,6 @@
     <ClInclude Include="getopt.h" />
     <ClInclude Include="LinkedListFirewallRules.h" />
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
-    <ClInclude Include="LinkedListHttpInjections.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="ModeDePoisoning.h" />
     <ClInclude Include="ModeMITM.h" />
@@ -188,7 +187,6 @@
     <ClCompile Include="Interface.c" />
     <ClCompile Include="LinkedListFirewallRules.c" />
     <ClCompile Include="LinkedListSpoofedDnsHosts.c" />
-    <ClCompile Include="LinkedListHttpInjections.c" />
     <ClCompile Include="LinkedListSystems.c" />
     <ClCompile Include="Logging.c" />
     <ClCompile Include="ModeDePoisoning.c" />

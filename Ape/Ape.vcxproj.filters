@@ -12,9 +12,6 @@
     <ClCompile Include="LinkedListFirewallRules.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
-    <ClCompile Include="LinkedListHttpInjections.c">
-      <Filter>Source files\LinkedList</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedListSpoofedDnsHosts.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
@@ -93,9 +90,6 @@
       <Filter>Header files\LinkedList</Filter>
     </ClInclude>
     <ClInclude Include="LinkedListFirewallRules.h">
-      <Filter>Header files\LinkedList</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkedListHttpInjections.h">
       <Filter>Header files\LinkedList</Filter>
     </ClInclude>
     <ClInclude Include="LinkedListSpoofedDnsHosts.h">
