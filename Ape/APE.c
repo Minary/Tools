@@ -46,7 +46,6 @@ CRITICAL_SECTION gCSConnectionsList;
 PSYSNODE gSystemsList = NULL;
 PHOSTNODE gHostsList = NULL;
 PRULENODE gFwRulesList = NULL;
-//PHTTPINJECTIONNODE gHttpInjectionList = NULL;
 
 int gDEBUGLEVEL = DEBUG_LEVEL;
 
@@ -99,7 +98,6 @@ int main(int argc, char **argv)
   gSystemsList = InitSystemList();
   gFwRulesList = InitFirewallRules();
   gHostsList = InitHostsList();
-//  gHttpInjectionList = InitHttpInjectionList();
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
@@ -150,13 +148,13 @@ int main(int argc, char **argv)
     goto END;
 
 
-    // ARP depoisening
+  // ARP depoisening
   }
   else if (action == 'd')
   {
     InitializeDePoisoning();
 
-    // Process data from pcap data dump file
+  // Process data from pcap data dump file
   }
   else if (action == 'f')
   {
@@ -168,11 +166,11 @@ int main(int argc, char **argv)
 
 
 
-    // Start ...
-    //  - ARP cache poisoning
-    //  - Firewall blocking
-    //  - DNS poisoning 
-    //  - forwarding data packets
+  // Start ...
+  //  - ARP cache poisoning
+  //  - Firewall blocking
+  //  - DNS poisoning 
+  //  - forwarding data packets
   }
   else if (action == 'x')
   {
