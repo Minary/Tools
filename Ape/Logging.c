@@ -24,7 +24,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   }
 
   if (fileHandle == INVALID_HANDLE_VALUE &&
-    (fileHandle = CreateFile(DBG_LOGFILE, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0)) == INVALID_HANDLE_VALUE)
+      (fileHandle = CreateFile(DBG_LOGFILE, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0)) == INVALID_HANDLE_VALUE)
   {
     goto END;
   }

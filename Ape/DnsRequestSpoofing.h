@@ -2,7 +2,8 @@
 
 #include <Windows.h>
 #include "DnsStructs.h"
+#include "LinkedListSpoofedDNSHosts.h"
 
-BOOL DnsRequestSpoofing(unsigned char * in_pPacket, pcap_t* device_descriptor, char *pSpoofedIP, char *pSourceIP, char *pDestIP, char *pHostName);
+BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp);
 void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseData);
 void *DnsRequestPoisonerGetHost2Spoof(u_char *pData);

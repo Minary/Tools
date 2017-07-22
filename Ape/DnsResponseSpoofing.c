@@ -36,6 +36,7 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *
     retVal = FALSE;
     goto END;
   }
+
   CopyMemory(spoofedDnsResponse, rawPacket, basePacketSize);
   CopyMemory(spoofedDnsResponse + basePacketSize, responseData->data, responseData->dataLength);
 
@@ -157,7 +158,7 @@ void FixNetworkLayerData4Response(unsigned char * data, PRAW_DNS_DATA responseDa
   ZeroMemory(dstIpStr, sizeof(dstIpStr));
   snprintf((char *)srcIpStr, sizeof(srcIpStr) - 1, "%i.%i.%i.%i", srcIpBin[0], srcIpBin[1], srcIpBin[2], srcIpBin[3]);
   snprintf((char *)dstIpStr, sizeof(dstIpStr) - 1, "%i.%i.%i.%i", dstIpBin[0], dstIpBin[1], dstIpBin[2], dstIpBin[3]);
-  LogMsg(DBG_LOW, "DnsResponseSpoofing(): %s:%d -> %s:%d udpDataLength=%d",
+  LogMsg(DBG_LOW, "FixNetworkLayerData4Response(): %s:%d -> %s:%d udpDataLength=%d",
     srcIpStr, ntohs(srcPort), dstIpStr, ntohs(dstPort), ntohs(udpHdr->ulen));
 }
 

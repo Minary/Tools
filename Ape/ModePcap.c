@@ -26,7 +26,6 @@ int InitializeParsePcapDumpFile()
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
   int retVal = -1;
-//  SCANPARAMS scanParams;
 
   printf("InitializeParsePcapDumpFile(0): Starting\n");
 
@@ -54,13 +53,13 @@ int InitializeParsePcapDumpFile()
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
-    printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+    fprintf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
     goto END;
   }
 
   if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
-    printf("No target hosts were defined!\n");
+    fprintf(stderr, "No target hosts were defined!\n");
     goto END;
   }
 
@@ -69,7 +68,7 @@ int InitializeParsePcapDumpFile()
     
   WriteDepoisoningFile();
 
-  LogMsg(2, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s\n", 
+  LogMsg(DBG_INFO, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s", 
     gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
   // Open Pcap input file
@@ -157,7 +156,6 @@ BOOL OpenPcapInterfaceHandle(PSCANPARAMS scanParams)
     goto END;
   }
 
-printf("OpenPcapInterfaceHandle(1): \n");
   ZeroMemory(adapter, sizeof(adapter));
   for (counter = 0, device = allDevices; device; device = device->next, counter++)
   {

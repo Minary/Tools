@@ -30,9 +30,9 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
 
   if ((tmpNode = (PHOSTNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HOSTNODE))) != NULL)
   {
-    CopyMemory(tmpNode->HostData.HostName, hostNameParam, sizeof(tmpNode->HostData.HostName) - 1);
-    CopyMemory(tmpNode->HostData.SpoofedIP, spoofedIpParam, sizeof(tmpNode->HostData.SpoofedIP) - 1);
-    tmpNode->HostData.type = RESP_A;
+    CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
+    CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
+    tmpNode->Data.Type = RESP_A;
     tmpNode->prev = NULL;
     tmpNode->isTail = FALSE;
 
@@ -44,16 +44,16 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
 }
 
 
-void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *cnameHost, unsigned char *spoofedIpParam)
+void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *cnameHostParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
   if ((tmpNode = (PHOSTNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HOSTNODE))) != NULL)
   {
-    CopyMemory(tmpNode->HostData.HostName, hostNameParam, sizeof(tmpNode->HostData.HostName) - 1);
-    CopyMemory(tmpNode->HostData.CnameHost, cnameHost, sizeof(tmpNode->HostData.CnameHost) - 1);
-    CopyMemory(tmpNode->HostData.SpoofedIP, spoofedIpParam, sizeof(tmpNode->HostData.SpoofedIP) - 1);
-    tmpNode->HostData.type = RESP_CNAME;
+    CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
+    CopyMemory(tmpNode->Data.CnameHost, cnameHostParam, sizeof(tmpNode->Data.CnameHost) - 1);
+    CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
+    tmpNode->Data.Type = RESP_CNAME;
     tmpNode->prev = NULL;
     tmpNode->isTail = FALSE;
 
@@ -80,7 +80,7 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
   for (count = 0; count < MAX_NODE_COUNT; count++)
   {
     if (tmpSys != NULL &&
-        !strncmp((char *) tmpSys->HostData.HostName, (char *) hostnameParam, sizeof(tmpSys->HostData.HostName) - 1))
+        !strncmp((char *) tmpSys->Data.HostName, (char *) hostnameParam, sizeof(tmpSys->Data.HostName) - 1))
     {
       retVal = tmpSys;
       break;
@@ -105,17 +105,17 @@ void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
 
   for (listPos = listHead; listPos != NULL && listPos->isTail == FALSE; listPos = listPos->next)
   {
-    if (listPos->HostData.type == RESP_A)
+    if (listPos->Data.Type == RESP_A)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s -> %s", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s -> %s", listPos->Data.HostName, listPos->Data.SpoofedIp);
     }
-    else if (listPos->HostData.type == RESP_CNAME)
+    else if (listPos->Data.Type == RESP_CNAME)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s -> %s -> %s", listPos->HostData.HostName, listPos->HostData.CnameHost, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s -> %s -> %s", listPos->Data.HostName, listPos->Data.CnameHost, listPos->Data.SpoofedIp);
     }
     else
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): INVALID\t%s -> %s", listPos->HostData.HostName, listPos->HostData.SpoofedIP);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): INVALID\t%s -> %s", listPos->Data.HostName, listPos->Data.SpoofedIp);
     }
   }
 }

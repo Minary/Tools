@@ -1,4 +1,5 @@
 #include <windows.h>
+
 #include "DnsStructs.h"
 #include "DnsHelper.h"
 
