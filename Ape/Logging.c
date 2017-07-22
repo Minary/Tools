@@ -5,6 +5,8 @@
 #include "APE.h"
 #include "Logging.h"
 
+char *gLogPriority[] = { "OFF", "DEBUG", "INFO", "LOW", "MEDIUM", "HIGH", "ERROR", "FATAL" };
+
 
 static HANDLE fileHandle = INVALID_HANDLE_VALUE;
 void LogMsg(int priorityParam, char *logMessageParam, ...)
@@ -50,7 +52,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   va_start(args, logMessageParam);
   vsprintf(tempBuffer, logMessageParam, args);
   va_end(args);
-  snprintf(logMessage, sizeof(logMessage) - 1, "%s : %s\n", time, tempBuffer);
+  snprintf(logMessage, sizeof(logMessage) - 1, "%s %-6s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
   printf(logMessage);
 
   // Write message to the logfile.
