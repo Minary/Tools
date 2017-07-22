@@ -106,11 +106,13 @@ void InitializeMITM()
   {
     if (WaitForSingleObject(gPOISONINGThreadHandle, 30) != WAIT_TIMEOUT)
     {
+      LogMsg(DBG_ERROR, "main(): ARP poisoner thread was stopped");
       break;
     }
 
     if (WaitForSingleObject(gRESENDThreadHandle, 30) != WAIT_TIMEOUT)
     {
+      LogMsg(DBG_ERROR, "main(): Packet forarder thread was stopped");
       break;
     }
 

