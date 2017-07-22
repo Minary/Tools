@@ -71,13 +71,13 @@ void InitializeMITM()
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
-    printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+    printf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
     goto END;
   }
 
   if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
-    printf("No target hosts were defined!\n");
+    fprintf(stderr, "No target hosts were defined!\n");
     goto END;
   }
   
@@ -85,7 +85,6 @@ void InitializeMITM()
   PrintTargetSystems(gTargetSystemsList);
 
   WriteDepoisoningFile();
-
 
 
   // 1. Start Ethernet FORWARDING thread
@@ -136,10 +135,10 @@ void AdminCheck(char *programNameParam)
   if (!UserIsAdmin())
   {
     system("cls");
-    printf("\nAPE (ARP Poisoning Engine)  Version %s\n", APE_VERSION);
-    printf("---------------------------------------\n\n");
-    printf("Web\t https://github.com/rubenunteregger\n\n\n");
-    printf("You need Administrator permissions to run %s successfully!\n\n", programNameParam);
+    fprintf(stderr, "\nAPE (ARP Poisoning Engine)  Version %s\n", APE_VERSION);
+    fprintf(stderr, "---------------------------------------\n\n");
+    fprintf(stderr, "Web\t https://github.com/rubenunteregger\n\n\n");
+    fprintf(stderr, "You need Administrator permissions to run %s successfully!\n\n", programNameParam);
 
     exit(1);
   }
@@ -154,11 +153,13 @@ int UserIsAdmin()
   SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
   PSID admGroup = NULL;
 
-
   if (AllocateAndInitializeSid(&ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0, &admGroup))
   {
     if (!CheckTokenMembership(NULL, admGroup, &retVal))
+    {
       retVal = FALSE;
+    }
+
     FreeSid(admGroup);
   }
 

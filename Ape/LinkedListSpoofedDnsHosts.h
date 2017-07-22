@@ -15,15 +15,15 @@ typedef enum
 typedef struct 
 {
   unsigned char HostName[MAX_BUF_SIZE + 1];
-  unsigned char SpoofedIP[MAX_IP_LEN + 1];
+  unsigned char SpoofedIp[MAX_IP_LEN + 1];
   unsigned char CnameHost[MAX_BUF_SIZE + 1];
-  DNS_RESPONSE_TYPE type;
+  DNS_RESPONSE_TYPE Type;
 } HOSTDATA;
 
 
 typedef struct 
 {
-  HOSTDATA HostData;
+  HOSTDATA Data;
   BOOL isTail;
   struct HOSTNODE *prev;
   struct HOSTNODE *next;

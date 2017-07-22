@@ -229,7 +229,7 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
                StrChr(spoofedIpAddr, ',') != NULL)
       {
         strncpy(tmpLine, spoofedIpAddr, sizeof(tmpLine) - 1);
-        sscanf(tmpLine, "%[^,],%s", spoofedIpAddr, cnameHost);
+        sscanf(tmpLine, "%[^,],%s", cnameHost, spoofedIpAddr);
         AddSpoofedCnameToList(&gDnsSpoofingList, hostname, cnameHost, spoofedIpAddr);
       }
 
