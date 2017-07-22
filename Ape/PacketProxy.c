@@ -196,7 +196,7 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
       (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
-      DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, (char *)tmpNode->Data.SpoofedIp, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp, (char *)tmpNode->Data.HostName) == TRUE)
+      DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp) == TRUE)
   {
     LogMsg(DBG_DEBUG, "Request DNS poisoning *2C succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
     return;
