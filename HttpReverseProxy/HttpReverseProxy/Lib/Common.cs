@@ -2,6 +2,7 @@
 {
   using System;
   using System.Collections;
+    using System.Collections.Generic;
   using System.Linq;
   using System.Net;
   using System.Net.NetworkInformation;
@@ -22,6 +23,13 @@
     #region MEMBERS
 
     private static Hashtable targetMacAddresses = new Hashtable();
+    private static List<Tuple<int, int>> privateNetworks = new List<Tuple<int, int>>()
+    {
+      new Tuple<int, int>(GetLongIPAddress("10.0.0.0"), GetLongIPAddress("10.255.255.255")),
+      new Tuple<int, int>(GetLongIPAddress("127.0.0.0"), GetLongIPAddress("127.255.255.255")),
+      new Tuple<int, int>(GetLongIPAddress("172.16.0.0"), GetLongIPAddress("172.16.255.255")),
+      new Tuple<int, int>(GetLongIPAddress("192.168.0.0"), GetLongIPAddress("192.168.255.255"))
+    };
 
     #endregion
 
@@ -72,7 +80,7 @@
     /// </summary>
     /// <param name="ipAddr"></param>
     /// <returns></returns>
-    public static Int32 ConvertIpToInt32(IPAddress ipAddr)
+    public static int ConvertIpToInt32(IPAddress ipAddr)
     {
       byte[] byteAddress = ipAddr.GetAddressBytes();
       return BitConverter.ToInt32(byteAddress, 0);
@@ -87,7 +95,7 @@
     public static string GetMacFromNetworkComputer(string clientIp)
     {
       string retVal = string.Empty;
-      Int32 convertedIpAddr = 0;
+      int convertedIpAddr = 0;
       byte[] macArray;
       int byteArrayLen = 0;
       int arpReply = 0;
@@ -129,7 +137,43 @@
       return retVal;
     }
 
+
+    public static bool IsIpPartOfPrivateNetwork(string ipAddr)
+    {
+      IPAddress ipAddrObj;
+
+      if (string.IsNullOrEmpty(ipAddr) == true)
+      {
+        return false;
+      }
+
+      if (IPAddress.TryParse(ipAddr, out ipAddrObj) == false)
+      {
+        return false;
+      }
+
+      int ipAddrLong = GetLongIPAddress(ipAddr);
+      foreach (var tuple in privateNetworks)
+      {
+        if (ipAddrLong >= tuple.Item1 && ipAddrLong <= tuple.Item2)
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     #endregion
 
+
+    #region PRIVATE
+
+    private static int GetLongIPAddress(string ipAddress)
+    {
+      return IPAddress.NetworkToHostOrder(BitConverter.ToInt32(IPAddress.Parse(ipAddress).GetAddressBytes(), 0));
+    }
+
+    #endregion
   }
 }
