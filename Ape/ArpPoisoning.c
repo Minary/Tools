@@ -213,7 +213,6 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
     retVal = NOK;
   }
 
-
 END:
 
   return retVal;
@@ -221,7 +220,7 @@ END:
 
 
 
-int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
+BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
 {
   int retVal = NOK;
   unsigned char arpPacket[sizeof(ETHDR) + sizeof(ARPHDR)];
@@ -250,18 +249,13 @@ int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
   CopyMemory(arpHdrPtr->sha, arpPacketParam->ArpLocalMacBin, BIN_MAC_LEN);
 
   // Send down the packet
-  if (interfaceHandleParam != NULL && pcap_sendpacket(interfaceHandleParam, arpPacket, sizeof(ETHDR) + sizeof(ARPHDR)) == 0)
+  if (interfaceHandleParam != NULL && 
+      pcap_sendpacket(interfaceHandleParam, arpPacket, sizeof(ETHDR) + sizeof(ARPHDR)) == 0)
   {
     retVal = OK;
   }
-  else
-  {
-    //char *errorMsg = pcap_geterr(interfaceHandleParam);
-    //if (errorMsg == NULL)
-    //  errorMsg = "WinPcap error unknown";
 
-    LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet");
-  }
+  LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet");
 
   return retVal;
 }

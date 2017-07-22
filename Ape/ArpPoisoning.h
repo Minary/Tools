@@ -5,5 +5,5 @@
 
 DWORD WINAPI ArpPoisoningLoop(LPVOID pScanParams);
 DWORD WINAPI ArpDePoisoning(LPVOID pScanParams);
-int SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam);
+BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam);
 int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[BIN_MAC_LEN], unsigned char victimIpBinParam[BIN_IP_LEN]);

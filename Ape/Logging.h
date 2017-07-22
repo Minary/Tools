@@ -9,10 +9,9 @@
 #define DBG_LOW    3
 #define DBG_MEDIUM 4
 #define DBG_HIGH   5
-#define DBG_ALERT  6
-#define DBG_ERROR  7
+#define DBG_ERROR  6
+#define DBG_FATAL  7
 
 #define DBG_LOGFILE "c:\\debug.log"
-
 
 void LogMsg(int priorityParam, char *logMessageParam, ...);
