@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxyLib.Interface
+﻿namespace HttpReverseProxyLib.DataTypes.Interface
 {
   public interface IPluginHost
   {

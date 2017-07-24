@@ -1,6 +1,8 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Class
 {
+  using HttpReverseProxyLib.DataTypes.Enum;
   using System.Collections.Generic;
+
 
 
   public class InstructionParams

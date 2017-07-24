@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxyLib.Interface
+﻿namespace HttpReverseProxyLib
 {
   using System;
   using System.IO;

@@ -1,4 +1,4 @@
-﻿namespace HttpReverseProxyLib.DataTypes
+﻿namespace HttpReverseProxyLib.DataTypes.Enum
 {
   public enum DataTransmissionMode : int
   {

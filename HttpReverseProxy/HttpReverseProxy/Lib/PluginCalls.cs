@@ -4,7 +4,7 @@
   using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System;
 
 

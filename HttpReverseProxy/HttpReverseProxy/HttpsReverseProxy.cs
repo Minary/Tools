@@ -3,7 +3,7 @@
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System;
   using System.Collections.Generic;
   using System.IO;
@@ -125,7 +125,7 @@
         Type objType = pluginAssembly.GetType(pluginName, false, false);
         object tmpPluginObj = Activator.CreateInstance(objType, true);
 
-        if (!(tmpPluginObj is HttpReverseProxyLib.Interface.IPlugin))
+        if (!(tmpPluginObj is IPlugin))
         {
           throw new Exception("The plugin file does not support the required plugin interface");
         }

@@ -5,8 +5,8 @@
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.DataTypes.Enum;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using HttpReverseProxyLib.Exceptions;
-  using HttpReverseProxyLib.Interface;
   using System;
   using System.Collections;
   using System.Collections.Generic;

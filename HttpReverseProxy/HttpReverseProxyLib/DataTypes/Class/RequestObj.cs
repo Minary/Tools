@@ -3,7 +3,7 @@
   using HttpReverseProxyLib.DataTypes.Class.Client;
   using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System;
   using System.Net.Sockets;
   using System.Text;
