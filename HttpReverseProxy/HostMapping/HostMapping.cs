@@ -1,7 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System.IO;
   using HostMappingConfig = HttpReverseProxy.Plugin.HostMapping.Config;
 

@@ -1,6 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
 
 
   public partial class Weaken

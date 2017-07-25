@@ -2,7 +2,7 @@
 {
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System;
   using System.IO;
   using System.IO.Pipes;

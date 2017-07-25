@@ -1,7 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.InjectFile
 {
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System.Collections.Generic;
   using System.IO;
   using InjectFileConfig = HttpReverseProxy.Plugin.InjectFile.Config;

@@ -1,7 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
   using HttpReverseProxyLib.DataTypes.Enum;
-  using HttpReverseProxyLib.Interface;
+  using HttpReverseProxyLib.DataTypes.Interface;
   using System.IO;
   using WeakenConfig = HttpReverseProxy.Plugin.Weaken.Config;
 
