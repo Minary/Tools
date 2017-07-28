@@ -52,7 +52,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   va_start(args, logMessageParam);
   vsprintf(tempBuffer, logMessageParam, args);
   va_end(args);
-  snprintf(logMessage, sizeof(logMessage) - 1, "%s %-6s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
+  snprintf(logMessage, sizeof(logMessage) - 1, "%s %-7s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
   printf(logMessage);
 
   // Write message to the logfile.

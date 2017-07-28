@@ -228,7 +228,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
 
     // Initialisation
     ZeroMemory(&arpPacket, sizeof(arpPacket));
-    arpPacket.lReqType = ARP_REQUEST;
+    arpPacket.ReqType = ARP_REQUEST;
     // Set MAC values
     CopyMemory(arpPacket.EthSrcMacBin, scanParams.LocalMacBin, BIN_MAC_LEN);
     CopyMemory(arpPacket.EthDstMacBin, remoteMacBin, BIN_MAC_LEN);

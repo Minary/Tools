@@ -145,7 +145,7 @@ typedef struct
 typedef struct
 {
   char IFCName[1024];
-  int lReqType;
+  int ReqType;
   unsigned char EthSrcMacBin[BIN_MAC_LEN];
   unsigned char EthDstMacBin[BIN_MAC_LEN];
 

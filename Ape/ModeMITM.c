@@ -19,11 +19,11 @@ extern PSYSNODE gTargetSystemsList;
 extern PHOSTNODE gDnsSpoofingList;
 extern SCANPARAMS gScanParams;
 
-extern DWORD gRESENDThreadID;
-extern DWORD gPOISONINGThreadID;
+DWORD gRESENDThreadID = 0;
+DWORD gPOISONINGThreadID = 0;
 
-extern HANDLE gRESENDThreadHandle;
-extern HANDLE gPOISONINGThreadHandle;
+HANDLE gRESENDThreadHandle = INVALID_HANDLE_VALUE;
+HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
 
 /*
  * All-in-one solution, target range
@@ -88,30 +88,55 @@ void InitializeMITM()
 
 
   // 1. Start Ethernet FORWARDING thread
-  if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL)
+  if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
+      gRESENDThreadHandle == INVALID_HANDLE_VALUE)
   {
     LogMsg(DBG_ERROR, "main(): Can't start Listener thread : %d", GetLastError());
     goto END;
   }
 
   // 2. Start POISONING the ARP caches.
-  if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL)
+  if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL ||
+      gPOISONINGThreadHandle == INVALID_HANDLE_VALUE)
   {
     LogMsg(DBG_ERROR, "main(): Can't start NetworkScanner thread : %d", GetLastError());
     goto END;
   }
 
-  Sleep(500);
-  while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE && gRESENDThreadHandle != INVALID_HANDLE_VALUE)
+printf("gPOISONINGThreadHandle=%d, gRESENDThreadHandle=%d, INVALID_HANDLE_VALUE=%d\n",
+  gPOISONINGThreadHandle, gRESENDThreadHandle, INVALID_HANDLE_VALUE);
+
+  //Sleep(500);
+  DWORD la = 111;
+  //while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE && 
+  //       gRESENDThreadHandle != INVALID_HANDLE_VALUE)
+  while(1 == 1)
   {
-    if (WaitForSingleObject(gPOISONINGThreadHandle, 30) != WAIT_TIMEOUT)
+    if ((la = WaitForSingleObject(gPOISONINGThreadHandle, 30)) != WAIT_TIMEOUT &&
+         la != WAIT_OBJECT_0)
     {
-      LogMsg(DBG_ERROR, "main(): ARP poisoner thread was stopped");
+printf("gPOISONINGThreadHandle: la=%d (WAIT_ABANDONED=%d), WAIT_OBJECT_0=%d, WAIT_TIMEOUT=%d, WAIT_FAILED=%d\n", 
+  la, WAIT_ABANDONED, WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_FAILED);
+
+if (la == WAIT_FAILED)
+{
+  printf("gPOISONINGThreadHandle: ErrorCode=%d\n", GetLastError());
+}
+      LogMsg(DBG_ERROR, "main(): ARP poisoning thread stopped");
       break;
     }
 
-    if (WaitForSingleObject(gRESENDThreadHandle, 30) != WAIT_TIMEOUT)
+    if ((la = WaitForSingleObject(gRESENDThreadHandle, 30)) != WAIT_TIMEOUT &&
+        la != WAIT_OBJECT_0)
     {
+printf("gRESENDThreadHandle: la=%d (WAIT_ABANDONED=%d), WAIT_OBJECT_0=%d, WAIT_TIMEOUT=%d, WAIT_FAILED=%d\n", 
+  la, WAIT_ABANDONED, WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_FAILED);
+
+if (la == WAIT_FAILED)
+{
+  printf("gRESENDThreadHandle: ErrorCode=%d\n", GetLastError());
+}
+
       LogMsg(DBG_ERROR, "main(): Packet forarder thread was stopped");
       break;
     }
