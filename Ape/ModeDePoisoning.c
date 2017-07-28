@@ -247,7 +247,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
     // Send 3 ARP depoisoning packets.
     for (i = 0; i < 3; i++)
     {
-      if (SendArpPacket(interfaceHandle, &arpPacket) != 0)
+      if (SendArpPacket(interfaceHandle, &arpPacket) == FALSE)
       {
         LogMsg(DBG_ERROR, "ArpDepoisoning(): Unable to send ARP packet.");
       }

