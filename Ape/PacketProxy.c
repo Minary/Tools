@@ -171,16 +171,13 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
    * Forward packet to the GW
    */
   }
+  else if (ProcessData2Internet(&packetInfo, scanParams) == FALSE)
+  {
+    LogMsg(DBG_ERROR, "Unable to send DATA 2 INTERNET");
+  }
   else
   {
-    if (ProcessData2Internet(&packetInfo, scanParams) == FALSE)
-    {
-      LogMsg(DBG_ERROR, "Unable to send DATA 2 INTERNET");
-    }
-    else
-    {
-      LogMsg(DBG_ERROR, "Unable to send ANYWHERE");
-    }
+    // Data successfully forwarded    
   }
 }
 
@@ -254,14 +251,12 @@ BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 }
 
 
-
 BOOL ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
   LogMsg(DBG_INFO, packetInfo->logMsg, "BLOCK");
 
   return TRUE;
 }
-
 
 
 void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo)
@@ -306,7 +301,6 @@ void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo)
     strcat(packetInfo->proto, "Unknown");
   }
 }
-
 
 
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize)
