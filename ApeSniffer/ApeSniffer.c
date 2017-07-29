@@ -4,23 +4,17 @@
 
 #include "APESniffer.h"
 #include "LinkedListConnections.h"
+#include "Logging.h"
+
 
 #pragma comment(lib, "wpcap.lib")
 #pragma comment(lib, "Ws2_32.lib")
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 
-/*
- * Extern variables
- *
- */
+
 extern char *optarg;
 
-
-/*
- * Global variables
- *
- */
 
 CRITICAL_SECTION csSystemsLL;
 CRITICAL_SECTION gCSOutputPipe;
@@ -105,10 +99,10 @@ int main(int argc, char* argv[])
     goto END;
 
 
-    /*
-     * Start sniffer
-     * -s IFC-Name
-     */
+  /*
+   * Start sniffer
+   * -s IFC-Name
+   */
   }
   else if (argc >= 3 && action == 's')
   {
@@ -158,64 +152,6 @@ void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *o
     }
   }
 }
-
-
-void LogMsg(int priorityParam, char *messageParam, ...)
-{
-  HANDLE fileHandle = INVALID_HANDLE_VALUE;
-  OVERLAPPED overlapped = { 0 };
-  char dateStamp[MAX_BUF_SIZE + 1];
-  char timeStamp[MAX_BUF_SIZE + 1];
-  char time[MAX_BUF_SIZE + 1];
-  char tempBuffer[MAX_BUF_SIZE + 1];
-  char logMessage[MAX_BUF_SIZE + 1];
-  DWORD bytesWritten = 0;
-  va_list args;
-
-
-  if (priorityParam < DEBUG_LEVEL || DEBUG_LEVEL == DBG_OFF)
-  {
-    return;
-  }
-
-  if ((fileHandle = CreateFile(DBG_LOGFILE, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0)) == INVALID_HANDLE_VALUE)
-  {
-    return;
-  }
-
-  ZeroMemory(&overlapped, sizeof(overlapped));
-
-  if (LockFileEx(fileHandle, LOCKFILE_EXCLUSIVE_LOCK, 0, 0, 0, &overlapped) == FALSE)
-  {
-    return;
-  }
-
-  ZeroMemory(time, sizeof(time));
-  ZeroMemory(timeStamp, sizeof(timeStamp));
-  ZeroMemory(dateStamp, sizeof(dateStamp));
-
-  // Create timestamp
-  _strtime(timeStamp);
-  _strdate(dateStamp);
-  snprintf(time, sizeof(time) - 1, "%s %s", dateStamp, timeStamp);
-
-  // Create log message
-  ZeroMemory(tempBuffer, sizeof(tempBuffer));
-  ZeroMemory(logMessage, sizeof(logMessage));
-  va_start(args, messageParam);
-  vsprintf(tempBuffer, messageParam, args);
-  va_end(args);
-  snprintf(logMessage, sizeof(logMessage) - 1, "%s : %s\n", time, tempBuffer);
-  printf(logMessage);
-
-  // Write message to the logfile.
-  SetFilePointer(fileHandle, 0, NULL, FILE_END);
-  WriteFile(fileHandle, logMessage, strnlen(logMessage, sizeof(logMessage) - 1), &bytesWritten, NULL);
-  UnlockFileEx(fileHandle, 0, 0, 0, &overlapped);
-
-  CloseHandle(fileHandle);
-}
-
 
 
 void ExecCommand(char *commandParam)

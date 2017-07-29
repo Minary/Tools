@@ -14,15 +14,15 @@
 //#define WITH_FIREWALL 0
 //#define WITH_SNIFFER 0
 
-#define DEBUG_LEVEL 0
-
-#define DBG_OFF    0
-#define DBG_INFO   1
-#define DBG_LOW    2
-#define DBG_MEDIUM 3
-#define DBG_HIGH   4
-#define DBG_ALERT  5
-#define DBG_ERROR  5
+//#define DEBUG_LEVEL 0
+//
+//#define DBG_OFF    0
+//#define DBG_INFO   1
+//#define DBG_LOW    2
+//#define DBG_MEDIUM 3
+//#define DBG_HIGH   4
+//#define DBG_ALERT  5
+//#define DBG_ERROR  5
 
 
 //#define FILE_HOST_TARGETS ".targethosts"
@@ -114,12 +114,8 @@ void stringify(unsigned char *pInput, int pInputLen, unsigned char *pOutput);
 //void writeDepoisoningFile(void);
 //void startUnpoisoningProcess();
 void ExecCommand(char *pCmd);
-void TerminateThreads();
-void LogMsg(int pPriority, char *pMsg, ...);
 void PrintConfig(SCANPARAMS pScanParams);
-void PrintTimestamp(char *pTitle);
 int UserIsAdmin();
-void adminCheck(char *pProgName);
 void PrintUsage(char *pAppName);
 //void ParseTargetHostsConfigFile(char *pTargetsFile);
 //void parseDNSConfigFile();

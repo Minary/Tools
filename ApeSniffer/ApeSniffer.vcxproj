@@ -94,6 +94,7 @@
     <ClCompile Include="Interface.c" />
     <ClCompile Include="LinkedListConnections.c" />
     <ClCompile Include="LinkedListSystems.c" />
+    <ClCompile Include="Logging.c" />
     <ClCompile Include="NetworkFunctions.c" />
     <ClCompile Include="SniffAndEvaluate.c" />
   </ItemGroup>
@@ -103,8 +104,8 @@
     <ClInclude Include="getopt.h" />
     <ClInclude Include="LinkedListConnections.h" />
     <ClInclude Include="LinkedListSystems.h" />
+    <ClInclude Include="Logging.h" />
     <ClInclude Include="NetBase.h" />
-    <ClInclude Include="NetDns.h" />
     <ClInclude Include="NetworkFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
     <ClInclude Include="SniffAndEvaluate.h" />

@@ -8,6 +8,7 @@
 #include "APESniffer.h"
 #include "LinkedListConnections.h"
 #include "LinkedListSystems.h"
+#include "Logging.h"
 #include "SniffAndEvaluate.h"
 
 
@@ -15,8 +16,8 @@ extern int gDEBUGLEVEL;
 extern char gTempFilesDir[MAX_BUF_SIZE + 1];
 extern CRITICAL_SECTION gCSOutputPipe;
 extern PCONNODE gConnectionList;
-PSYSNODE gTargetSystemsList;
 
+PSYSNODE gTargetSystemsList;
 SCANPARAMS gCurrentScanParams;
 HANDLE gOutputPipe = INVALID_HANDLE_VALUE;
 

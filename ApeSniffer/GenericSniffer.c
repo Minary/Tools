@@ -7,16 +7,12 @@
 
 #include "ApeSniffer.h"
 #include "GenericSniffer.h"
-#include "NetDns.h"
-#include "SniffAndEvaluate.h"
+#include "Logging.h"
 #include "NetworkFunctions.h"
+#include "SniffAndEvaluate.h"
 
 
 
-/*
-*
-*
-*/
 int GenericSniffer(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -109,14 +105,9 @@ END:
 
 
 
-
-/*
-*
-*
-*/
 void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *headerParam, const u_char *packetDataParam)
 {
-  PETHDR lEHdr = (PETHDR)packetDataParam;
+  PETHDR etherHdr = (PETHDR)packetDataParam;
   char srcMacStr[64];
   char dstMacStr[64];
   char srcIpStr[64];
@@ -146,12 +137,12 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
     ZeroMemory(dstIpStr, sizeof(dstIpStr));
     ZeroMemory(proto, sizeof(proto));
 
-    Mac2String(lEHdr->ether_shost, (unsigned char *)srcMacStr, sizeof(srcMacStr) - 1);
-    Mac2String(lEHdr->ether_dhost, (unsigned char *)dstMacStr, sizeof(dstMacStr) - 1);
+    Mac2String(etherHdr->ether_shost, (unsigned char *)srcMacStr, sizeof(srcMacStr) - 1);
+    Mac2String(etherHdr->ether_dhost, (unsigned char *)dstMacStr, sizeof(dstMacStr) - 1);
     printf("\n\n");
 
     // IPv4
-    if (htons(lEHdr->ether_type) == 0x0800)
+    if (htons(etherHdr->ether_type) == 0x0800)
     {
       ipHdrPtr = (PIPHDR)(packetDataParam + 14);
 

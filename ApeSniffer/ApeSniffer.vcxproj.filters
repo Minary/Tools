@@ -12,15 +12,21 @@
     <Filter Include="Source Files\getopt">
       <UniqueIdentifier>{e174aa61-4d4b-4e76-8a5b-a0060c5e07d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\LinkedList">
+      <UniqueIdentifier>{a9daac01-e2c7-4e36-86ab-c38b0b251bc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LinkedList">
+      <UniqueIdentifier>{762544bb-7137-477f-9239-ce45806a8ee5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Logging">
+      <UniqueIdentifier>{f492f00c-fb0f-4d67-a67b-baf9f923e8ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{e10e29c8-21f6-475c-9e3e-fd64ace0f93b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SniffAndEvaluate.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LinkedListConnections.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LinkedListSystems.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NetworkFunctions.c">
@@ -41,24 +47,24 @@
     <ClCompile Include="ApeSniffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LinkedListConnections.c">
+      <Filter>Source Files\LinkedList</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListSystems.c">
+      <Filter>Source Files\LinkedList</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging.c">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkedListSystems.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkedListConnections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SniffAndEvaluate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NetDns.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PacketProxy.h">
@@ -72,6 +78,15 @@
     </ClInclude>
     <ClInclude Include="ApeSniffer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListConnections.h">
+      <Filter>Header Files\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListSystems.h">
+      <Filter>Header Files\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Header Files\Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
