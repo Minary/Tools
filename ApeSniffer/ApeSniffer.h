@@ -8,32 +8,7 @@
 
 
 #define APESNIFFER_VERSION "0.1"
-
-//#define WITH_HTTP_INJECTION 0
-//#define WITH_DNS_SPOOFER 0
-//#define WITH_FIREWALL 0
-//#define WITH_SNIFFER 0
-
-//#define DEBUG_LEVEL 0
-//
-//#define DBG_OFF    0
-//#define DBG_INFO   1
-//#define DBG_LOW    2
-//#define DBG_MEDIUM 3
-//#define DBG_HIGH   4
-//#define DBG_ALERT  5
-//#define DBG_ERROR  5
-
-
-//#define FILE_HOST_TARGETS ".targethosts"
-//#define FILE_FIREWALL_RULES1 ".fwrules"
-//#define FILE_FIREWALL_RULES2 "bin\\.fwrules"
-//#define FILE_DNS_POISONING ".dnshosts"
-//#define FILE_HTTPINJECTION_RULES1 ".injecturls"
-//#define FILE_HTTPINJECTION_RULES2 "bin\\.injecturls"
-//#define FILE_UNPOISON ".UNPOISON"
 #define DBG_LOGFILE "c:\\debug.log"
-//#define HOSTS_FILE "hosts.txt"
 
 
 #define TCP_MAX_ACTIVITY 10

@@ -19,10 +19,6 @@
 
 
 
-/*
-*
-*
-*/
 int ListInterfaceDetails()
 {
   int retVal = 0;
@@ -181,8 +177,7 @@ END:
 
 
 
-
-int GetInterfaceDetails(char *pIFCName, PSCANPARAMS pScanParams)
+int GetInterfaceDetails(char *ifcName, PSCANPARAMS scanParams)
 {
   int retVal = 0;
   unsigned long ocalIpBin = 0;
@@ -217,33 +212,33 @@ int GetInterfaceDetails(char *pIFCName, PSCANPARAMS pScanParams)
   {
     for (adapter = adapterInfoPtr; adapter; adapter = adapter->Next)
     {
-      if (StrStrI(adapter->AdapterName, pIFCName))
+      if (StrStrI(adapter->AdapterName, ifcName))
       {
         // Get local MAC address
-        CopyMemory(pScanParams->LocalMAC, adapter->Address, BIN_MAC_LEN);
+        CopyMemory(scanParams->LocalMAC, adapter->Address, BIN_MAC_LEN);
 
         // Get local IP address
         ocalIpBin = inet_addr(adapter->IpAddressList.IpAddress.String);
-        CopyMemory(pScanParams->LocalIP, &ocalIpBin, 4);
+        CopyMemory(scanParams->LocalIP, &ocalIpBin, 4);
 
         // Get gateway IP address
         gatewayIpBin = inet_addr(adapter->GatewayList.IpAddress.String);
-        CopyMemory(pScanParams->GWIP, &gatewayIpBin, 4);
+        CopyMemory(scanParams->GWIP, &gatewayIpBin, 4);
 
         // Get gateway MAC address
-        CopyMemory(pScanParams->GWIP, &gatewayIpBin, 4); // ????
+        CopyMemory(scanParams->GWIP, &gatewayIpBin, 4); // ????
         ZeroMemory(&gatewayMacBin, sizeof(gatewayMacBin));
         SendARP(gatewayIpBin, 0, gatewayMacBin, &gatewayMacBinLength);
-        CopyMemory(pScanParams->GWMAC, gatewayMacBin, 6);
+        CopyMemory(scanParams->GWMAC, gatewayMacBin, 6);
 
         // Get interface index.
-        pScanParams->Index = adapter->Index;
+        scanParams->Index = adapter->Index;
 
         // Get interface alias.
-        GetAliasByIfcIndex(pScanParams->Index, (char *)pScanParams->IFCAlias, sizeof(pScanParams->IFCAlias) - 1);
+        GetAliasByIfcIndex(scanParams->Index, (char *)scanParams->IFCAlias, sizeof(scanParams->IFCAlias) - 1);
 
         // Get interface description
-        CopyMemory(pScanParams->IFCDescr, adapter->Description, sizeof(pScanParams->IFCDescr) - 1);
+        CopyMemory(scanParams->IFCDescr, adapter->Description, sizeof(scanParams->IFCDescr) - 1);
 
         break;
       }
@@ -263,12 +258,7 @@ END:
 
 
 
-
-/*
-*
-*
-*/
-int GetInterfaceName(char *pIFCName, char *pRealIFCName, int pBufLen)
+int GetInterfaceName(char *ifcName, char *realIfcName, int bufferSize)
 {
   int retVal = 0;
   pcap_if_t *allDevices = NULL;
@@ -287,13 +277,11 @@ int GetInterfaceName(char *pIFCName, char *pRealIFCName, int pBufLen)
   }
 
   ZeroMemory(adapter, sizeof(adapter));
-  counter = 0;
-
   for (counter = 0, device = allDevices; device; device = device->next, counter++)
   {
-    if (StrStrI(device->name, pIFCName))
+    if (StrStrI(device->name, ifcName))
     {
-      strncpy(pRealIFCName, device->name, pBufLen);
+      strncpy(realIfcName, device->name, bufferSize);
       break;
     }
   }

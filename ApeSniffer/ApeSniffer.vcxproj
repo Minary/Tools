@@ -89,26 +89,29 @@
   <ItemGroup>
     <ClCompile Include="ApeSniffer.c" />
     <ClCompile Include="DnsParser.c" />
-    <ClCompile Include="GenericSniffer.c" />
     <ClCompile Include="getopt.c" />
     <ClCompile Include="Interface.c" />
     <ClCompile Include="LinkedListConnections.c" />
     <ClCompile Include="LinkedListSystems.c" />
     <ClCompile Include="Logging.c" />
+    <ClCompile Include="ModeGenericSniffer.c" />
+    <ClCompile Include="ModeMinary.c" />
     <ClCompile Include="NetworkFunctions.c" />
     <ClCompile Include="SniffAndEvaluate.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApeSniffer.h" />
-    <ClInclude Include="GenericSniffer.h" />
+    <ClInclude Include="DnsParser.h" />
     <ClInclude Include="getopt.h" />
+    <ClInclude Include="Interface.h" />
     <ClInclude Include="LinkedListConnections.h" />
     <ClInclude Include="LinkedListSystems.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="ModeGenericSniffer.h" />
+    <ClInclude Include="ModeMinary.h" />
     <ClInclude Include="NetBase.h" />
     <ClInclude Include="NetworkFunctions.h" />
     <ClInclude Include="PacketProxy.h" />
-    <ClInclude Include="SniffAndEvaluate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

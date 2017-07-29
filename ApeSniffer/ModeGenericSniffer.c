@@ -6,14 +6,14 @@
 #include <Shlwapi.h>
 
 #include "ApeSniffer.h"
-#include "GenericSniffer.h"
+#include "ModeGenericSniffer.h"
 #include "Logging.h"
 #include "NetworkFunctions.h"
 #include "SniffAndEvaluate.h"
 
 
 
-int GenericSniffer(PSCANPARAMS scanParamsParam)
+int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
   pcap_if_t *allDevices = NULL;
@@ -76,7 +76,7 @@ int GenericSniffer(PSCANPARAMS scanParamsParam)
     retVal = 4;
     goto END;
   }
-  
+
   if (pcap_setfilter((pcap_t *)scanParamsParam->IfcReadHandle, &filterCode) < 0)
   {
     LogMsg(DBG_ERROR, "GeneralSniffer() : Error setting the filter.");
@@ -91,7 +91,7 @@ int GenericSniffer(PSCANPARAMS scanParamsParam)
   // Start intercepting data packets.
   pcap_loop((pcap_t *)scanParamsParam->IfcReadHandle, 0, (pcap_handler)GenericSnifferCallback, (unsigned char *)scanParamsParam);
   LogMsg(DBG_INFO, "GeneralSniffer() : General scanner stopped");
-  
+
 END:
 
   // Release all allocated resources.

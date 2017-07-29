@@ -1,10 +1,17 @@
+#define HAVE_REMOTE
+
+#include <pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <windows.h>
 
 #include "APESniffer.h"
+#include "getopt.h"
+#include "Interface.h"
 #include "LinkedListConnections.h"
 #include "Logging.h"
+#include "ModeGenericSniffer.h"
+#include "ModeMinary.h"
 
 
 #pragma comment(lib, "wpcap.lib")
@@ -12,6 +19,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 extern char *optarg;
 
@@ -34,11 +42,10 @@ int main(int argc, char* argv[])
   int opt = 0;
   int action = 0;
 
-
   // Initialisation
   if (!InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400) ||
-    !InitializeCriticalSectionAndSpinCount(&gCSOutputPipe, 0x00000400) ||
-    !InitializeCriticalSectionAndSpinCount(&gCSConnectionsList, 0x00000400))
+      !InitializeCriticalSectionAndSpinCount(&gCSOutputPipe, 0x00000400) ||
+      !InitializeCriticalSectionAndSpinCount(&gCSConnectionsList, 0x00000400))
   {
     retVal = 1;
     goto END;
@@ -72,8 +79,7 @@ int main(int argc, char* argv[])
         break;
     }
   }
-
-
+  
   // List all interfaces
   if (action == 'l')
   {
@@ -81,10 +87,10 @@ int main(int argc, char* argv[])
     goto END;
 
 
-    /*
-     * General sniffer mode
-     * -g IFC-Name "PCAP_Pattern"
-     */
+  //
+  // General sniffer mode
+  // -g IFC-Name "PCAP_Pattern"
+  //
   }
   else if (argc >= 3 && action == 'g')
   {
@@ -93,30 +99,30 @@ int main(int argc, char* argv[])
     GetInterfaceDetails(argv[2], &gScanParams);
 
     if (argv[3] != NULL)
+    {
       gScanParams.PcapPattern = (unsigned char *)argv[3];
+    }
 
-    GenericSniffer(&gScanParams);
+    ModeGenericSnifferStart(&gScanParams);
     goto END;
 
 
-  /*
-   * Start sniffer
-   * -s IFC-Name
-   */
+  //
+  // Start sniffer
+  // -s IFC-Name
+  //
   }
   else if (argc >= 3 && action == 's')
   {
-    // Interface name
-
-    StartSniffAndEvaluate(&gScanParams);
+    ModeMinaryStart(&gScanParams);
 
     while (1 == 1)
     {
       Sleep(1000);
       printf(".");
     }
-    goto END;
 
+    goto END;
   }
   else
   {
@@ -185,10 +191,6 @@ void ExecCommand(char *commandParam)
 
 
 
-/*
- *
- *
- */
 void PrintUsage(char *pAppName)
 {
   system("cls");
@@ -204,4 +206,3 @@ void PrintUsage(char *pAppName)
   printf("WinPcap version\n---------------\n\n");
   printf("%s\n\n", pcap_lib_version());
 }
-

@@ -2,6 +2,7 @@
 #define __NETBASE__
 
 #include <Windows.h>
+#include <stdint.h>
 
 #define ETHERTYPE_ARP 0x0806
 #define ETHERTYPE_IP 0x0800
@@ -24,17 +25,13 @@
 #define MAX_IP_LEN 18
 
 
-/*
-* Type definitions
-*
-*/
+
 typedef struct
 {
   unsigned char ether_dhost[BIN_MAC_LEN];  // dest Ethernet address
   unsigned char ether_shost[BIN_MAC_LEN];  // source Ethernet address
   unsigned short ether_type;     // protocol (16-bit)
 } ETHDR, *PETHDR;
-
 
 
 typedef struct

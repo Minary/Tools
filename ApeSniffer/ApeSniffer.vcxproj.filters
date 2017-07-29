@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\getopt">
-      <UniqueIdentifier>{e174aa61-4d4b-4e76-8a5b-a0060c5e07d2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\LinkedList">
       <UniqueIdentifier>{a9daac01-e2c7-4e36-86ab-c38b0b251bc4}</UniqueIdentifier>
     </Filter>
@@ -23,6 +20,12 @@
     </Filter>
     <Filter Include="Source Files\Logging">
       <UniqueIdentifier>{e10e29c8-21f6-475c-9e3e-fd64ace0f93b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modes">
+      <UniqueIdentifier>{7a529b40-8093-4dfd-99cf-2e6b68caf381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modes">
+      <UniqueIdentifier>{52a523a9-5a25-41c7-a9f7-a9ec5364557a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -38,12 +41,6 @@
     <ClCompile Include="Interface.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="getopt.c">
-      <Filter>Source Files\getopt</Filter>
-    </ClCompile>
-    <ClCompile Include="GenericSniffer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ApeSniffer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,12 +53,18 @@
     <ClCompile Include="Logging.c">
       <Filter>Source Files\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeGenericSniffer.c">
+      <Filter>Source Files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeMinary.c">
+      <Filter>Source Files\Modes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SniffAndEvaluate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkFunctions.h">
@@ -69,12 +72,6 @@
     </ClInclude>
     <ClInclude Include="PacketProxy.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GenericSniffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="getopt.h">
-      <Filter>Source Files\getopt</Filter>
     </ClInclude>
     <ClInclude Include="ApeSniffer.h">
       <Filter>Header Files</Filter>
@@ -87,6 +84,21 @@
     </ClInclude>
     <ClInclude Include="Logging.h">
       <Filter>Header Files\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeGenericSniffer.h">
+      <Filter>Header Files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeMinary.h">
+      <Filter>Header Files\Modes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
