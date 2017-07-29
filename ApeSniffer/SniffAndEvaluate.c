@@ -22,10 +22,6 @@ HANDLE gOutputPipe = INVALID_HANDLE_VALUE;
 
 
 
-/*
-*
-*
-*/
 int StartSniffAndEvaluate(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -130,11 +126,6 @@ int StartSniffAndEvaluate(PSCANPARAMS scanParamsParam)
 
 
 
-
-/*
- * Callback function invoked by libpcap for every incoming packet
- *
- */
 void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *pcapHdrParam, unsigned char *packetDataParam)
 {
   SYSTEMNODE system;
@@ -186,7 +177,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   }
 
   if (memcmp(scanParams.LocalMAC, ethrHdr->ether_shost, BIN_MAC_LEN) == 0 ||
-    memcmp(scanParams.LocalMAC, ethrHdr->ether_dhost, BIN_MAC_LEN) != 0)
+      memcmp(scanParams.LocalMAC, ethrHdr->ether_dhost, BIN_MAC_LEN) != 0)
   {
     return;
   }
@@ -225,8 +216,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
     // Src/Dst IPs
     snprintf((char *)system.dstIpStr, sizeof(system.dstIpStr) - 1, "%d.%d.%d.%d", ipHdrPtrParam->daddr.byte1, ipHdrPtrParam->daddr.byte2, ipHdrPtrParam->daddr.byte3, ipHdrPtrParam->daddr.byte4);
     snprintf((char *)system.srcIpStr, sizeof(system.srcIpStr) - 1, "%d.%d.%d.%d", ipHdrPtrParam->saddr.byte1, ipHdrPtrParam->saddr.byte2, ipHdrPtrParam->saddr.byte3, ipHdrPtrParam->saddr.byte4);
-
-
+    
     totalLength = ntohs(ipHdrPtrParam->tlen);
     tcpHdrPtrParam = (PTCPHDR)((u_char*)ipHdrPtrParam + ipHeaderLength);
 
@@ -239,8 +229,9 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
     // If packet is an HTTP(S) request sent by the client to the server
     // the packet is processed separately.
     if (ntohs(tcpHdrPtrParam->dport) == 80)
+    {
       HandleHTTPTraffic((char *)srcMacStr, ipHdrPtrParam, tcpHdrPtrParam);
-
+    }
 
     // Dst IP is not our own local IP.
     // Process packet and forward it to the default GW.
@@ -444,10 +435,6 @@ int WriteOutput(char *pData, int pDataLen)
 
 
 
-/*
- *
- *
- */
 void HandleHTTPTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHdrPtrParam)
 {
   char srcIpStr[MAX_BUF_SIZE + 1];
@@ -493,9 +480,7 @@ void HandleHTTPTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
 
 
   snprintf(connectionId, sizeof(connectionId) - 1, "%s:%d->%s:%d", srcIpStr, srcPort, dstIpStr, dstPort);
-
-
-
+  
   // The data is attached to the connection buffer.
   if (tcpDataLength > 0)
   {
@@ -540,5 +525,61 @@ void HandleHTTPTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
   // There should be a better place where this 
   // function is called.
   RemoveOldConnections(&gConnectionList);
+}
+
+
+
+int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
+{
+  int retVal = OK;
+  PETHDR etherHdrPtr = NULL;
+  PIPHDR ipHdrPtr = NULL;     // ip header
+  PUDPHDR udpHdrPtr = NULL;   // udp header                              
+  PDNS_HEADER dnsHdrPtr = NULL; // dns header
+  char *data = NULL;
+  int ipHdrLength = 0;
+  int dataLength = 0;
+  int index1;
+  int count2;
+
+  etherHdrPtr = (PETHDR)packetParam;
+  ipHdrPtr = (PIPHDR)((unsigned char*)packetParam + sizeof(ETHDR));
+  ipHdrLength = (ipHdrPtr->ver_ihl & 0xf) * 4;
+  udpHdrPtr = (PUDPHDR)((unsigned char*)ipHdrPtr + ipHdrLength);
+  //dnsHdrPtr = (PDNS_HDR) ((unsigned char*) udpHdrPtr + sizeof(UDPHDR));
+  dnsHdrPtr = (PDNS_HEADER)((unsigned char*)udpHdrPtr + sizeof(UDPHDR));
+  //data = (char *)((unsigned char*)dnsHdrPtr + sizeof(DNS_HDR));
+  data = (char *)((unsigned char*)dnsHdrPtr + sizeof(DNS_HEADER));
+
+
+  // Extract host name
+  //if ((dataLength = packetLengthParam - (sizeof(ETHDR) + ipHdrLength + sizeof(UDPHDR) + sizeof(PDNS_HDR))) > 0)
+  if ((dataLength = packetLengthParam - (sizeof(ETHDR) + ipHdrLength + sizeof(UDPHDR) + sizeof(PDNS_HEADER))) > 0)
+  {
+    count2 = 0;
+
+    for (index1 = 1; index1 < dataLength && count2 < hostBufferLengthParam; index1++)
+    {
+      if (data[index1] > 31 && data[index1] < 127)
+      {
+        hostnameParam[count2++] = data[index1];
+      }
+      else if (data[index1] == '\0')
+      {
+        break;
+      }
+      else
+      {
+        hostnameParam[count2++] = '.';
+      }
+    }
+  }
+
+  if (count2 > 2)
+  {
+    retVal = OK;
+  }
+
+  return retVal;
 }
 
