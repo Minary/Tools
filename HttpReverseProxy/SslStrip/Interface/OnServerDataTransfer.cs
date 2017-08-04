@@ -77,9 +77,9 @@
       // Keep SSL stripped URLs in cache
       foreach (string tmpKey in cacheUrlMapping.Keys)
       {
-        if (Cache.CacheSslStrip.Instance.SslStripCache.ContainsKey(tmpKey) == false)
+        if (this.cacheSslStrip.SslStripCache.ContainsKey(tmpKey) == false)
         {
-          Cache.CacheSslStrip.Instance.AddElement(requestObj.Id, tmpKey, cacheUrlMapping[tmpKey]);
+          this.cacheSslStrip.AddElement(requestObj.Id, tmpKey, cacheUrlMapping[tmpKey]);
         }
       }
     }

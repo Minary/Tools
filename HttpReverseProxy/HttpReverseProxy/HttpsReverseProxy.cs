@@ -63,10 +63,10 @@
     {
       // Initialize general values
       Config.RemoteHostIp = "0.0.0.0";
-//this.pluginCalls = new Lib.PluginCalls();
+      //this.pluginCalls = new Lib.PluginCalls();
 
-// Load all plugins
-//this.LoadAllPlugins();
+      // Load all plugins
+      //this.LoadAllPlugins();
 
       // Start listener
       serverCertificate2 = new X509Certificate2(certificateFilePath, string.Empty);
@@ -103,7 +103,7 @@
       }
 
       // Unload loaded plugins
-//this.UnloadAllPlugins();
+      //this.UnloadAllPlugins();
     }
 
 
@@ -307,13 +307,13 @@
       List<IPlugin> tmpPluginList = new List<IPlugin>();
       tmpPluginList.AddRange(Config.LoadedPlugins);
 
-      foreach(IPlugin tmpPlugin in tmpPluginList)
+      foreach (IPlugin tmpPlugin in tmpPluginList)
       {
         tmpPlugin.OnUnload();
         Config.LoadedPlugins.Remove(tmpPlugin);
       }
     }
-    
+
     #endregion
 
 
@@ -385,16 +385,18 @@
     /// <param name="pluginData"></param>
     public void RegisterPlugin(IPlugin pluginData)
     {
-      if (pluginData != null)
+      if (pluginData == null)
       {
-        lock (Config.LoadedPlugins)
+        return;
+      }
+
+      lock (Config.LoadedPlugins)
+      {
+        List<IPlugin> foundPlugins = Config.LoadedPlugins.FindAll(elem => elem.Config.Name == pluginData.Config.Name);
+        if (foundPlugins == null || foundPlugins.Count <= 0)
         {
-          List<IPlugin> foundPlugins = Config.LoadedPlugins.FindAll(elem => elem.Config.Name == pluginData.Config.Name);
-          if (foundPlugins == null || foundPlugins.Count <= 0)
-          {
-            Config.AddNewPlugin(pluginData);
-            Logging.Instance.LogMessage("HttpsReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
-          }
+          Config.AddNewPlugin(pluginData);
+          Logging.Instance.LogMessage("HttpsReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
         }
       }
     }

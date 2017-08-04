@@ -7,12 +7,12 @@
   using System.Collections.Generic;
   using System.Text.RegularExpressions;
 
+
   public class CacheRedirect
   {
 
     #region MEMBERS
-
-    private static CacheRedirect instance;
+    
     private Dictionary<string, HostRecord> cache = new Dictionary<string, HostRecord>();
 
     #endregion
@@ -20,13 +20,17 @@
 
     #region PROPERTIES
 
-    public static CacheRedirect Instance { get { return instance ?? (instance = new CacheRedirect()); } set { } }
     public Dictionary<string, HostRecord> RedirectCache { get { return this.cache; } set { } }
 
     #endregion
 
 
     #region PUBLIC
+
+    public CacheRedirect()
+    {
+    }
+
 
     /// <summary>
     ///
@@ -166,15 +170,6 @@
     }
 
     #endregion
-
-
-    #region PRIVATE
-
-    private CacheRedirect()
-    {
-    }
-
-    #endregion
-
+    
   }
 }

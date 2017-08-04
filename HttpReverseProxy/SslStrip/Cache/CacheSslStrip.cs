@@ -7,20 +7,18 @@
   using System.Collections.Generic;
   using System.Text.RegularExpressions;
 
+
   public class CacheSslStrip
   {
 
     #region MEMBERS
-
-    private static CacheSslStrip instance;
+    
     private Dictionary<string, HostRecord> cache = new Dictionary<string, HostRecord>();
 
     #endregion
 
 
     #region PROPERTIES
-
-    public static CacheSslStrip Instance { get { return instance ?? (instance = new CacheSslStrip()); } set { } }
 
     public Dictionary<string, HostRecord> SslStripCache { get { return this.cache; } set { } }
 

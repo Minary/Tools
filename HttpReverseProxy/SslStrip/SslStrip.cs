@@ -18,6 +18,9 @@
 
     #region MEMBERS
 
+    private CacheHsts cacheHsts;
+    private CacheRedirect cacheRedirect;
+    private CacheSslStrip cacheSslStrip;
     private PluginProperties pluginProperties;
     private string sslStrippedData;
     private Dictionary<string, bool> sslStrippedHosts = new Dictionary<string, bool>();
@@ -49,6 +52,9 @@
       this.sslStrippedHosts = new Dictionary<string, bool>();
       this.sslStrippedUrls = new Dictionary<string, string>();
 
+      this.cacheHsts = new CacheHsts();
+      this.cacheRedirect = new CacheRedirect();
+
       this.pluginProperties = new PluginProperties()
       {
         Name = SslStripConfig.PluginName,
@@ -70,14 +76,14 @@
           continue;
         }
 
-        if (CacheHsts.Instance.HstsCache.ContainsKey(requestObj.ClientRequestObj.GetRequestedUrl()))
+        if (this.cacheHsts.HstsCache.ContainsKey(requestObj.ClientRequestObj.GetRequestedUrl()))
         {
           continue;
         }
 
         try
         {
-          CacheHsts.Instance.AddElement(requestObj.ClientRequestObj.GetRequestedUrl());
+          this.cacheHsts.AddElement(requestObj.ClientRequestObj.GetRequestedUrl());
         }
         catch
         {
@@ -171,7 +177,7 @@
 
       try
       {
-        CacheRedirect.Instance.AddElement(requestObj.Id, requestedLocation, redirectLocationHttps);
+        this.cacheRedirect.AddElement(requestObj.Id, requestedLocation, redirectLocationHttps);
       }
       catch
       {
@@ -211,7 +217,7 @@
 
       try
       {
-        CacheRedirect.Instance.AddElement(requestObj.Id, redirectLocationHttp, redirectLocationHttps);
+        this.cacheRedirect.AddElement(requestObj.Id, redirectLocationHttp, redirectLocationHttps);
       }
       catch
       {

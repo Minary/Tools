@@ -8,6 +8,7 @@
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
 
+
   public partial class SslStrip
   {
 
@@ -32,9 +33,9 @@
 
       // 1. If requested Url was HTML SSL stripped
       //    -> replace "http" by "https"
-      if (CacheSslStrip.Instance.NeedsRequestBeMapped(requestedUrl))
+      if (this.cacheSslStrip.NeedsRequestBeMapped(requestedUrl))
       {
-        HostRecord tmpHost = CacheSslStrip.Instance.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
+        HostRecord tmpHost = this.cacheSslStrip.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
         requestObj.ProxyProtocol = tmpHost.ProxyProtocol;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
         requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
@@ -43,9 +44,9 @@
 
       // 2. If requested Url was detected to be redirected
       //    ->  replace "scheme://host/randomFileName" by the redirection location
-      if (CacheRedirect.Instance.NeedsRequestBeMapped(requestedUrl))
+      if (this.cacheRedirect.NeedsRequestBeMapped(requestedUrl))
       {
-        HostRecord tmpHost = CacheRedirect.Instance.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
+        HostRecord tmpHost = this.cacheRedirect.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
         requestObj.ProxyProtocol = tmpHost.ProxyProtocol;
         requestObj.ClientRequestObj.Host = tmpHost.Host;
         requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
@@ -54,7 +55,7 @@
 
       // 3. If requested host was flaged to use HTTPS because of HSTS
       //    -> replace scheme "http://" by "https://"
-      if (CacheHsts.Instance.GetElement(requestObj.ClientRequestObj.Host) != null)
+      if (this.cacheHsts.GetElement(requestObj.ClientRequestObj.Host) != null)
       {
         Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Info, "SslStrip.OnPostClientHeadersRequest(): HSTS header set for \"{0}\"", requestObj.ClientRequestObj.Host);
         requestObj.ProxyProtocol = ProxyProtocol.Https;

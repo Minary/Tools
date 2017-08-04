@@ -11,17 +11,15 @@
   {
 
     #region MEMBER
-
-    private static CacheHsts instance;
-    private Dictionary<string, HstsRecord> cache = new Dictionary<string, HstsRecord>();
+    
+    private static Dictionary<string, HstsRecord> cache = new Dictionary<string, HstsRecord>();
 
     #endregion
 
 
     #region PROPERTIES
-
-    public static CacheHsts Instance { get { return instance ?? (instance = new CacheHsts()); } set { } }
-    public Dictionary<string, HstsRecord> HstsCache { get { return this.cache; } set { } }
+    
+    public Dictionary<string, HstsRecord> HstsCache { get { return cache; } set { } }
 
     #endregion
 
@@ -32,7 +30,7 @@
     /// Initializes a new instance of the <see cref="CacheHsts"/> class.
     ///
     /// </summary>
-    private CacheHsts()
+    public CacheHsts()
     {
     }
 
@@ -51,7 +49,7 @@
       }
 
       // Return if element already exists
-      if (this.cache.ContainsKey(host))
+      if (cache.ContainsKey(host))
       {
         return;
       }
@@ -59,7 +57,7 @@
       Logging.Instance.LogMessage("SslStrip.CacheHsts.AddElement", ProxyProtocol.Undefined, Loglevel.Debug, "Cache.AddElement(): host => {0}", host);
 
       HstsRecord tmpHost = new HstsRecord(host);
-      this.cache.Add(host, tmpHost);
+      cache.Add(host, tmpHost);
     }
 
 
@@ -68,7 +66,7 @@
     /// </summary>
     public void EnumerateCache()
     {
-      foreach (string tmpKey in this.cache.Keys)
+      foreach (string tmpKey in cache.Keys)
       {
         Logging.Instance.LogMessage("SslStrip.CacheHsts.EnumerateCache", ProxyProtocol.Undefined, Loglevel.Debug, "EnumerateCache(): host:\"{0}\"", tmpKey);
       }
@@ -80,9 +78,13 @@
     /// </summary>
     public void ResetCache()
     {
-      if (this.cache != null)
+      if (cache != null)
       {
-        this.cache.Clear();
+        cache.Clear();
+      }
+      else
+      {
+        cache = new Dictionary<string, HstsRecord>();
       }
     }
 
@@ -99,9 +101,9 @@
         throw new Exception("Something is wrong with the host name");
       }
 
-      if (this.cache.ContainsKey(host))
+      if (cache.ContainsKey(host))
       {
-        return this.cache.Remove(host);
+        return cache.Remove(host);
       }
 
       return false;
@@ -121,12 +123,12 @@
         throw new Exception("Something is wrong with the host name");
       }
 
-      if (!this.cache.ContainsKey(host))
+      if (!cache.ContainsKey(host))
       {
         return null;
       }
 
-      return this.cache[host];
+      return cache[host];
     }
 
 
@@ -138,7 +140,7 @@
     /// <returns></returns>
     public bool NeedsRequestBeMapped(string host)
     {
-      if (!string.IsNullOrEmpty(host) && !string.IsNullOrWhiteSpace(host) && this.cache.ContainsKey(host))
+      if (!string.IsNullOrEmpty(host) && !string.IsNullOrWhiteSpace(host) && cache.ContainsKey(host))
       {
         return true;
       }

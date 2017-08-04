@@ -14,8 +14,8 @@
     {
       Logging.Instance.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Debug, "SslStrip.OnUnload():");
 
-      CacheHsts.Instance.ResetCache();
-      CacheRedirect.Instance.RedirectCache.Clear();
+      this.cacheHsts.ResetCache();
+      this.cacheRedirect.RedirectCache.Clear();
     }
   }
 }
