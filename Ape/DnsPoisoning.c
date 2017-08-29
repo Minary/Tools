@@ -153,6 +153,7 @@ END:
   return retVal;
 }
 
+
 int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
 {
   int retVal = OK;
