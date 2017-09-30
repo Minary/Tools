@@ -155,7 +155,7 @@ int main(int argc, char **argv)
   {
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
-    InitializeMITM();
+    InitializeMitm();
   }
   else
   {

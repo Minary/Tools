@@ -89,7 +89,7 @@ void InitializeMITM()
 
   // 1. Start Ethernet FORWARDING thread
   if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
-      gRESENDThreadHandle == INVALID_HANDLE_VALUE)
+       gRESENDThreadHandle == INVALID_HANDLE_VALUE)
   {
     LogMsg(DBG_ERROR, "main(): Can't start Listener thread : %d", GetLastError());
     goto END;
@@ -97,7 +97,7 @@ void InitializeMITM()
 
   // 2. Start POISONING the ARP caches.
   if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL ||
-      gPOISONINGThreadHandle == INVALID_HANDLE_VALUE)
+       gPOISONINGThreadHandle == INVALID_HANDLE_VALUE)
   {
     LogMsg(DBG_ERROR, "main(): Can't start NetworkScanner thread : %d", GetLastError());
     goto END;
@@ -153,8 +153,6 @@ END:
 }
 
 
-
-
 void AdminCheck(char *programNameParam)
 {
   // The user needs adminstrator privileges to 
@@ -170,8 +168,6 @@ void AdminCheck(char *programNameParam)
     exit(1);
   }
 }
-
-
 
 
 int UserIsAdmin()
@@ -192,4 +188,3 @@ int UserIsAdmin()
 
   return retVal;
 }
-
