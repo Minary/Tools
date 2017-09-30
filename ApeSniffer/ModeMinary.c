@@ -50,62 +50,13 @@ int ModeMinaryStart(PSCANPARAMS scanParamsParam)
     printf("Writing out put to console\n");
   }
 
-  // Open device list.
-  if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
+  if (GetPcapDevice() == FALSE)
   {
-    LogMsg(DBG_ERROR, "startSniffer() : Error in pcap_findalldevs_ex() : %s", tempBuffer);
+    printf("Could not open Pcap device correctly.\n");
     goto END;
   }
 
-  ZeroMemory(adapter, sizeof(adapter));
-
-  // Loop through all available interfaces and pick the
-  // right one out.
-  for (counter = 0, device = allDevices; device; device = device->next, counter++)
-  {
-    if (StrStrI(device->name, (char *)gCurrentScanParams.IFCName)) //pIFCName))
-    {
-      strcpy(adapter, device->name);
-      break;
-    }
-  }
-
-  if (allDevices)
-  {
-    pcap_freealldevs(allDevices);
-  }
-
-  // Open interface.
-  if ((gCurrentScanParams.IfcReadHandle = pcap_open(adapter, 65536, PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
-  {
-    LogMsg(DBG_ERROR, "startSniffer() : Unable to open the adapter \"%s\"", gCurrentScanParams.IFCName);
-    goto END;
-  }
-
-  // Compiling + setting the filter
-  if (device->addresses != NULL)
-  {
-    netMask = ((struct sockaddr_in *)(device->addresses->netmask))->sin_addr.S_un.S_addr;
-  }
-  else
-  {
-    netMask = 0xffffff;
-  }
-
-  ZeroMemory(&filterCode, sizeof(filterCode));
-  ZeroMemory(bpfFilter, sizeof(bpfFilter));
-  snprintf(bpfFilter, sizeof(bpfFilter) - 1, "dst port 80 or dst port 443 or dst port 53 or src port 53");
-  if (pcap_compile((pcap_t *)gCurrentScanParams.IfcReadHandle, &filterCode, bpfFilter, 1, netMask) < 0)
-  {
-    LogMsg(DBG_ERROR, "startSniffer() : Unable to compile the packet filter");
-  }
-
-  if (pcap_setfilter((pcap_t *)gCurrentScanParams.IfcReadHandle, &filterCode) >= 0)
-  {
-    LogMsg(DBG_ERROR, "startSniffer() : Error setting the filter");
-  }
-
-  LogMsg(DBG_INFO, "startSniffer() : Scanner started. Waiting for data on device \"%s\" ...", adapter);
+  LogMsg(DBG_INFO, "startSniffer() : Scanner started. Waiting for data ...");
 
   // Start intercepting data packets.
   pcap_loop((pcap_t *)gCurrentScanParams.IfcReadHandle, 0, (pcap_handler)SniffAndParseCallback, (unsigned char *)&gCurrentScanParams);
@@ -484,5 +435,93 @@ void HandleHttpTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
   // There should be a better place where this 
   // function is called.
   RemoveOldConnections(&gConnectionList);
+}
+
+
+int filterException(int code, PEXCEPTION_POINTERS ex) 
+{
+  printf("EXCEPTION: Filtering %d\r\n", code);
+  return EXCEPTION_EXECUTE_HANDLER;
+}
+
+BOOL GetPcapDevice()
+{
+  BOOL retVal = FALSE;
+  pcap_if_t *device = NULL;
+  pcap_if_t *allDevices = NULL;
+  struct bpf_program filterCode;
+  unsigned int netMask = 0;
+  char adapter[MAX_BUF_SIZE + 1];
+  char bpfFilter[MAX_BUF_SIZE + 1];
+  char tempBuffer[PCAP_ERRBUF_SIZE];
+  int counter;
+
+  // Open device list.
+  if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
+  {
+    LogMsg(DBG_ERROR, "startSniffer() : Error in pcap_findalldevs_ex() : %s", tempBuffer);
+    goto END;
+  }
+
+  ZeroMemory(adapter, sizeof(adapter));
+
+  // Loop through all available interfaces and pick the
+  // right one out.
+  for (counter = 0, device = allDevices; device; device = device->next, counter++)
+  {
+    if (StrStrI(device->name, (char *)gCurrentScanParams.IfcName)) //pIFCName))
+    {
+      strcpy(adapter, device->name);
+      break;
+    }
+  }
+
+  if (allDevices)
+  {
+    pcap_freealldevs(allDevices);
+  }
+
+  // Open interface.
+  if ((gCurrentScanParams.IfcReadHandle = pcap_open(adapter, 65536, PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
+  {
+    LogMsg(DBG_ERROR, "startSniffer() : Unable to open the adapter \"%s\"", gCurrentScanParams.IfcName);
+    goto END;
+  }
+
+  // Compiling + setting the filter
+  if (device->addresses != NULL)
+  {
+    __try
+    {
+      netMask = ((struct sockaddr_in *)(device->addresses->netmask))->sin_addr.S_un.S_addr;
+    }
+    __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+    {
+      netMask = 0xffffff;
+    }
+  }
+  else
+  {
+    netMask = 0xffffff;
+  }
+
+  ZeroMemory(&filterCode, sizeof(filterCode));
+  ZeroMemory(bpfFilter, sizeof(bpfFilter));
+  snprintf(bpfFilter, sizeof(bpfFilter) - 1, "dst port 80 or dst port 443 or dst port 53 or src port 53");
+  if (pcap_compile((pcap_t *)gCurrentScanParams.IfcReadHandle, &filterCode, bpfFilter, 1, netMask) < 0)
+  {
+    LogMsg(DBG_ERROR, "startSniffer() : Unable to compile the packet filter");
+  }
+
+  if (pcap_setfilter((pcap_t *)gCurrentScanParams.IfcReadHandle, &filterCode) >= 0)
+  {
+    LogMsg(DBG_ERROR, "startSniffer() : Error setting the filter");
+  }
+
+  retVal = TRUE;
+
+END:
+
+  return retVal;
 }
 
