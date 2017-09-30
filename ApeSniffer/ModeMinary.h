@@ -4,8 +4,8 @@
 #include "APESniffer.h"
 
 
-int ModeMinaryStart(PSCANPARAMS pScanParams);
-void SniffAndParseCallback(unsigned char *pScanParams, struct pcap_pkthdr *pPcapHdr, unsigned char *pPktData);
-int WriteOutput(char *pData, int pDataLen);
-void HandleHttpTraffic(char *pSrcMAC, PIPHDR pIPHdr, PTCPHDR pTCPHdr);
+int ModeMinaryStart(PSCANPARAMS scanParamsParam);
+void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *pcapHdrParam, unsigned char *packetDataParam);
+int WriteOutput(char *data, int dataLength);
+void HandleHttpTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHdrPtrParam);
 BOOL GetPcapDevice();
