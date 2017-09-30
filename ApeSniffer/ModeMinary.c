@@ -338,7 +338,17 @@ int WriteOutput(char *data, int dataLength)
       LogMsg(DBG_HIGH, "gCurrentScanParams.OutputPipeName[0]=%s\n", gCurrentScanParams.OutputPipeName[0]);
     }
 
-    printf(data);
+    if (data != NULL)
+    {
+      __try
+      {
+        puts(data);
+      }
+      __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+      {
+        printf("OMG it's a bug!!\r\n");
+      }
+    }
   }
 
   LeaveCriticalSection(&gCSOutputPipe);

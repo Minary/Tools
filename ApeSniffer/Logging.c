@@ -53,7 +53,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   vsprintf(tempBuffer, logMessageParam, args);
   va_end(args);
   snprintf(logMessage, sizeof(logMessage) - 1, "%s %-7s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
-  printf(logMessage);
+  PrintToScreen(logMessage);
 
   // Write message to the logfile.
   SetFilePointer(fileHandle, 0, NULL, FILE_END);
@@ -64,5 +64,23 @@ END:
   {
     UnlockFileEx(fileHandle, 0, 0, 0, &overlapped);
     CloseHandle(fileHandle);
+  }
+}
+
+
+void PrintToScreen(char *data)
+{
+  if (data == NULL)
+  {
+    return;
+  }
+
+  __try
+  {
+    puts(data);
+  }
+  __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+  {
+    puts("OMG it's a bug!!\r\n");
   }
 }

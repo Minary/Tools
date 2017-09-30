@@ -15,3 +15,4 @@
 #define DBG_LOGFILE "c:\\debug.log"
 
 void LogMsg(int priorityParam, char *logMessageParam, ...);
+void PrintToScreen(char *data);
