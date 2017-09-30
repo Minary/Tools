@@ -206,7 +206,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   // redirect to this system (e.g. www.facebook.com).
   //
   if (memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) == 0 &&
-    ipHdrPtrParam->proto == IP_PROTO_TCP)
+      ipHdrPtrParam->proto == IP_PROTO_TCP)
   {
     readlDstSystem = GetNodeByIp(gTargetSystemsList, ethrHdr->ether_dhost);
     Mac2String(ethrHdr->ether_dhost, dstMacStr, sizeof(dstMacStr) - 1);
@@ -232,8 +232,8 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
       HandleHttpTraffic((char *)srcMacStr, ipHdrPtrParam, tcpHdrPtrParam);
     }
 
-    // Dst IP is not our own local IP.
-    // Process packet and forward it to the default GW.
+  // Dst IP is not our own local IP.
+  // Process packet and forward it to the default GW.
   }
   else if (memcmp(&ipHdrPtrParam->saddr, scanParams.LocalIP, BIN_IP_LEN) != 0 && memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) != 0)
   {
@@ -275,15 +275,15 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
             ZeroMemory(realData, sizeof(realData));
 
             /*
-            * Copy connection data to data structure.
-            */
+             * Copy connection data to data structure.
+             */
             system.srcPort = ntohs(tcpHdrPtrParam->sport);
             system.dstPort = ntohs(tcpHdrPtrParam->dport);
 
 
             /*
-            * Copy and stringify the payload
-            */
+             * Copy and stringify the payload
+             */
             if (tcpDataLength > 1460)
             {
               strncpy((char *)data, (char *)tcpHdrPtrParam + tcpHeaderLength, 1460);
@@ -383,12 +383,12 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
 }
 
 
-int WriteOutput(char *pData, int pDataLen)
+int WriteOutput(char *data, int dataLength)
 {
   int retVal = 0;
   DWORD dwRead = 0;
 
-  if (pData == NULL || pDataLen <= 0)
+  if (data == NULL || dataLength <= 0)
   {
     return NOK;
   }
@@ -397,14 +397,14 @@ int WriteOutput(char *pData, int pDataLen)
 
   // Write output data to named pipe
   if (gCurrentScanParams.OutputPipeName[0] != NULL &&
-    gOutputPipe != INVALID_HANDLE_VALUE &&
-    gOutputPipe != 0)
+      gOutputPipe != INVALID_HANDLE_VALUE &&
+      gOutputPipe != 0)
   {
-    if (!WriteFile(gOutputPipe, pData, pDataLen, &dwRead, NULL))
+    if (!WriteFile(gOutputPipe, data, dataLength, &dwRead, NULL))
     {
       CloseHandle(gOutputPipe);
       gOutputPipe = INVALID_HANDLE_VALUE;
-      LogMsg(DBG_ERROR, "WriteOutput() : Error occurred while writing \"%s\" ...", pData);
+      LogMsg(DBG_ERROR, "WriteOutput() : Error occurred while writing \"%s\" ...", data);
     }
     else
     {
@@ -415,9 +415,12 @@ int WriteOutput(char *pData, int pDataLen)
   {
     // Write output data to the screen
     LogMsg(DBG_HIGH, "gOutputPipe == INVALID_HANDLE_VALUE || gOutputPipe == 0\n");
-    LogMsg(DBG_HIGH, "gCurrentScanParams.OutputPipeName[0]=%s\n", gCurrentScanParams.OutputPipeName[0]);
+    if (gCurrentScanParams.OutputPipeName[0] != NULL)
+    {
+      LogMsg(DBG_HIGH, "gCurrentScanParams.OutputPipeName[0]=%s\n", gCurrentScanParams.OutputPipeName[0]);
+    }
 
-    printf(pData);
+    printf(data);
   }
 
   LeaveCriticalSection(&gCSOutputPipe);

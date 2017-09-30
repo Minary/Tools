@@ -37,9 +37,9 @@
 
 
 /*
-* Type definitions
-*
-*/
+ * Type definitions
+ *
+ */
 typedef struct
 {
   unsigned char sysIpStr[MAX_IP_LEN + 1];
@@ -52,12 +52,11 @@ typedef struct
 } SYSTEMNODE, *PSYSTEMNODE, **PPSYSTEMNODE;
 
 
-
 typedef struct SCANPARAMS
 {
-  unsigned char IFCName[MAX_BUF_SIZE + 1];
-  unsigned char IFCAlias[MAX_BUF_SIZE + 1];
-  unsigned char IFCDescr[MAX_BUF_SIZE + 1];
+  unsigned char IfcName[MAX_BUF_SIZE + 1];
+  unsigned char IfcAlias[MAX_BUF_SIZE + 1];
+  unsigned char IfcDescr[MAX_BUF_SIZE + 1];
   int Index;
   unsigned char GWIP[BIN_IP_LEN];
   unsigned char GWIPStr[MAX_IP_LEN];
@@ -85,15 +84,10 @@ typedef struct SCANPARAMS
  *
  */
 void stringify(unsigned char *pInput, int pInputLen, unsigned char *pOutput);
-//BOOL APE_ControlHandler(DWORD lala);
-//void writeDepoisoningFile(void);
-//void startUnpoisoningProcess();
 void ExecCommand(char *pCmd);
 void PrintConfig(SCANPARAMS pScanParams);
 int UserIsAdmin();
 void PrintUsage(char *pAppName);
-//void ParseTargetHostsConfigFile(char *pTargetsFile);
-//void parseDNSConfigFile();
 
 #endif
 

@@ -5,17 +5,12 @@
 
 #include "APESniffer.h"
 #include "SniffAndEvaluate.h"
-//#include "NetworkFunctions.h"
 #include "LinkedListConnections.h"
 
 
 extern CRITICAL_SECTION gCSConnectionsList;
 
 
-/*
-*
-*
-*/
 PCONNODE InitConnectionList()
 {
   PCONNODE firstSysNode = NULL;
@@ -46,18 +41,17 @@ void AddConnectionToList(PPCONNODE conNodesParam, char *srcMacStr, char *srcIpSt
   PCONNODE tempNode = NULL;
 
   if (conNodesParam == NULL ||
-    *conNodesParam == NULL ||
-    srcMacStr == NULL ||
-    srcIpStrParam == NULL ||
-    srcPortParam <= 0 ||
-    dstIpStrParam == NULL ||
-    dstPortParam <= 0)
+     *conNodesParam == NULL ||
+     srcMacStr == NULL ||
+     srcIpStrParam == NULL ||
+     srcPortParam <= 0 ||
+     dstIpStrParam == NULL ||
+     dstPortParam <= 0)
   {
     return;
   }
 
   EnterCriticalSection(&gCSConnectionsList);
-
   if ((tempNode = (PCONNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(CONNODE))) != NULL)
   {
     ZeroMemory(id, sizeof(id));
@@ -84,39 +78,32 @@ void AddConnectionToList(PPCONNODE conNodesParam, char *srcMacStr, char *srcIpSt
 }
 
 
-
-
-/*
-*
-*
-*/
-PCONNODE ConnectionNodeExists(PCONNODE conNodesParam, char *pID)
+PCONNODE ConnectionNodeExists(PCONNODE conNodesParam, char *id)
 {
   PCONNODE retVal = NULL;
-  PCONNODE lTmpCon;
-  int lCount = 0;
-
-
+  PCONNODE tmpConnection;
+  int counter = 0;
+  
   EnterCriticalSection(&gCSConnectionsList);
-
-  if (pID != NULL && (lTmpCon = conNodesParam) != NULL)
+  if (id != NULL && (tmpConnection = conNodesParam) != NULL)
   {
 
     // Go to the end of the list
-    for (lCount = 0; lCount < MAX_CONNECTION_COUNT; lCount++)
+    for (counter = 0; counter < MAX_CONNECTION_COUNT; counter++)
     {
-      if (lTmpCon != NULL)
+      if (tmpConnection != NULL)
       {
-        if (!strncmp(lTmpCon->ID, pID, sizeof(lTmpCon->ID)))
+        if (!strncmp(tmpConnection->ID, id, sizeof(tmpConnection->ID)))
         {
-          retVal = lTmpCon;
+          retVal = tmpConnection;
           break;
         }
       }
 
-      if ((lTmpCon = lTmpCon->next) == NULL)
+      if ((tmpConnection = tmpConnection->next) == NULL)
+      {
         break;
-
+      }
     }
   }
 
@@ -126,24 +113,19 @@ PCONNODE ConnectionNodeExists(PCONNODE conNodesParam, char *pID)
 }
 
 
-
-/*
- *
- *
- */
-void ConnectionDeleteNode(PPCONNODE conNodesParam, char *pConID)
+void ConnectionDeleteNode(PPCONNODE conNodesParam, char *conId)
 {
   int retVal = 0;
   PCONNODE tempNode, q;
-  char lTemp[MAX_BUF_SIZE + 1];
+  char tmpBuffer[MAX_BUF_SIZE + 1];
 
-  if (conNodesParam != NULL && *conNodesParam != NULL && pConID != NULL)
+  if (conNodesParam != NULL && *conNodesParam != NULL && conId != NULL)
   {
-    ZeroMemory(lTemp, sizeof(lTemp));
+    ZeroMemory(tmpBuffer, sizeof(tmpBuffer));
     EnterCriticalSection(&gCSConnectionsList);
 
     // Remove first node.
-    if (!strncmp(((PCONNODE)*conNodesParam)->ID, pConID, MAX_ID_LEN) && ((PCONNODE)*conNodesParam)->first == 0)
+    if (!strncmp(((PCONNODE)*conNodesParam)->ID, conId, MAX_ID_LEN) && ((PCONNODE)*conNodesParam)->first == 0)
     {
       tempNode = *conNodesParam;
       *conNodesParam = ((PCONNODE)*conNodesParam)->next;
@@ -151,7 +133,7 @@ void ConnectionDeleteNode(PPCONNODE conNodesParam, char *pConID)
 
       if (tempNode->data != NULL)
       {
-        WriteHTTPDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
+        WriteHttpDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
         HeapFree(GetProcessHeap(), 0, tempNode->data);
       }
 
@@ -159,11 +141,10 @@ void ConnectionDeleteNode(PPCONNODE conNodesParam, char *pConID)
       goto END;
     }
 
-
     q = (PCONNODE)*conNodesParam;
     while (q->next != NULL && q->next->next != NULL && q->first == 0)
     {
-      if (!strncmp(q->ID, pConID, MAX_ID_LEN))
+      if (!strncmp(q->ID, conId, MAX_ID_LEN))
       {
         tempNode = q->next;
         q->next = tempNode->next;
@@ -171,7 +152,7 @@ void ConnectionDeleteNode(PPCONNODE conNodesParam, char *pConID)
 
         if (tempNode->data != NULL && tempNode->dataLength)
         {
-          WriteHTTPDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
+          WriteHttpDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
           HeapFree(GetProcessHeap(), 0, tempNode->data);
         }
 
@@ -190,14 +171,8 @@ END:
 }
 
 
-
-/*
-*
-*
-*/
 void ConnectionAddData(PCONNODE nodeParam, char *dataParam, int dataLengthParam)
 {
-
   if (nodeParam == NULL || dataParam == NULL || dataLengthParam <= 0)
   {
     return;
@@ -230,19 +205,16 @@ void ConnectionAddData(PCONNODE nodeParam, char *dataParam, int dataLengthParam)
     {
       if (dataLengthParam > 4 && (!strncmp(dataParam, "GET ", 3) || !strncmp(dataParam, "POST ", 4)))
       {
-        WriteHTTPDataToPipe((char *)nodeParam->data, nodeParam->dataLength, nodeParam->srcMacStr, nodeParam->srcIpStr, nodeParam->srcPort, nodeParam->dstIpStr, nodeParam->dstPort);
-        //printf("DATA1.0.1\n");
+        WriteHttpDataToPipe((char *)nodeParam->data, nodeParam->dataLength, nodeParam->srcMacStr, nodeParam->srcIpStr, nodeParam->srcPort, nodeParam->dstIpStr, nodeParam->dstPort);
 
         if (HeapFree(GetProcessHeap(), 0, nodeParam->data))
         {
-          //printf("DATA1.0.2\n");
           nodeParam->dataLength = 0;
           if ((nodeParam->data = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dataLengthParam + 3)) != NULL)
           {
             memset(nodeParam->data, '.', dataLengthParam + 2);
             CopyMemory(nodeParam->data, dataParam, dataLengthParam);
             nodeParam->dataLength = dataLengthParam + 2;
-            //printf("DATA1.0.3 |%s|\n", pNode->Data);
           }
         }
       }
@@ -259,11 +231,6 @@ void ConnectionAddData(PCONNODE nodeParam, char *dataParam, int dataLengthParam)
 }
 
 
-
-/*
-*
-*
-*/
 int ConnectionCountNodes(PCONNODE conNodesParam)
 {
   int retVal = 0;
@@ -281,7 +248,6 @@ int ConnectionCountNodes(PCONNODE conNodesParam)
 }
 
 
-
 /*
  * Remove all entries that contain more than MAX_CONNECTION_VOLUME bytes
  * or are oldern than TCP_MAX_ACTIVITY.
@@ -291,7 +257,6 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
 {
   PCONNODE tempNode, q;
   time_t now = time(NULL);
-
 
   EnterCriticalSection(&gCSConnectionsList);
 
@@ -307,7 +272,7 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
 
       if (tempNode->data != NULL)
       {
-        WriteHTTPDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
+        WriteHttpDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
         HeapFree(GetProcessHeap(), 0, tempNode->data);
       }
 
@@ -326,7 +291,7 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
 
         if (tempNode->data != NULL)
         {
-          WriteHTTPDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
+          WriteHttpDataToPipe((char *)tempNode->data, tempNode->dataLength, tempNode->srcMacStr, tempNode->srcIpStr, tempNode->srcPort, tempNode->dstIpStr, tempNode->dstPort);
           HeapFree(GetProcessHeap(), 0, tempNode->data);
         }
 
@@ -345,24 +310,19 @@ END:
 
 
 
-/*
-*
-*
-*/
-void WriteHTTPDataToPipe(char *dataParam, int dataLengthParam, char *srcMacStrParam, char *srcIpStrParam, unsigned short srcPortParam, char *dstIpStrParam, unsigned short dstPortParam)
+void WriteHttpDataToPipe(char *dataParam, int dataLengthParam, char *srcMacStrParam, char *srcIpStrParam, unsigned short srcPortParam, char *dstIpStrParam, unsigned short dstPortParam)
 {
-  unsigned char *lDataPipe = NULL;
-  int lBufLen = 0;
-
+  unsigned char *dataPipe = NULL;
+  int bufLen = 0;
 
   // Write data to pipe
-  if ((lDataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dataLengthParam + 200)) != NULL)
+  if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dataLengthParam + 200)) != NULL)
   {
-    snprintf((char *)lDataPipe, dataLengthParam + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStrParam, srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam, dataParam);
-    strcat((char *)lDataPipe, "\r\n");
-    lBufLen = strlen((char *)lDataPipe);
+    snprintf((char *)dataPipe, dataLengthParam + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStrParam, srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam, dataParam);
+    strcat((char *)dataPipe, "\r\n");
+    bufLen = strlen((char *)dataPipe);
 
-    WriteOutput((char *)lDataPipe, lBufLen);
-    HeapFree(GetProcessHeap(), 0, lDataPipe);
+    WriteOutput((char *)dataPipe, bufLen);
+    HeapFree(GetProcessHeap(), 0, dataPipe);
   }
 }

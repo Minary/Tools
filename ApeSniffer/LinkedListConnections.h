@@ -32,12 +32,12 @@ typedef struct CONNODE
  *
  */
 PCONNODE InitConnectionList();
-void AddConnectionToList(PPCONNODE pConNodes, char *pSrcMAC, char *pSrcIP, unsigned short pSrcPort, char *pDstIP, unsigned short pDstPort);
-PCONNODE ConnectionNodeExists(PCONNODE pConNodes, char *pID);
-void ConnectionDeleteNode(PPCONNODE pConNodes, char *pID);
-int ConnectionCountNodes(PCONNODE pConNodes);
-void ConnectionAddData(PCONNODE pNode, char *pData, int pDataLen);
-void RemoveOldConnections(PPCONNODE pConNodes);
-void WriteHTTPDataToPipe(char *pData, int pDataLen, char *pSMAC, char *pSrcIP, unsigned short pSrcPort, char *pDstIP, unsigned short pDstPort);
+void AddConnectionToList(PPCONNODE conNodes, char *srcMac, char *srcIp, unsigned short srcPort, char *dstIp, unsigned short dstPort);
+PCONNODE ConnectionNodeExists(PCONNODE conNodes, char *id);
+void ConnectionDeleteNode(PPCONNODE conNodes, char *id);
+int ConnectionCountNodes(PCONNODE conNodes);
+void ConnectionAddData(PCONNODE node, char *data, int dataLength);
+void RemoveOldConnections(PPCONNODE conNodes);
+void WriteHttpDataToPipe(char *data, int dataLength, char *srcMac, char *srcIp, unsigned short srcPort, char *dstIp, unsigned short dstPort);
 
 #endif

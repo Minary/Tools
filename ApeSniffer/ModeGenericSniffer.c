@@ -12,7 +12,6 @@
 #include "SniffAndEvaluate.h"
 
 
-
 int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -37,7 +36,7 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
   ZeroMemory(adapter, sizeof(adapter));
   for (counter = 0, device = allDevices; device; device = device->next, counter++)
   {
-    if (StrStrI(device->name, (char *)scanParamsParam->IFCName)) //pIFCName))
+    if (StrStrI(device->name, (char *)scanParamsParam->IfcName)) //pIFCName))
     {
       strcpy(adapter, device->name);
       break;
@@ -47,7 +46,7 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
   // Open interface.
   if ((scanParamsParam->IfcReadHandle = pcap_open(adapter, 65536, PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "GeneralSniffer() : Unable to open the adapter \"%s\"", scanParamsParam->IFCName);
+    LogMsg(DBG_ERROR, "GeneralSniffer() : Unable to open the adapter \"%s\"", scanParamsParam->IfcName);
     retVal = 3;
     goto END;
   }
@@ -104,7 +103,6 @@ END:
 }
 
 
-
 void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *headerParam, const u_char *packetDataParam)
 {
   PETHDR etherHdr = (PETHDR)packetDataParam;
@@ -139,7 +137,6 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
 
     Mac2String(etherHdr->ether_shost, (unsigned char *)srcMacStr, sizeof(srcMacStr) - 1);
     Mac2String(etherHdr->ether_dhost, (unsigned char *)dstMacStr, sizeof(dstMacStr) - 1);
-    printf("\n\n");
 
     // IPv4
     if (htons(etherHdr->ether_type) == 0x0800)
@@ -154,9 +151,9 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
 
       if (ipHdrPtr->proto == 1)
       {
-        printf("ICMP\t%s  %s", srcIpStr, dstIpStr);
+printf("ICMP\t%s  %s\n\n", srcIpStr, dstIpStr);
 
-        // TCP data packet
+      // TCP data packet
       }
       else if (ipHdrPtr->proto == IP_PROTO_TCP)
       {
@@ -166,9 +163,7 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
         tcpHdrLength = tcpHdrPtr->doff * 4;
         tcpDataLength = totalLength - ipHdrLength - tcpHdrLength;
 
-        printf("TCP\t%s:%d  %s:%d ", srcIpStr, ntohs(tcpHdrPtr->sport), dstIpStr, ntohs(tcpHdrPtr->dport));
-
-
+printf("TCP\t%s:%d  %s:%d ", srcIpStr, ntohs(tcpHdrPtr->sport), dstIpStr, ntohs(tcpHdrPtr->dport));
         if (tcpDataLength > 0)
         {
           strncpy((char *)data, (char *)tcpHdrPtr + tcpHdrLength, tcpDataLength);
@@ -180,20 +175,23 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
           {
             ZeroMemory(tempBuffer, sizeof(tempBuffer));
             memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-            printf("\n\t%s", tempBuffer);
+printf("\n\t%s", tempBuffer);
           }
 
           ZeroMemory(tempBuffer, sizeof(tempBuffer));
           memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-          printf("\n\t%s", tempBuffer);
+printf("\n\t%s|", tempBuffer);
         }
+printf("\n\n");
       }
       else if (ipHdrPtr->proto == IP_PROTO_UDP)
       {
         udpHdrPtr = (PUDPHDR)((u_char*)ipHdrPtr + ipLength);
-        printf("UDP\t%s:%d  %s:%d", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, ntohs(udpHdrPtr->dport));
+printf("UDP\t%s:%d  %s:%d\n\n", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, ntohs(udpHdrPtr->dport));
       }
     }
+
+  // IPv6
   }
   else if (htons(ethrHdrPtr->ether_type) == 0x0806)
   {

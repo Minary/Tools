@@ -140,8 +140,7 @@ int main(int argc, char **argv)
     LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
-    ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
-    
+    ParseFirewallConfigFile(FILE_FIREWALL_RULES1);    
     InitializeParsePcapDumpFile();
 
 
@@ -156,7 +155,6 @@ int main(int argc, char **argv)
   {
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES1);
-
     InitializeMITM();
   }
   else

@@ -17,7 +17,6 @@
 #include "NetworkFunctions.h"
 
 
-
 void Mac2String(unsigned char macAddr[BIN_MAC_LEN], unsigned char *outputBuffer, int outputBufferSize)
 {
   if (outputBuffer && outputBufferSize > 0 && macAddr != NULL && outputBufferSize >= MAX_MAC_LEN)
@@ -25,7 +24,6 @@ void Mac2String(unsigned char macAddr[BIN_MAC_LEN], unsigned char *outputBuffer,
     snprintf((char *)outputBuffer, outputBufferSize - 1, "%02X-%02X-%02X-%02X-%02X-%02X", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
   }
 }
-
 
 
 int GetAliasByIfcIndex(int ifcIndex, char *aliasNameBuffer, int bufferLength)

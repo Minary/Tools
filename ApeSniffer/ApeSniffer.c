@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     switch (opt)
     {
       case 'g':
-        strncpy(gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName) - 1);
+        strncpy(gScanParams.IfcName, optarg, sizeof(gScanParams.IfcName) - 1);
         action = 'g';
         break;
       case 'l':
@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
         strncpy(gScanParams.OutputPipeName, optarg, sizeof(gScanParams.OutputPipeName) - 1);
         break;
       case 's':
-        strncpy((char *)gScanParams.IFCName, optarg, sizeof(gScanParams.IFCName));
-        GetInterfaceName(optarg, (char *)gScanParams.IFCName, sizeof(gScanParams.IFCName) - 1);
+        strncpy((char *)gScanParams.IfcName, optarg, sizeof(gScanParams.IfcName));
+        GetInterfaceName(optarg, (char *)gScanParams.IfcName, sizeof(gScanParams.IfcName) - 1);
         GetInterfaceDetails(optarg, &gScanParams);
         action = 's';
         break;
@@ -94,8 +94,8 @@ int main(int argc, char* argv[])
   }
   else if (argc >= 3 && action == 'g')
   {
-    strncpy((char *)gScanParams.IFCName, argv[2], sizeof(gScanParams.IFCName));
-    GetInterfaceName(argv[2], (char *)gScanParams.IFCName, sizeof(gScanParams.IFCName) - 1);
+    strncpy((char *)gScanParams.IfcName, argv[2], sizeof(gScanParams.IfcName));
+    GetInterfaceName(argv[2], (char *)gScanParams.IfcName, sizeof(gScanParams.IfcName) - 1);
     GetInterfaceDetails(argv[2], &gScanParams);
 
     if (argv[3] != NULL)
@@ -135,17 +135,14 @@ END:
 }
 
 
-
 void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *outputParam)
 {
-  int counter = 0;
-
   if (inputParam == NULL || outputParam == NULL)
   {
     return;
   }
 
-  for (; counter < inputLengthParam && inputParam[counter] != '\0'; counter++)
+  for (int counter = 0; counter < inputLengthParam && inputParam[counter] != '\0'; counter++)
   {
     //    if (pInput[lCounter] < 32 || pInput[lCounter] > 176)
     if (inputParam[counter] < 32 || inputParam[counter] > 126)
@@ -178,7 +175,6 @@ void ExecCommand(char *commandParam)
   ZeroMemory(tempBuffer, sizeof(tempBuffer));
 
   comspec = comspec != NULL ? comspec : "cmd.exe";
-
   startupInfoParam.cb = sizeof(STARTUPINFO);
   startupInfoParam.dwFlags = STARTF_USESHOWWINDOW;
   startupInfoParam.wShowWindow = SW_HIDE;
@@ -188,7 +184,6 @@ void ExecCommand(char *commandParam)
 
   CreateProcess(NULL, tempBuffer, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, &startupInfoParam, &processInfoParam);
 }
-
 
 
 void PrintUsage(char *pAppName)

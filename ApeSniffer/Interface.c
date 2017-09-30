@@ -235,10 +235,10 @@ int GetInterfaceDetails(char *ifcName, PSCANPARAMS scanParams)
         scanParams->Index = adapter->Index;
 
         // Get interface alias.
-        GetAliasByIfcIndex(scanParams->Index, (char *)scanParams->IFCAlias, sizeof(scanParams->IFCAlias) - 1);
+        GetAliasByIfcIndex(scanParams->Index, (char *)scanParams->IfcAlias, sizeof(scanParams->IfcAlias) - 1);
 
         // Get interface description
-        CopyMemory(scanParams->IFCDescr, adapter->Description, sizeof(scanParams->IFCDescr) - 1);
+        CopyMemory(scanParams->IfcDescr, adapter->Description, sizeof(scanParams->IfcDescr) - 1);
 
         break;
       }
