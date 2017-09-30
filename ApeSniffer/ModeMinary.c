@@ -24,19 +24,11 @@ SCANPARAMS gCurrentScanParams;
 HANDLE gOutputPipe = INVALID_HANDLE_VALUE;
 
 
-
 int ModeMinaryStart(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
-  pcap_if_t *allDevices = NULL;
-  pcap_if_t *device = NULL;
-  char tempBuffer[PCAP_ERRBUF_SIZE];
-  char adapter[MAX_BUF_SIZE + 1];
-  char bpfFilter[MAX_BUF_SIZE + 1];
   int counter = 0;
   int interfaceNumber = 0;
-  struct bpf_program filterCode;
-  unsigned int netMask = 0;
   char namedPipePath[MAX_BUF_SIZE + 1];
 
   PSCANPARAMS tempParams = (PSCANPARAMS)scanParamsParam;
@@ -122,7 +114,6 @@ END:
 
   return retVal;
 }
-
 
 
 void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *pcapHdrParam, unsigned char *packetDataParam)
@@ -295,21 +286,16 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
               stringify(data, tcpDataLength, realData);
             }
 
-
-            //
-            if (tcpDataLength > 2)
+            // OVERHEAD is calculated as follows : 15 + 10 + 32 ~ 84
+            if (tcpDataLength > 2 &&
+                (dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, tcpDataLength + 84)) != NULL)
             {
-              // Write HTTP data to pipe
-              if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, tcpDataLength + 84)) != NULL)
-              {
-                // OVERHEAD is calculated as follows : 15 + 10 + 32 ~ 84
-                snprintf((char *)dataPipe, tcpDataLength + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, realData);
-                strcat((char *)dataPipe, "\r\n");
-                bufferLength = strlen((char *)dataPipe);
+              snprintf((char *)dataPipe, tcpDataLength + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, realData);
+              strcat((char *)dataPipe, "\r\n");
+              bufferLength = strlen((char *)dataPipe);
 
-                WriteOutput((char *)dataPipe, bufferLength);
-                HeapFree(GetProcessHeap(), 0, dataPipe);
-              }
+              WriteOutput((char *)dataPipe, bufferLength);
+              HeapFree(GetProcessHeap(), 0, dataPipe);
             }
           }
         }
@@ -356,25 +342,6 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
               WriteOutput((char *)dataPipe, bufferLength);
               HeapFree(GetProcessHeap(), 0, dataPipe);
             }
-          }
-
-          // Generic/Dropzone traffic
-        }
-        else if (ntohs(udpHdrPtr->dport) == 1234 || ntohs(udpHdrPtr->sport) == 1234)
-        {
-          payloadPtr = ((char*)ipHdrPtrParam + ipHeaderLength + sizeof(UDPHDR));
-          ZeroMemory(payload, sizeof(payload));
-          CopyMemory(payload, payloadPtr, ntohs(udpHdrPtr->ulen) - sizeof(UDPHDR));
-          if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, MAX_BUF_SIZE + 1)) != NULL)
-          {
-            // We have to swap src/dst port because otherwise it won't reach the DNS request module
-            snprintf((char *)dataPipe, MAX_BUF_SIZE, "GENERIC||%s||%s||%d||%s||%d||%s", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, payload);
-            strcat((char *)dataPipe, "\r\n");
-            bufferLength = strnlen((char *)dataPipe, MAX_BUF_SIZE);
-            WriteOutput((char *)dataPipe, bufferLength);
-            HeapFree(GetProcessHeap(), 0, dataPipe);
-
-            LogMsg(2, "Generic data. (Dropzone)");
           }
         }
       }
@@ -427,7 +394,6 @@ int WriteOutput(char *data, int dataLength)
 
   return OK;
 }
-
 
 
 void HandleHttpTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHdrPtrParam)
