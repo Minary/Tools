@@ -37,7 +37,6 @@
 #define MAX_BUF_SIZE 1024
 #define MAX_PACKET_SIZE 512
 
-
 #define PCAP_READTIMEOUT 1
 
 #define SLEEP_BETWEEN_ARPS 50
@@ -45,9 +44,6 @@
 #define SLEEP_BETWEEN_ARPSCANS 120 * 1000 // 120 secs
 
 #define snprintf _snprintf
-
-#define OK 0
-#define NOK 1
 
 
 /*

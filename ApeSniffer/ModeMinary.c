@@ -281,7 +281,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
         else if (ntohs(udpHdrPtr->sport) == 53)
         {
           ZeroMemory(hostname, sizeof(hostname));
-          if (GetReqHostName(packetDataParam, pcapHdrParam->len, hostname, sizeof(hostname) - 1) == OK)
+          if (GetReqHostName(packetDataParam, pcapHdrParam->len, hostname, sizeof(hostname) - 1) == TRUE)
           {
             if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, MAX_BUF_SIZE + 1)) != NULL)
             {
@@ -301,9 +301,9 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
 }
 
 
-int WriteOutput(char *data, int dataLength)
+BOOL WriteOutput(char *data, int dataLength)
 {
-  int retVal = 0;
+  BOOL retVal = FALSE;
   DWORD dwRead = 0;
 
   if (data == NULL || dataLength <= 0)
@@ -353,7 +353,7 @@ int WriteOutput(char *data, int dataLength)
 
   LeaveCriticalSection(&gCSOutputPipe);
 
-  return OK;
+  return TRUE;
 }
 
 

@@ -79,9 +79,9 @@ int IpString2Bin(unsigned char ipParam[BIN_IP_LEN], unsigned char *inputParam, i
 }
 
 
-int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLengthParam)
+BOOL GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLengthParam)
 {
-  int retVal = NOK;
+  BOOL retVal = FALSE;
   MIB_IF_ROW2 ifcRow;
 
   if (aliasBufferParam == NULL || bufferLengthParam <= 0)
@@ -95,7 +95,7 @@ int GetAliasByIfcIndex(int ifcIndexParam, char *aliasBufferParam, int bufferLeng
   if (GetIfEntry2(&ifcRow) == NO_ERROR) 
   {
     snprintf(aliasBufferParam, bufferLengthParam-1, "%ws", ifcRow.Alias);
-    retVal = OK;
+    retVal = TRUE;
   }
 
   return retVal;

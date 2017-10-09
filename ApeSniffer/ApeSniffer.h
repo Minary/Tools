@@ -32,7 +32,6 @@
 
 #define snprintf _snprintf
 
-#define OK 0
 #define NOK 1
 
 

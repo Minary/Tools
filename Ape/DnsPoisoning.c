@@ -154,9 +154,9 @@ END:
 }
 
 
-int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
+BOOL GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam)
 {
-  int retVal = OK;
+  BOOL retVal = TRUE;
   PETHDR etherHdrPtr = NULL;
   PIPHDR ipHdrPtr = NULL;     // ip header
   PUDPHDR udpHdrPtr = NULL;   // udp header                              
@@ -202,7 +202,7 @@ int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *host
 
   if (count2 > 2)
   {
-    retVal = OK;
+    retVal = TRUE;
   }
 
   return retVal;

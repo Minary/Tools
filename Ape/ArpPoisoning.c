@@ -127,9 +127,9 @@ END:
  * ARP :	LocMAC/GW-IP -> VicMAC/VicIP
  *
  */
-int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[BIN_MAC_LEN], unsigned char victimIpBinParam[BIN_IP_LEN])
+BOOL SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[BIN_MAC_LEN], unsigned char victimIpBinParam[BIN_IP_LEN])
 {
-  int retVal = OK;
+  BOOL retVal = TRUE;
   ArpPacket arpPacket;
   char victimIpStr[MAX_BUF_SIZE + 1];
   char victimMacStr[MAX_BUF_SIZE + 1];
@@ -141,13 +141,13 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
 
   if (scanParamsParam == NULL || scanParamsParam->InterfaceWriteHandle == NULL)
   {
-    retVal = NOK;
+    retVal = FALSE;
     goto END;
   }
 
   if (memcmp(victimMacBinParam, scanParamsParam->GatewayMacBin, BIN_MAC_LEN) == 0)
   {
-    retVal = NOK;
+    retVal = FALSE;
     goto END;
   }
 
@@ -185,7 +185,7 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
   if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) == FALSE)
   {
     LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet A2B: %s/%-15s <-->  %s/%-15s", victimMacStr, victimIpStr, gatewayMacStr, gatewayIpStr);
-    retVal = NOK;
+    retVal = FALSE;
   }
   else
   {
@@ -212,7 +212,7 @@ int SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[B
   if (SendArpPacket((pcap_t *)scanParamsParam->InterfaceWriteHandle, &arpPacket) == FALSE)
   {
     LogMsg(DBG_ERROR, "Unable to send ARP poisoning packet B2A: %s/%-15s <-->  %s/%-15s", gatewayMacStr, gatewayIpStr, victimMacStr, victimIpStr);
-    retVal = NOK;
+    retVal = FALSE;
   }
   else
   {

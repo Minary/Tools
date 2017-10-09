@@ -4,4 +4,4 @@
 #include "APE.h" 
 
 DWORD WINAPI DnsResponseSniffer(LPVOID lpParam);
-int GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam);
+BOOL GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hostnameParam, int hostBufferLengthParam);

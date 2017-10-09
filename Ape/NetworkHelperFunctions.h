@@ -8,7 +8,7 @@ void MacBin2String(unsigned char pMAC[BIN_MAC_LEN], unsigned char *pOutput, int 
 void IpBin2String(unsigned char pIP[BIN_IP_LEN], unsigned char *pOutput, int pOutputLen);
 void MacString2Bin(unsigned char pMAC[BIN_MAC_LEN], unsigned char *pInput, int pInputLen);
 int IpString2Bin(unsigned char pIP[BIN_IP_LEN], unsigned char *pInput, int pInputLen);
-int GetAliasByIfcIndex(int pIfcIndex, char *pAliasBuf, int pBufLen);
+BOOL GetAliasByIfcIndex(int pIfcIndex, char *pAliasBuf, int pBufLen);
 void SetMacStatic(char *pIfcAlias, char *pIP, char *pMAC);
 void RemoveMacFromCache(char *pIfcAlias, char *pIPAddr);
 void DumpPacket(unsigned char *pPktData, int pPktLen, char *pTitlestring, const struct pcap_pkthdr *pPktHdr);
