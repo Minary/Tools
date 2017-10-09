@@ -177,7 +177,8 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   // Dst IP is not our own local IP.
   // Process packet and forward it to the default GW.
   }
-  else if (memcmp(&ipHdrPtrParam->saddr, scanParams.LocalIP, BIN_IP_LEN) != 0 && memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) != 0)
+  else if (memcmp(&ipHdrPtrParam->saddr, scanParams.LocalIP, BIN_IP_LEN) != 0 && 
+           memcmp(&ipHdrPtrParam->daddr, scanParams.LocalIP, BIN_IP_LEN) != 0)
   {
     readlDstSystem = GetNodeByIp(gTargetSystemsList, ethrHdr->ether_dhost);
     {
@@ -199,7 +200,6 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
 
         ZeroMemory(srcMacStr, sizeof(srcMacStr));
         Mac2String(ethrHdr->ether_shost, srcMacStr, sizeof(srcMacStr) - 1);
-
 
         // If packet is an HTTP request sent by a client to the server
         // the packet is processed separately./
@@ -326,7 +326,7 @@ int WriteOutput(char *data, int dataLength)
     }
     else
     {
-      //LogMsg(DBG_INFO, "WriteOutput() : Data written \"%s\" ...", pData);
+//LogMsg(DBG_INFO, "WriteOutput() : Data written \"%s\" ...", pData);
     }
   }
   else

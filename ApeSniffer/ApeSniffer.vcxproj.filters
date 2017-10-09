@@ -29,9 +29,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SniffAndEvaluate.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NetworkFunctions.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -68,9 +65,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketProxy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ApeSniffer.h">

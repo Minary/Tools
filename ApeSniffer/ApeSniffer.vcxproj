@@ -124,7 +124,6 @@
     <ClCompile Include="ModeGenericSniffer.c" />
     <ClCompile Include="ModeMinary.c" />
     <ClCompile Include="NetworkFunctions.c" />
-    <ClCompile Include="SniffAndEvaluate.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApeSniffer.h" />
@@ -138,7 +137,6 @@
     <ClInclude Include="ModeMinary.h" />
     <ClInclude Include="NetBase.h" />
     <ClInclude Include="NetworkFunctions.h" />
-    <ClInclude Include="PacketProxy.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -25,7 +25,6 @@ BOOL GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hos
   dnsHdrPtr = (PDNS_HEADER)((unsigned char*)udpHdrPtr + sizeof(UDPHDR));
   data = (char *)((unsigned char*)dnsHdrPtr + sizeof(DNS_HEADER));
 
-
   // Extract host name
   if ((dataLength = packetLengthParam - (sizeof(ETHDR) + ipHdrLength + sizeof(UDPHDR) + sizeof(PDNS_HEADER))) > 0)
   {
@@ -52,6 +51,6 @@ BOOL GetReqHostName(unsigned char *packetParam, int packetLengthParam, char *hos
   {
     retVal = TRUE;
   }
-
+  
   return retVal;
 }
