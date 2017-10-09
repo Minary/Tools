@@ -264,7 +264,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
         if (ntohs(udpHdrPtr->dport) == 53)
         {
           ZeroMemory(hostname, sizeof(hostname));
-          if (GetReqHostName(packetDataParam, pcapHdrParam->len, hostname, sizeof(hostname) - 1) == OK)
+          if (GetReqHostName(packetDataParam, pcapHdrParam->len, hostname, sizeof(hostname) - 1) == TRUE)
           {
             // Write DNS data to pipe
             if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, MAX_BUF_SIZE + 1)) != NULL)
