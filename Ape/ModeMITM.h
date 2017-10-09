@@ -1,5 +1,5 @@
 #pragma once
 
-void InitializeMITM();
+void InitializeMitm();
 void AdminCheck(char *programNameParam);
 int UserIsAdmin();

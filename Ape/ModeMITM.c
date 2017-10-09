@@ -38,7 +38,7 @@ HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
  *
  */
 
-void InitializeMITM()
+void InitializeMitm()
 {
   AdminCheck(gScanParams.ApplicationName);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
