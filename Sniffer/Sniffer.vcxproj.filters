@@ -38,9 +38,6 @@
     <ClCompile Include="Interface.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ApeSniffer.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedListConnections.c">
       <Filter>Source Files\LinkedList</Filter>
     </ClCompile>
@@ -59,15 +56,15 @@
     <ClCompile Include="ModeMinary.c">
       <Filter>Source Files\Modes</Filter>
     </ClCompile>
+    <ClCompile Include="Sniffer.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NetworkFunctions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ApeSniffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LinkedListConnections.h">
@@ -93,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="ModeMinary.h">
       <Filter>Header Files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="Sniffer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

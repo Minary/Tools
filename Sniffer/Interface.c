@@ -9,13 +9,12 @@
 #include <Shlwapi.h>
 #include <stdarg.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "GenericSniffer.h"
 #include "LinkedListSystems.h"
 #include "LinkedListConnections.h"
 #include "Logging.h"
 #include "NetworkFunctions.h"
-#include "PacketProxy.h"
 
 
 

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "getopt.h"
 #include "Interface.h"
 #include "LinkedListConnections.h"
@@ -189,11 +189,11 @@ void ExecCommand(char *commandParam)
 void PrintUsage(char *pAppName)
 {
   system("cls");
-  printf("\nAPESniffer  Version %s\n", APESNIFFER_VERSION);
-  printf("-----------------------\n\n");
+  printf("\Sniffer  Version %s\n", SNIFFER_VERSION);
+  printf("--------------------\n\n");
   printf("List all interfaces               :  %s -l\n", pAppName);
   printf("Start generic sniffer             :  %s -g IFC-Name\n", pAppName);
-  printf("Start APE sniffer                 :  %s -s IFC-Name [-p PIPE_NAME] \n", pAppName);
+  printf("Start Sniffer                     :  %s -s IFC-Name [-p PIPE_NAME] \n", pAppName);
   printf("\n\n\n\nExamples\n--------\n\n");
   printf("Example : %s -l\n", pAppName);
   printf("Example : %s -s 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n", pAppName);

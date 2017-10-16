@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ApeSniffer.h"
+#include "Sniffer.h"
 
 int ListInterfaceDetails();
 int GetInterfaceDetails(char *ifcName, PSCANPARAMS scanParams);

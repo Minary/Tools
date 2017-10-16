@@ -2,7 +2,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "ApeSniffer.h"
+#include "Sniffer.h"
 #include "LinkedListSystems.h"
 
 

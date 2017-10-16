@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ape", "Ape\Ape.vcxproj", "{EE757BA9-3018-40F6-A4BF-B801DD65FF66}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApeSniffer", "ApeSniffer\ApeSniffer.vcxproj", "{A0D09316-FC10-46A0-95C4-4E37F9BD78DF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sniffer", "Sniffer\Sniffer.vcxproj", "{A0D09316-FC10-46A0-95C4-4E37F9BD78DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientRequestSniffer", "HttpReverseProxy\ClientRequestSniffer\ClientRequestSniffer.csproj", "{E49DF12A-F849-4EE4-A47B-B2A02BA4DB44}"
 EndProject

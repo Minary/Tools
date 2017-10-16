@@ -3,7 +3,7 @@
 #include <time.h>
 #include <windows.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "SniffAndEvaluate.h"
 #include "LinkedListConnections.h"
 

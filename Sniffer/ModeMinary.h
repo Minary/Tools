@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "APESniffer.h"
+#include "Sniffer.h"
 
 
 int ModeMinaryStart(PSCANPARAMS scanParamsParam);

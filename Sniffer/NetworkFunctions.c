@@ -10,7 +10,7 @@
 #include <sys/timeb.h>
 #include <icmpapi.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "LinkedListSystems.h"
 #include "LinkedListConnections.h"
 #include "Logging.h"

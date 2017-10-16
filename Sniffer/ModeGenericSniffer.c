@@ -5,7 +5,7 @@
 #include <pcap.h>
 #include <Shlwapi.h>
 
-#include "ApeSniffer.h"
+#include "Sniffer.h"
 #include "ModeGenericSniffer.h"
 #include "Logging.h"
 #include "NetworkFunctions.h"

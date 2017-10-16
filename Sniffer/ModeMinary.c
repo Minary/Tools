@@ -5,7 +5,7 @@
 #include <pcap.h>
 #include <Shlwapi.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "DnsParser.h"
 #include "LinkedListConnections.h"
 #include "LinkedListSystems.h"

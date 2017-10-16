@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "APESniffer.h"
+#include "Sniffer.h"
 #include "Logging.h"
 
 char *gLogPriority[] = { "OFF", "DEBUG", "INFO", "LOW", "MEDIUM", "HIGH", "ERROR", "FATAL" };

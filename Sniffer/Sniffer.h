@@ -1,5 +1,5 @@
-#ifndef __ARPPOISONINGENGINE__
-#define __ARPPOISONINGENGINE__
+#ifndef __SNIFFER__
+#define __SNIFFER__
 
 #include <windows.h>
 #include <stdlib.h>
@@ -7,7 +7,7 @@
 #include "NetBase.h"
 
 
-#define APESNIFFER_VERSION "0.1"
+#define SNIFFER_VERSION "0.1"
 #define DBG_LOGFILE "c:\\debug.log"
 
 
