@@ -196,7 +196,7 @@ void PrintUsage(char *pAppName)
   printf("Start APE sniffer                 :  %s -s IFC-Name [-p PIPE_NAME] \n", pAppName);
   printf("\n\n\n\nExamples\n--------\n\n");
   printf("Example : %s -l\n", pAppName);
-  printf("Example : %s -x 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n", pAppName);
+  printf("Example : %s -s 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n", pAppName);
   printf("Example : %s -g 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n\n\n\n\n", pAppName);
   printf("WinPcap version\n---------------\n\n");
   printf("%s\n\n", pcap_lib_version());
