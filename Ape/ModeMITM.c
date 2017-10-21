@@ -86,7 +86,6 @@ void InitializeMitm()
 
   WriteDepoisoningFile();
 
-
   // 1. Start Ethernet FORWARDING thread
   if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
        gRESENDThreadHandle == INVALID_HANDLE_VALUE)
@@ -103,40 +102,20 @@ void InitializeMitm()
     goto END;
   }
 
-printf("gPOISONINGThreadHandle=%d, gRESENDThreadHandle=%d, INVALID_HANDLE_VALUE=%d\n",
-  gPOISONINGThreadHandle, gRESENDThreadHandle, INVALID_HANDLE_VALUE);
-
-  //Sleep(500);
-  DWORD la = 111;
-  //while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE && 
-  //       gRESENDThreadHandle != INVALID_HANDLE_VALUE)
-  while(1 == 1)
+  DWORD waitStatus = 0;
+  while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE && 
+         gRESENDThreadHandle != INVALID_HANDLE_VALUE)
   {
-    if ((la = WaitForSingleObject(gPOISONINGThreadHandle, 30)) != WAIT_TIMEOUT &&
-         la != WAIT_OBJECT_0)
+    if ((waitStatus = WaitForSingleObject(gPOISONINGThreadHandle, 30)) != WAIT_TIMEOUT &&
+         waitStatus != WAIT_OBJECT_0)
     {
-printf("gPOISONINGThreadHandle: la=%d (WAIT_ABANDONED=%d), WAIT_OBJECT_0=%d, WAIT_TIMEOUT=%d, WAIT_FAILED=%d\n", 
-  la, WAIT_ABANDONED, WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_FAILED);
-
-if (la == WAIT_FAILED)
-{
-  printf("gPOISONINGThreadHandle: ErrorCode=%d\n", GetLastError());
-}
       LogMsg(DBG_ERROR, "main(): ARP poisoning thread stopped");
       break;
     }
 
-    if ((la = WaitForSingleObject(gRESENDThreadHandle, 30)) != WAIT_TIMEOUT &&
-        la != WAIT_OBJECT_0)
+    if ((waitStatus = WaitForSingleObject(gRESENDThreadHandle, 30)) != WAIT_TIMEOUT &&
+         waitStatus != WAIT_OBJECT_0)
     {
-printf("gRESENDThreadHandle: la=%d (WAIT_ABANDONED=%d), WAIT_OBJECT_0=%d, WAIT_TIMEOUT=%d, WAIT_FAILED=%d\n", 
-  la, WAIT_ABANDONED, WAIT_OBJECT_0, WAIT_TIMEOUT, WAIT_FAILED);
-
-if (la == WAIT_FAILED)
-{
-  printf("gRESENDThreadHandle: ErrorCode=%d\n", GetLastError());
-}
-
       LogMsg(DBG_ERROR, "main(): Packet forarder thread was stopped");
       break;
     }

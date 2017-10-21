@@ -16,13 +16,9 @@
 
 
 #define FILE_HOST_TARGETS ".targethosts"
-#define FILE_FIREWALL_RULES1 ".fwrules"
-#define FILE_FIREWALL_RULES2 "bin\\.fwrules"
+#define FILE_FIREWALL_RULES ".fwrules"
 #define FILE_DNS_POISONING ".dnshosts"
-#define FILE_HTTPINJECTION_RULES1 ".injecturls"
-#define FILE_HTTPINJECTION_RULES2 "bin\\.injecturls"
 #define FILE_UNPOISON ".UNPOISON"
-#define HOSTS_FILE "hosts.txt"
 
 
 #define TCP_MAX_ACTIVITY 10

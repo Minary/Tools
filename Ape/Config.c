@@ -121,8 +121,7 @@ int ParseFirewallConfigFile(char *firewallRulesFile)
     goto END;
   }
 
-  if ((fileHandle = fopen(FILE_FIREWALL_RULES1, "r")) == NULL &&
-    (fileHandle = fopen(FILE_FIREWALL_RULES2, "r")) == NULL)
+  if ((fileHandle = fopen(FILE_FIREWALL_RULES, "r")) == NULL)
   {
     goto END;
   }
