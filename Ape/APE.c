@@ -78,6 +78,11 @@ int main(int argc, char **argv)
   gFwRulesList = InitFirewallRules();
   gDnsSpoofingList = InitHostsList();
 
+  if (InitLogging() == FALSE)
+  {
+    exit(1);
+  }
+
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
   {
@@ -127,7 +132,7 @@ int main(int argc, char **argv)
     goto END;
 
 
-  // ARP depoisening
+    // ARP depoisening
   }
   else if (action == 'd')
   {
@@ -140,16 +145,16 @@ int main(int argc, char **argv)
     LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
-    ParseFirewallConfigFile(FILE_FIREWALL_RULES);    
+    ParseFirewallConfigFile(FILE_FIREWALL_RULES);
     InitializeParsePcapDumpFile();
 
 
 
-  // Start ...
-  //  - ARP cache poisoning
-  //  - Firewall blocking
-  //  - DNS poisoning 
-  //  - forwarding data packets
+    // Start ...
+    //  - ARP cache poisoning
+    //  - Firewall blocking
+    //  - DNS poisoning 
+    //  - forwarding data packets
   }
   else if (action == 'x')
   {
@@ -166,6 +171,7 @@ END:
 
   DeleteCriticalSection(&csSystemsLL);
   LogMsg(DBG_LOW, "main(): Stopping %s", argv[0]);
+  StopLogging();
 
   return retVal;
 }

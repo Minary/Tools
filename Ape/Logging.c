@@ -5,13 +5,46 @@
 #include "APE.h"
 #include "Logging.h"
 
+
 char *gLogPriority[] = { "OFF", "DEBUG", "INFO", "LOW", "MEDIUM", "HIGH", "ERROR", "FATAL" };
-
-
+HANDLE loggingMutex;
 static HANDLE fileHandle = INVALID_HANDLE_VALUE;
+
+
+BOOLEAN InitLogging()
+{
+  if ((loggingMutex = CreateMutexA(NULL, FALSE, NULL) == NULL) || loggingMutex == INVALID_HANDLE_VALUE)
+  {
+    printf("InitLogging(): Creating Logging mutex failed: Error no=%d\n", GetLastError());
+    return FALSE;
+  }
+
+  if (fileHandle = CreateFile(DBG_LOGFILE, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0) == INVALID_HANDLE_VALUE)
+  {
+    printf("InitLogging(): Creating file handle failed: Error no=%d\n", GetLastError());
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+void StopLogging()
+{
+  if (loggingMutex != INVALID_HANDLE_VALUE)
+  {
+    CloseHandle(loggingMutex);
+  }
+
+  if (fileHandle != INVALID_HANDLE_VALUE)
+  {
+    CloseHandle(fileHandle);
+  }
+}
+
+
 void LogMsg(int priorityParam, char *logMessageParam, ...)
 {
-  OVERLAPPED overlapped = { 0 };
   char dateStamp[MAX_BUF_SIZE + 1];
   char timeStamp[MAX_BUF_SIZE + 1];
   char time[MAX_BUF_SIZE + 1];
@@ -19,20 +52,35 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   char logMessage[MAX_BUF_SIZE + 1];
   DWORD bytesWritten = 0;
   va_list args;
+  DWORD waitResult = 0;
+
+  waitResult = WaitForSingleObject(loggingMutex, 1000);
+  if (waitResult == WAIT_ABANDONED)
+  {
+    printf("LogMsg(): Error! Mutex is abandoned\r\n");
+    goto END;
+  }
+
+  if (waitResult == WAIT_FAILED)
+  {
+    printf("LogMsg(): Error! Opening mutex failed\r\n");
+    goto END;
+  }
+
+  if (waitResult == WAIT_TIMEOUT)
+  {
+    printf("LogMsg(): Error! Opening mutex ran in timeout\r\n");
+    goto END;
+  }
+  
+
+  if (waitResult != WAIT_OBJECT_0)
+  {
+    printf("LogMsg(): Error! Mutex (%d) is invalid\r\n", loggingMutex);
+    goto END;
+  }
 
   if (priorityParam < DEBUG_LEVEL || DEBUG_LEVEL == DBG_OFF)
-  {
-    goto END;
-  }
-
-  if (fileHandle == INVALID_HANDLE_VALUE &&
-      (fileHandle = CreateFile(DBG_LOGFILE, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0)) == INVALID_HANDLE_VALUE)
-  {
-    goto END;
-  }
-
-  ZeroMemory(&overlapped, sizeof(overlapped));
-  if (LockFileEx(fileHandle, LOCKFILE_EXCLUSIVE_LOCK, 0, 0, 0, &overlapped) == TRUE)
   {
     goto END;
   }
@@ -60,9 +108,14 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   WriteFile(fileHandle, logMessage, strnlen(logMessage, sizeof(logMessage) - 1), &bytesWritten, NULL);
 
 END:
-  if (fileHandle != INVALID_HANDLE_VALUE)
+  __try
   {
-    UnlockFileEx(fileHandle, 0, 0, 0, &overlapped);
-    CloseHandle(fileHandle);
+    if (ReleaseMutex(loggingMutex) == FALSE)
+    {
+      printf("LogMsg(): Error! Releasing Mutex failed with error no. %d\r\n", GetLastError());
+    }
+  }
+  __finally
+  {
   }
 }

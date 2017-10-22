@@ -14,4 +14,6 @@
 
 #define DBG_LOGFILE "c:\\debug.log"
 
+BOOLEAN InitLogging();
+void StopLogging();
 void LogMsg(int priorityParam, char *logMessageParam, ...);
