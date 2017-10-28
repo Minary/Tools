@@ -5,11 +5,8 @@ The Tools repository contains the basic tool set to provide Minary with the basi
 ***Ape***
 Ape is the ARP poisoning engine. It is responsible to poison and depoison a target system]s ARP cache table. Ape only works with IPv4 networks. IPv6 spoofing is possible but it is not implemented with this Minary version.
 
-***ApeSniffer***
-ApeSniffer's task is to capture relevant data from the "wire", collecting it and pass the data to the Minary data pipe.
-
-***ArpScan***
-ArpScan does pretty much what its name alredy says: It scans a network for reachable systems by sending ARP pings to a user defined IP range and waits for ARP replies.
+***Sniffer***
+Sniffer captures relevant data from the "wire", collecting it and pass the data to the Minary data pipe.
 
 ***HttpReverseProxy***
 HttpReverseProxy is an HTTP(S) reverse proxy server that redirects incomin requests to the server that is defined within the Host header field.
