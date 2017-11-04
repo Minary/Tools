@@ -17,3 +17,4 @@
 BOOLEAN InitLogging();
 void StopLogging();
 void LogMsg(int priorityParam, char *logMessageParam, ...);
+void WriteToLogfile(char *logMessage);

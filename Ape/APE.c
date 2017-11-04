@@ -62,6 +62,12 @@ int main(int argc, char **argv)
   int opt = 0;
   char action = 0;
 
+  if (InitLogging() == FALSE)
+  {
+    printf("main(): Logging initialization failed!");
+    exit(1);
+  }
+
   // Initialisation
   if (!InitializeCriticalSectionAndSpinCount(&csSystemsLL, 0x00000400))
   {
@@ -77,11 +83,6 @@ int main(int argc, char **argv)
   gTargetSystemsList = InitSystemList();
   gFwRulesList = InitFirewallRules();
   gDnsSpoofingList = InitHostsList();
-
-  if (InitLogging() == FALSE)
-  {
-    exit(1);
-  }
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
