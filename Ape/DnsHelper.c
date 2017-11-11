@@ -17,7 +17,7 @@ unsigned char* ChangeDnsNameToTextFormat(unsigned char* reader, unsigned char* b
   int i, j;
 
   *count = 1;
-  name = (unsigned char*)malloc(256);
+  name = (unsigned char*) HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 256);
   name[0] = '\0';
 
   //read the names in 3www6google3com format

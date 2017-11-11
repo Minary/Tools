@@ -109,11 +109,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
     default:
       printf("LogMsg(): Error! OMG BUG!\r\n");
       break;
-
   }
-
-
-
 
 END:
 

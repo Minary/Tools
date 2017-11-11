@@ -130,7 +130,7 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
     dstPort = ntohs(udpHdr->dport);
     srcPort = ntohs(udpHdr->sport);
 
-    urlTemp = (u_char*)malloc(2 * MAX_BUF_SIZE + 2);
+    urlTemp = (u_char*)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 2 * MAX_BUF_SIZE + 2);
     urlPacket = (u_char*)(dnsHdr + sizeof(DNS_HEADER));
     for (counter = 0; urlPacket[counter] != 0; counter++)
     {

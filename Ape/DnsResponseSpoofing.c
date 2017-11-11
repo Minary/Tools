@@ -182,7 +182,6 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
   char *data = NULL;
   char *dnsData = NULL;
   PHOSTNODE retVal = NULL;
-  PHOSTNODE tmpNode = NULL;
   PDNS_HEADER dnsHdr = NULL;
   unsigned char *reader = NULL;
   int stop;
@@ -230,13 +229,10 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
     goto END;
   }
 
-  if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
-  {
-    retVal = tmpNode;
-  }
+  retVal = GetNodeByHostname(gDnsSpoofingList, peerName);
 
 END:
-  if (tmpNode != NULL)
+  if (peerName != NULL)
   {
     HeapFree(GetProcessHeap(), 0, peerName);
   }
