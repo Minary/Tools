@@ -47,14 +47,21 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   snprintf(time, sizeof(time) - 1, "%s %s", dateStamp, timeStamp);
 
   // Create log message
-  ZeroMemory(tempBuffer, sizeof(tempBuffer));
-  ZeroMemory(logMessage, sizeof(logMessage));
-  va_start(args, logMessageParam);
-  vsprintf(tempBuffer, logMessageParam, args);
-  va_end(args);
-  snprintf(logMessage, sizeof(logMessage) - 1, "%s %-7s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
-  PrintToScreen(logMessage);
-
+  __try
+  {
+    ZeroMemory(tempBuffer, sizeof(tempBuffer));
+    ZeroMemory(logMessage, sizeof(logMessage));
+    va_start(args, logMessageParam);
+    vsprintf(tempBuffer, logMessageParam, args);
+    va_end(args);
+    snprintf(logMessage, sizeof(logMessage) - 1, "%s %-7s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
+    puts(logMessage);
+  }
+  __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+  {
+    puts("OMG it's a bug!!\r\n");
+    return;
+  }
   // Write message to the logfile.
   SetFilePointer(fileHandle, 0, NULL, FILE_END);
 //  WriteFile(fileHandle, logMessage, strnlen(logMessage, sizeof(logMessage) - 1), &bytesWritten, NULL);
@@ -64,23 +71,5 @@ END:
   {
     UnlockFileEx(fileHandle, 0, 0, 0, &overlapped);
     CloseHandle(fileHandle);
-  }
-}
-
-
-void PrintToScreen(char *data)
-{
-  if (data == NULL)
-  {
-    return;
-  }
-
-  __try
-  {
-    puts(data);
-  }
-  __except (filterException(GetExceptionCode(), GetExceptionInformation()))
-  {
-    puts("OMG it's a bug!!\r\n");
   }
 }
