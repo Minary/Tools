@@ -110,9 +110,7 @@ DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
 
     Sleep(SLEEP_BETWEEN_REPOISONING);
   }
-
-END:
-
+  
   LogMsg(DBG_LOW, "ArpPoisoningLoop(): exit");
 
   return retVal;

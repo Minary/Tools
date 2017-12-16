@@ -189,7 +189,7 @@ void ExecCommand(char *commandParam)
 void PrintUsage(char *pAppName)
 {
   system("cls");
-  printf("\Sniffer  Version %s\n", SNIFFER_VERSION);
+  printf("Sniffer  Version %s\n", SNIFFER_VERSION);
   printf("--------------------\n\n");
   printf("List all interfaces               :  %s -l\n", pAppName);
   printf("Start generic sniffer             :  %s -g IFC-Name\n", pAppName);

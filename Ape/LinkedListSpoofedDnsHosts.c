@@ -37,8 +37,8 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
     tmpNode->isTail = FALSE;
 
     // Insert new record at the beginning of the list
-    tmpNode->next = (PHOSTNODE) *listHead;
-    ((PHOSTNODE)*listHead)->prev = (PHOSTNODE) tmpNode;
+    tmpNode->next = (HOSTNODE *) *listHead;
+    ((PHOSTNODE)*listHead)->prev = (HOSTNODE *) tmpNode;
     *listHead = tmpNode;
   }
 }
@@ -58,8 +58,8 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, un
     tmpNode->isTail = FALSE;
 
     // Insert new record at the beginning of the list
-    tmpNode->next = (PHOSTNODE) *listHead;
-    ((PHOSTNODE)*listHead)->prev = (PHOSTNODE) tmpNode;
+    tmpNode->next = (HOSTNODE *) *listHead;
+    ((PHOSTNODE)*listHead)->prev = (HOSTNODE *) tmpNode;
     *listHead = tmpNode;
   }
 }

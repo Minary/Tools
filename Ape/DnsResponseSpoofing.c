@@ -6,9 +6,11 @@
 
 #include "APE.h"
 #include "DnsForge.h"
+#include "DnsHelper.h"
 #include "DnsResponseSpoofing.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
+#include "NetworkHelperFunctions.h"
 #include "NetworkStructs.h"
 
 
@@ -23,7 +25,6 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTN
   PDNS_HEADER dnsBasicHdr = (PDNS_HEADER)(rawPacket + basePacketSize);
   PRAW_DNS_DATA responseData = NULL;
   int counter = 0;
-  char errbuf[PCAP_ERRBUF_SIZE];
 
   // Create DNS response data block
   if (spoofingRecord->Data.Type == RESP_A)
