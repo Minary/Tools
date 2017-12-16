@@ -103,7 +103,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\EXTERNAL\WinPcap\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\EXTERNAL\WinPcap\Include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
     </ClCompile>
     <Link>
@@ -111,7 +111,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\EXTERNAL\WinPcap\Lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\EXTERNAL\WinPcap\Lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
