@@ -127,9 +127,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Filter Include="Header files">
       <UniqueIdentifier>{fbec2556-9d1b-4a31-b5ee-d062a0895873}</UniqueIdentifier>
     </Filter>
