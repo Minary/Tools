@@ -43,7 +43,7 @@
 # except build/, which is used as an MSBuild target.
 !**/packages/build/
 #!**/packages/repositories.config
-**/nuget.exe.old
+#**/nuget.exe.old
 
 
 # Ignore directories that are not part of the solution/project basis files. 
@@ -58,11 +58,3 @@ ipch/
 **/Release/
 **/x64/
 BUILDS/
-DhcPoison/
-
-
-!Plugin**/app.config
-!Minary/app.config
-!Minary/**/*.manifest
-!.nuget/NuGet.exe
-
