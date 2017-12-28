@@ -1,6 +1,5 @@
 ﻿namespace HttpReverseProxy.Plugin.SslStrip
 {
-  using HttpReverseProxy.Plugin.SslStrip.Cache;
   using HttpReverseProxy.Plugin.SslStrip.DataTypes;
   using HttpReverseProxyLib;
   using HttpReverseProxyLib.DataTypes;

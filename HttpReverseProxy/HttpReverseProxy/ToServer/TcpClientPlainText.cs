@@ -2,8 +2,6 @@
 {
   using HttpReverseProxyLib.DataTypes.Class;
   using System.IO;
-  using System.Net.Sockets;
-  using System.Text;
 
 
   public class TcpClientPlainText : TcpClientBase

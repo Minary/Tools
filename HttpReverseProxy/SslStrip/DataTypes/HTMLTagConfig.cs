@@ -2,6 +2,7 @@
 {
   using System.Collections.Concurrent;
 
+
   public class HtmlTagConfig
   {
 

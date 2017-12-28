@@ -1,14 +1,12 @@
 ﻿namespace HttpReverseProxy.ToServer
 {
   using HttpReverseProxyLib;
-  using HttpReverseProxyLib.DataTypes;
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Class.Server;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.DataTypes.Interface;
   using HttpReverseProxyLib.Exceptions;
   using System;
-  using System.Collections;
   using System.Collections.Generic;
   using System.IO;
   using System.Net.Sockets;

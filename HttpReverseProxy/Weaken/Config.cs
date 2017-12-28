@@ -1,7 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.Weaken
 {
 
-
   public class Config
   {
 

@@ -1,7 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
   using HttpReverseProxyLib.Exceptions;
-  using System;
   using System.Collections.Generic;
   using System.IO;
   using System.Text.RegularExpressions;
