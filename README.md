@@ -3,13 +3,15 @@
 The Tools repository contains the basic tool set to provide Minary with the basic means to perform the attacks on the target systems.
 
 ***APE***
-APE (ARP poisoning engine) is responsible to poison and depoison a target system's ARP cache table. The name lets already assume that APE only works with IPv4 networks. IPv6 spoofing is possible but it is not implemented with this Minary version.
-
-APE implements **DNS poisoning**. It does that in both directions by either poisoning _DNS requests_ or _DNS responses_.
-
-APE offers firewalling capabilities to either block or pass data packets to their actual destination.
-
-
+APE (ARP poisoning engine) is the component in the Minary system that conducts the actual attacks on the target systems.
+It consists of the following subparts:
+  * **ARP poisoning**: Act as a _Man in the middle_ between target systems and the internet gateway 
+  * **ARP depoisoning**: Undo the _Man in the middle_ and restore the original routing path between client system and internet gateway. 
+  * **Routing**: Route received data packets to the actual target system.
+  * **DNS poisoning**: Poison client DNS requests. Do that in both directions by either poisoning the actual _DNS request_ or the servers _DNS response_.
+  * **Firewalling**: Block data packets or pass them to their actual destination. 
+  
+The name lets already assume that APE only works with IPv4 networks (IPv6 doesn't know the ARP concept). IPv6 spoofing is possible but it is not implemented with this Minary version.
 
 ***Sniffer***
 Sniffer captures relevant data from the "wire", collecting it and pass the data to the Minary data pipe where the data is evaluated by the activated plugins.
