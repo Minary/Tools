@@ -12,13 +12,13 @@
 
     public string CreateCertificate(string certificateHost)
     {
-      string certificateFileName = Regex.Replace(certificateHost, @"[^\d\w_]", "_");
-      string certificateOutputPath = string.Format("{0}.pfx", certificateFileName);
-      string certificateFullPath = Path.Combine(Directory.GetCurrentDirectory(), certificateOutputPath);
-      DateTime validityStartDate = DateTime.Now.AddDays(-1);
-      DateTime validityEndDate = DateTime.Now.AddYears(5);
+      var certificateFileName = Regex.Replace(certificateHost, @"[^\d\w_]", "_");
+      var certificateOutputPath = $"{certificateFileName}.pfx";
+      var certificateFullPath = Path.Combine(Directory.GetCurrentDirectory(), certificateOutputPath);
+      var validityStartDate = DateTime.Now.AddDays(-1);
+      var validityEndDate = DateTime.Now.AddYears(5);
 
-      Console.WriteLine("Creating new certificate for host {0}", certificateHost);
+      Console.WriteLine($"Creating new certificate for host {certificateHost}");
 
       // Delete certificate file if it already exists
       if (File.Exists(certificateFullPath))

@@ -37,20 +37,24 @@
     /// <param name="cnex"></param>
     public void SendErrorMessage2Client(RequestObj requestObj, ClientNotificationException cnex)
     {
-      string httpServerResponseStatus = string.Format("HTTP/1.1 {0} {1}", this.statusDescription[HttpStatusCode.InternalServerError].Code, this.statusDescription[HttpStatusCode.InternalServerError].Title);
-      string message = message = this.statusDescription[HttpStatusCode.InternalServerError].Description;
+      var tmpStatusCode = this.statusDescription[HttpStatusCode.InternalServerError].Code;
+      var tmpStatusTitle = this.statusDescription[HttpStatusCode.InternalServerError].Title;
+      var httpServerResponseStatus = $"HTTP/1.1 {tmpStatusCode} {tmpStatusTitle}";
+      var message = this.statusDescription[HttpStatusCode.InternalServerError].Description;
 
       if (cnex.Data.Contains(StatusCodeLabel.StatusCode))
       {
         HttpStatusCode code = (HttpStatusCode)cnex.Data[StatusCodeLabel.StatusCode];
-        httpServerResponseStatus = string.Format("HTTP/1.1 {0} {1}", this.statusDescription[code].Code, this.statusDescription[code].Title);
+        var tmpStatusCode2 = this.statusDescription[code].Code;
+        var tmpStatusTitle2 = this.statusDescription[code].Title;
+        httpServerResponseStatus = $"HTTP/1.1 {tmpStatusCode2} {tmpStatusTitle2}";
         message = this.statusDescription[code].Description;
       }
 
-      string[] serverHeaders = new string[] { httpServerResponseStatus, "Content-Type: text/html", "Connection: close", string.Format("Content-Length: {0}", message.Length) };
+      var serverHeaders = new string[] { httpServerResponseStatus, "Content-Type: text/html", "Connection: close", $"Content-Length: {message.Length}" };
 
       // Send headers to client
-      foreach (string tmpHeader in serverHeaders)
+      foreach (var tmpHeader in serverHeaders)
       {
         this.SendStringToClient(requestObj.ClientRequestObj.ClientBinaryWriter, tmpHeader, true);
       }
@@ -74,24 +78,23 @@
 
       // 1. Send cRemoteSocket response
       var response = webEx.Response as HttpWebResponse;
-      if (response != null && response.StatusCode != HttpStatusCode.OK)
+      if (response?.StatusCode != HttpStatusCode.OK)
       {
-        string errorCode = string.Format("HTTP/{0} {1} {2}\n", response.ProtocolVersion, (int)response.StatusCode, response.StatusDescription);
-        ////        requestObj.ClientRequestNetworkStream.Write(Encoding.ASCII.GetBytes(errorCode), 0, errorCode.Length);
+        var errorCode = $"HTTP/{response.ProtocolVersion} {(int)response.StatusCode} {response.StatusDescription}\n";
         requestObj.ClientRequestObj.ClientBinaryWriter.Write(Encoding.ASCII.GetBytes(errorCode), 0, errorCode.Length);
       }
       else
       {
-        string errorCode = string.Format("HTTP/1.1 500 Internal cRemoteSocket error\n");
+        var errorCode = "HTTP/1.1 500 Internal cRemoteSocket error\n";
         requestObj.ClientRequestObj.ClientBinaryWriter.Write(Encoding.ASCII.GetBytes(errorCode), 0, errorCode.Length);
       }
 
       // 2. Sending cRemoteSocket response headers
-      if (webEx.Response != null && webEx.Response.Headers != null && webEx.Response.Headers.Count > 0)
+      if (webEx.Response?.Headers?.Count > 0)
       {
-        foreach (string tmpKey in webEx.Response.Headers.AllKeys)
+        foreach (var tmpKey in webEx.Response.Headers.AllKeys)
         {
-          string httpResponseString = string.Format("{0}: {1}\n", tmpKey, webEx.Response.Headers[tmpKey]);
+          var httpResponseString = $"{tmpKey}: {webEx.Response.Headers[tmpKey]}\n";
           requestObj.ClientRequestObj.ClientBinaryWriter.Write(Encoding.ASCII.GetBytes(httpResponseString), 0, httpResponseString.Length);
         }
       }

@@ -11,26 +11,14 @@
   public class CacheRedirect
   {
 
-    #region MEMBERS
-    
-    private Dictionary<string, HostRecord> cache = new Dictionary<string, HostRecord>();
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public Dictionary<string, HostRecord> RedirectCache { get { return this.cache; } set { } }
+    public Dictionary<string, HostRecord> RedirectCache { get; set; } = new Dictionary<string, HostRecord>();
 
     #endregion
 
 
     #region PUBLIC
-
-    public CacheRedirect()
-    {
-    }
-
 
     /// <summary>
     ///
@@ -70,9 +58,8 @@
       }
 
       Logging.Instance.LogMessage(id, ProxyProtocol.Undefined, Loglevel.Debug, "CacheRedirect.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
-
       HostRecord tmpHost = new HostRecord("GET", ProxyProtocol.Https, tmpUriValue.Host, tmpUriValue.PathAndQuery);
-      this.cache.Add(keyLocation, tmpHost);
+      this.RedirectCache.Add(keyLocation, tmpHost);
     }
 
     /// <summary>
@@ -80,9 +67,9 @@
     /// </summary>
     public void EnumerateCache()
     {
-      foreach (string tmpKey in this.cache.Keys)
+      foreach (var tmpKey in this.RedirectCache.Keys)
       {
-        Logging.Instance.LogMessage("SslStrip.CacheRedirect", ProxyProtocol.Undefined, Loglevel.Debug, "SslStrip.CacheRedirect.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.cache[tmpKey].Url, cache[tmpKey].Counter);
+        Logging.Instance.LogMessage("SslStrip.CacheRedirect", ProxyProtocol.Undefined, Loglevel.Debug, "SslStrip.CacheRedirect.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.RedirectCache[tmpKey].Url, RedirectCache[tmpKey].Counter);
       }
     }
 
@@ -92,9 +79,9 @@
     /// </summary>
     public void ResetCache()
     {
-      if (this.cache != null)
+      if (this.RedirectCache != null)
       {
-        this.cache.Clear();
+        this.RedirectCache.Clear();
       }
     }
 
@@ -111,9 +98,9 @@
         throw new Exception("Key Uri is not well formed");
       }
 
-      if (this.cache.ContainsKey(urlKey))
+      if (this.RedirectCache.ContainsKey(urlKey))
       {
-        return this.cache.Remove(urlKey);
+        return this.RedirectCache.Remove(urlKey);
       }
 
       return false;
@@ -132,12 +119,12 @@
         throw new Exception("The Url is malformed");
       }
 
-      if (!this.cache.ContainsKey(urlKey))
+      if (!this.RedirectCache.ContainsKey(urlKey))
       {
         return null;
       }
 
-      return this.cache[urlKey];
+      return this.RedirectCache[urlKey];
     }
 
 
@@ -151,16 +138,15 @@
       if (Uri.IsWellFormedUriString(urlKey, UriKind.Absolute))
       {
         // Example: Key="http://www.buglist.io/test/boom/ignaz.html"
-        if (this.cache.ContainsKey(urlKey))
+        if (this.RedirectCache.ContainsKey(urlKey))
         {
           return true;
         }
 
         // http://www.buglist.io/ and HSTS enabled
-        Uri tmpUri = new Uri(urlKey);
-        string tmpRequestUrl = string.Format("{0}://{1}/", tmpUri.Scheme, tmpUri.Host);
-
-        if (this.cache.ContainsKey(urlKey))
+        var tmpUri = new Uri(urlKey);
+        var tmpRequestUrl = $"{tmpUri.Scheme}://{tmpUri.Host}/";
+        if (this.RedirectCache.ContainsKey(urlKey))
         {
           return true;
         }

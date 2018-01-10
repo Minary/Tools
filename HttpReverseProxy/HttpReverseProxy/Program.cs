@@ -161,7 +161,7 @@
       }
       catch (Exception ex)
       {
-        throw new Exception(string.Format("The following error occurred while loading certificate file: {0}", ex.Message));
+        throw new Exception($"The following error occurred while loading certificate file: {ex.Message}");
       }
 
       if (collection.Count < 1)

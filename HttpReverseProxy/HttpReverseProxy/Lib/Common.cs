@@ -121,7 +121,7 @@
 
       if ((arpReply = SendArp(convertedIpAddr, 0, macArray, ref byteArrayLen)) != 0)
       {
-        throw new Exception(string.Format("Error no. {0} occured while resolving MAC address of system {1}", arpReply, clientIp));
+        throw new Exception($"Error no. {arpReply} occured while resolving MAC address of system {clientIp}");
       }
 
       // return the MAC address in a PhysicalAddress format

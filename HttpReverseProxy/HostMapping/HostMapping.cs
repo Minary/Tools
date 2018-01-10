@@ -11,16 +11,9 @@
 
     #region MEMBERS
 
-    private PluginProperties pluginProperties;
+    private PluginProperties pluginProperties = new PluginProperties();
     private Config pluginConfig = new Config();
     private string configurationFileFullPath;
-
-    #endregion
-
-
-    #region PROPERTIES
-
-    public Config PluginConfig { get { return this.pluginConfig; } set { } }
 
     #endregion
 
@@ -30,15 +23,12 @@
     public HostMapping()
     {
       // Set plugin properties
-      this.pluginProperties = new PluginProperties()
-      {
-        Name = HostMappingConfig.PluginName,
-        Priority = HostMappingConfig.PluginPriority,
-        Version = HostMappingConfig.PluginVersion,
-        PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", HostMappingConfig.PluginName),
-        IsActive = true,
-        SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
-      };
+      this.pluginProperties.Name = HostMappingConfig.PluginName;
+      this.pluginProperties.Priority = HostMappingConfig.PluginPriority;
+      this.pluginProperties.Version = HostMappingConfig.PluginVersion;
+      this.pluginProperties.PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", HostMappingConfig.PluginName);
+      this.pluginProperties.IsActive = true;
+      this.pluginProperties.SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https;
     }
 
     #endregion

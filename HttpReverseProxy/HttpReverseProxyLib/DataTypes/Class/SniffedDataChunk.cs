@@ -12,14 +12,13 @@
 
     private int maxDataChunkSize;
     private MemoryStream dataStream;
-    private int totalBytesWritten;
 
     #endregion
 
 
     #region PROPERTIES
 
-    public int TotalBytesWritten { get { return this.totalBytesWritten; } set { } }
+    public int TotalBytesWritten { get; private set; }
 
     #endregion 
 
@@ -30,7 +29,7 @@
     {
       this.maxDataChunkSize = maxSniffedClientDataSize;
       this.dataStream = new MemoryStream();
-      this.totalBytesWritten = 0;
+      this.TotalBytesWritten = 0;
     }
 
 
@@ -40,7 +39,7 @@
       {
         int bytesToWrite = dataLength - ((int)this.dataStream.Length + dataLength - this.maxDataChunkSize);
         this.dataStream.Write(data, 0, dataLength);
-        this.totalBytesWritten += dataLength;
+        this.TotalBytesWritten += dataLength;
       }
     }
 
@@ -53,9 +52,9 @@
       {
         try
         {
-          byte[] dataBytes = new byte[this.totalBytesWritten];
+          byte[] dataBytes = new byte[this.TotalBytesWritten];
           this.dataStream.Seek(0, SeekOrigin.Begin);
-          this.dataStream.Read(dataBytes, 0, this.totalBytesWritten);
+          this.dataStream.Read(dataBytes, 0, this.TotalBytesWritten);
 
           dataString = Encoding.UTF8.GetString(dataBytes);
         }

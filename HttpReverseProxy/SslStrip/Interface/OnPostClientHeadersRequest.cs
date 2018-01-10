@@ -28,7 +28,7 @@
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      string requestedUrl = string.Format("{0}://{1}{2}", requestObj.ProxyProtocol.ToString().ToLower(), requestObj.ClientRequestObj.Host, requestObj.ClientRequestObj.RequestLine.Path);
+      string requestedUrl = $"{requestObj.ProxyProtocol.ToString().ToLower()}://{requestObj.ClientRequestObj.Host}{requestObj.ClientRequestObj.RequestLine.Path}";
 
       // 1. If requested Url was HTML SSL stripped
       //    -> replace "http" by "https"

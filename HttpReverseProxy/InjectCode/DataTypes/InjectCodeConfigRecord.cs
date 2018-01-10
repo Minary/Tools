@@ -5,35 +5,22 @@
 
   public class InjectCodeConfigRecord
   {
-
-    #region MEMBERS
-
-    private string hostRegex;
-    private string pathRegex;
-    private string injectionCodeFileContent;
-    private string injectionCodeFile;
-    private string tag;
-    private string tagRegex;
-    private TagPosition position;
-
-    #endregion
-
-
+  
     #region PROPERTIES
 
-    public string HostRegex { get { return this.hostRegex; } set { this.hostRegex = value; } }
+    public string HostRegex { get; set; } = string.Empty;
 
-    public string PathRegex { get { return this.pathRegex; } set { this.pathRegex = value; } }
-    
-    public string InjectionCodeFile { get { return this.injectionCodeFile; } set { this.injectionCodeFile = value; } }
+    public string PathRegex { get; set; } = string.Empty;
 
-    public string InjectionCodeFileContent { get { return this.injectionCodeFileContent; } set { this.injectionCodeFileContent = value; } }
+    public string InjectionCodeFile { get; set; } = string.Empty;
 
-    public string Tag { get { return this.tag; } set { this.tag = value; } }
+    public string InjectionCodeFileContent { get; set; } = string.Empty;
 
-    public string TagRegex { get { return this.tagRegex; } set { this.tagRegex = value; } }
+    public string Tag { get; set; } = string.Empty;
 
-    public TagPosition Position { get { return this.position; } set { this.position = value; } }
+    public string TagRegex { get; set; } = string.Empty;
+
+    public TagPosition Position { get; set; }
 
     #endregion
 
@@ -42,14 +29,13 @@
 
     public InjectCodeConfigRecord(string hostRegex, string pathRegex, string injectionCodeFile, string tag, TagPosition position)
     {
-      this.hostRegex = hostRegex;
-      this.pathRegex = pathRegex;
-      this.injectionCodeFile = injectionCodeFile;
-      this.tag = tag;
-      this.position = position;
-      
-      this.tagRegex = string.Format(@"(<\s*{0}[^>]*>)", tag);
-      this.injectionCodeFileContent = File.ReadAllText(injectionCodeFile);
+      this.HostRegex = hostRegex;
+      this.PathRegex = pathRegex;
+      this.InjectionCodeFile = injectionCodeFile;
+      this.Tag = tag;
+      this.Position = position;      
+      this.TagRegex = $@"(<\s*{tag}[^>]*>)";
+      this.InjectionCodeFileContent = File.ReadAllText(injectionCodeFile);
     }
 
     #endregion 

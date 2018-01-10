@@ -94,13 +94,15 @@ PRULENODE FirewallBlockRuleMatch(PRULENODE firewallRuleNodesParam, char *protoco
   for (; firewallRuleNodesParam != NULL && firewallRuleNodesParam->isTail == FALSE; firewallRuleNodesParam = firewallRuleNodesParam->next)
   {
     // 1. Protocol
-    if (protocolParam != NULL && strncmp(protocolParam, firewallRuleNodesParam->Protocol, 4))
+    if (protocolParam != NULL && 
+        strncmp(protocolParam, firewallRuleNodesParam->Protocol, 4))
     {
       continue;
     }
 
     // 2. Source IP      
-    if (firewallRuleNodesParam->SrcIPBin != 0 && srcIpParam != firewallRuleNodesParam->SrcIPBin)
+    if (firewallRuleNodesParam->SrcIPBin != 0 && 
+        srcIpParam != firewallRuleNodesParam->SrcIPBin)
     {
       continue;
     }

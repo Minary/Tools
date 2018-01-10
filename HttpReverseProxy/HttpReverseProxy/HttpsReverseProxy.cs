@@ -21,38 +21,25 @@
   {
 
     #region MEMBERS
-
-    private static readonly HttpsReverseProxy ReverseProxyServer = new HttpsReverseProxy();
+    
     private static X509Certificate2 serverCertificate2;
     private static RemoteCertificateValidationCallback remoteCertificateValidation = new RemoteCertificateValidationCallback(delegate { return true; });
     private TcpListener tcpListener;
     private Thread tcpListenerThread;
-    private Lib.PluginCalls pluginCalls;
+//    private Lib.PluginCalls pluginCalls;
 
     #endregion
 
 
     #region PROPERTIES
 
-    public static HttpsReverseProxy Server
-    {
-      get { return ReverseProxyServer; }
-    }
+    public static HttpsReverseProxy Server { get; set; } = new HttpsReverseProxy();
 
-    public IPAddress ListeningIpInterface
-    {
-      get { return IPAddress.Any; }
-    }
+    public IPAddress ListeningIpInterface { get; private set; } = IPAddress.Any;
 
-    public int ListeningPort
-    {
-      get { return Config.LocalHttpsServerPort; }
-    }
+    public int ListeningPort { get; private set; } = Config.LocalHttpsServerPort;
 
-    public List<IPlugin> LoadedPlugins
-    {
-      get { return Config.LoadedPlugins; }
-    }
+    public List<IPlugin> LoadedPlugins { get; private set; } = Config.LoadedPlugins;
 
     #endregion
 
@@ -96,7 +83,7 @@
       this.tcpListener.Stop();
 
       // Wait for cRemoteSocket to finish processing current connections...
-      if (this.tcpListenerThread != null && this.tcpListenerThread.IsAlive)
+      if (this.tcpListenerThread?.IsAlive == true)
       {
         this.tcpListenerThread.Abort();
         this.tcpListenerThread.Join();
@@ -118,10 +105,10 @@
 
       try
       {
-        string fileName = Path.GetFileName(pluginFileFullPath);
+        var fileName = Path.GetFileName(pluginFileFullPath);
         fileName = Path.GetFileNameWithoutExtension(fileName);
 
-        string pluginName = string.Format("HttpReverseProxy.Plugin.{0}.{0}", fileName);
+        var pluginName = $"HttpReverseProxy.Plugin.{fileName}.{fileName}";
         Type objType = pluginAssembly.GetType(pluginName, false, false);
         object tmpPluginObj = Activator.CreateInstance(objType, true);
 
@@ -130,7 +117,7 @@
           throw new Exception("The plugin file does not support the required plugin interface");
         }
 
-        IPlugin tmpPlugin = (IPlugin)tmpPluginObj;
+        var tmpPlugin = (IPlugin)tmpPluginObj;
         if (Config.LoadedPlugins.Find(elem => elem.Config.Name == tmpPlugin.Config.Name) != null)
         {
           throw new Exception("This plugin was loaded already");
@@ -140,7 +127,8 @@
       }
       catch (Exception ex)
       {
-        Console.WriteLine("An error occurred while loading HTTPS plugin file \"{0}\": {1}\r\n{2}", Path.GetFileName(pluginFileFullPath), ex.Message, ex.StackTrace);
+        var filename = Path.GetFileName(pluginFileFullPath);
+        Console.WriteLine($"An error occurred while loading HTTPS plugin file \"{filename}\": {ex.Message}\r\n{ex.StackTrace}");
       }
     }
 
@@ -168,15 +156,15 @@
       }
       catch (ThreadAbortException taex)
       {
-        Console.WriteLine("HandleHttpsClient(ThreadAbortException): {0}", taex.Message);
+        Console.WriteLine($"HandleHttpsClient(ThreadAbortException): {taex.Message}");
       }
       catch (SocketException sex)
       {
-        Console.WriteLine("HandleHttpsClient(SocketException): {0}", sex.Message);
+        Console.WriteLine($"HandleHttpsClient(SocketException): {sex.Message}");
       }
       catch (Exception ex)
       {
-        Console.WriteLine("HandleHttpsClient(Exception): {0}", ex.Message);
+        Console.WriteLine($"HandleHttpsClient(Exception): {ex.Message}");
       }
     }
 
@@ -199,7 +187,7 @@
       }
       catch (Exception ex)
       {
-        Console.WriteLine("InitiateHttpsClientRequestProcessing(Exception): {0}", ex.Message);
+        Console.WriteLine($"InitiateHttpsClientRequestProcessing(Exception): {ex.Message}");
       }
 
       try
@@ -230,11 +218,10 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateHttpsClientRequestProcessing(EXCEPTION): {0}\r\n{1}", ex.Message, ex.GetType().ToString());
-
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, $"ProxyServer.InitiateHttpsClientRequestProcessing(EXCEPTION): {ex.Message}\r\n{ex.GetType().ToString()}");
         if (ex.InnerException is Exception)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ProxyServer.InitiateHttpsClientRequestProcessing(INNEREXCEPTION): {0}, {1}", ex.InnerException.Message, ex.GetType().ToString());
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, $"ProxyServer.InitiateHttpsClientRequestProcessing(INNEREXCEPTION): {ex.InnerException.Message}, {ex.GetType().ToString()}");
         }
       }
       finally
@@ -359,6 +346,7 @@
       {
         Console.WriteLine("Local certificate is null.");
       }
+
       // Display the properties of the client's certificate.
       X509Certificate remoteCertificate = stream.RemoteCertificate;
       if (stream.RemoteCertificate != null)

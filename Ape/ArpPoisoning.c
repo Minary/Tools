@@ -75,7 +75,9 @@ DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
         {
           continue;
         }
-        else if (systemList[counter].sysIpStr != NULL && strnlen((char *)systemList[counter].sysIpStr, MAX_IP_LEN) > 0 && systemList[counter].sysMacBin != NULL)
+        else if (systemList[counter].sysIpStr != NULL && 
+                 strnlen((char *)systemList[counter].sysIpStr, MAX_IP_LEN) > 0 && 
+                 systemList[counter].sysMacBin != NULL)
         {
           // Prepare the poisoning ARP Reply packet.
           SendArpPoison(&scanParams, systemList[counter].sysMacBin, systemList[counter].sysIpBin);

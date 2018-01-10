@@ -12,29 +12,17 @@
   public class Config
   {
 
-    #region MEMBERS
-
-    private static string pluginName = "InjectFile";
-    private static int pluginPriority = 4;
-    private static string pluginVersion = "0.1";
-    private static string configFileName = "plugin.config";
-
-    private static List<InjectFileConfigRecord> injectFileRecords = new List<InjectFileConfigRecord>();
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public static string PluginName { get { return pluginName; } set { } }
+    public static string PluginName { get; private set; } = "InjectFile";
 
-    public static int PluginPriority { get { return pluginPriority; } set { } }
+    public static int PluginPriority { get; private set; } = 4;
 
-    public static string ConfigFileName { get { return configFileName; } set { } }
+    public static string ConfigFileName { get; private set; } = "0.1";
 
-    public static string PluginVersion { get { return pluginVersion; } set { } }
+    public static string PluginVersion { get; private set; } = "plugin.config";
 
-    public static List<InjectFileConfigRecord> InjectFileRecords { get { return injectFileRecords; } set { } }
+    public static List<InjectFileConfigRecord> InjectFileRecords { get; set; } = new List<InjectFileConfigRecord>();
 
     #endregion
 
@@ -57,14 +45,13 @@
         throw new ProxyWarningException("Config file does not exist");
       }
 
-      string[] configFileLines = File.ReadAllLines(configFilePath);
-      injectFileRecords.Clear();
-
-      foreach (string tmpLine in configFileLines)
+      var configFileLines = File.ReadAllLines(configFilePath);
+      InjectFileRecords.Clear();
+      foreach (var tmpLine in configFileLines)
       {
         try
         {
-          injectFileRecords.Add(this.VerifyRecordParameters(tmpLine));
+          InjectFileRecords.Add(this.VerifyRecordParameters(tmpLine));
         }
         catch (ProxyWarningException pwex)
         {
@@ -84,9 +71,9 @@
 
     protected InjectFileConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string hostRegex = string.Empty;
-      string pathRegex = string.Empty;
-      string replacementResource = string.Empty;
+      var hostRegex = string.Empty;
+      var pathRegex = string.Empty;
+      var replacementResource = string.Empty;
 
       if (string.IsNullOrEmpty(configFileLine))
       {
@@ -106,22 +93,22 @@
 
       if(string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", hostRegex));
+        throw new ProxyWarningException($"Host parameter is invalid: {hostRegex}");
       }
 
       if(string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", pathRegex));
+        throw new ProxyWarningException($"Path parameter is invalid: {pathRegex}");
       }
 
       if (string.IsNullOrEmpty(replacementResource) || Regex.Match(hostRegex, @"[\r\n\s]").Success)
       {
-        throw new ProxyWarningException(string.Format("Replacement resource parameter is invalid: {0}", replacementResource));
+        throw new ProxyWarningException($"Replacement resource parameter is invalid: {replacementResource}");
       }
 
-      if (injectFileRecords.Exists(elem => elem.Host == hostRegex && elem.Path == pathRegex))
+      if (InjectFileRecords.Exists(elem => elem.Host == hostRegex && elem.Path == pathRegex))
       {
-        throw new ProxyWarningException(string.Format("Record already exists"));
+        throw new ProxyWarningException("Record already exists");
       }
 
       return new InjectFileConfigRecord(hostRegex, pathRegex, replacementResource);
@@ -130,7 +117,7 @@
 
     public bool IsRegexPatternValid(string pattern)
     {
-      bool isValid = false;
+      var isValid = false;
 
       try
       {

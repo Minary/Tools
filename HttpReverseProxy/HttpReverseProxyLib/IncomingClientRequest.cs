@@ -189,7 +189,7 @@
 
       if (!requestObj.ClientRequestObj.RequestLine.Path.StartsWith("/"))
       {
-        requestObj.ClientRequestObj.RequestLine.Path = string.Format("/{0}", requestObj.ClientRequestObj.RequestLine.Path);
+        requestObj.ClientRequestObj.RequestLine.Path = $"/{requestObj.ClientRequestObj.RequestLine.Path}";
       }
 
       requestObj.HttpLogData = requestObj.ClientRequestObj.RequestLine.RequestLine.Trim();

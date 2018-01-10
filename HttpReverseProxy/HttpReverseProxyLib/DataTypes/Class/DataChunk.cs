@@ -6,22 +6,13 @@
   public class DataChunk
   {
 
-    #region PRIVATE
-
-    private byte[] contentData;
-    private int contentDataLength;
-    private Encoding dataEncoding;
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public byte[] ContentData { get { return this.contentData; } set { this.contentData = value; } }
+    public byte[] ContentData { get; set; }
 
-    public int ContentDataLength { get { return this.contentDataLength; } set { this.contentDataLength = value; } }
+    public int ContentDataLength { get; set; }
 
-    public Encoding DataEncoding { get { return this.dataEncoding; } set { this.dataEncoding = value; } }
+    public Encoding DataEncoding { get; set; }
 
     #endregion
 
@@ -30,9 +21,9 @@
 
     public DataChunk(byte[] contentData, int contentDataLength, Encoding dataEncoding)
     {
-      this.contentData = contentData;
-      this.contentDataLength = contentDataLength;
-      this.dataEncoding = dataEncoding;
+      this.ContentData = contentData;
+      this.ContentDataLength = contentDataLength;
+      this.DataEncoding = dataEncoding;
     }
 
     #endregion

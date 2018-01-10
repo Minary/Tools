@@ -8,31 +8,18 @@
 
   public class Config
   {
-
-    #region MEMBERS
-
-    private static string pluginName = "HostMapping";
-    private static int pluginPriority = 1;
-    private static string pluginVersion = "0.1";
-    private static string configFileName = "plugin.config";
-
-//    private static Dictionary<string, Tuple<string, string>> mappings = new Dictionary<string, Tuple<string, string>>();
-    private static Dictionary<string, string> mappings = new Dictionary<string, string>();
-
-    #endregion
-
-
+    
     #region PROPERTIES
 
-    public static string PluginName { get { return pluginName; } set { } }
+    public static string PluginName { get; private set; } = "HostMapping";
 
-    public static int PluginPriority { get { return pluginPriority; } set { } }
+    public static int PluginPriority { get; private set; } = 1;
 
-    public static string PluginVersion { get { return pluginVersion; } set { } }
+    public static string PluginVersion { get; private set; } = "0.1";
 
-    public static string ConfigFileName { get { return configFileName; } set { } }
+    public static string ConfigFileName { get; private set; } = "plugin.config";
 
-    public static Dictionary<string, string> Mappings { get { return mappings; } set { } }
+    public static Dictionary<string, string> Mappings { get; set; } = new Dictionary<string, string>();
 
     #endregion
 
@@ -58,28 +45,23 @@
       string[] configFileLines = File.ReadAllLines(configFilePath);
       foreach (string tmpLine in configFileLines)
       {
-        if (string.IsNullOrEmpty(tmpLine))
-        {
-          continue;
-        }
-
-        if (!tmpLine.Contains("||"))
+        if (string.IsNullOrEmpty(tmpLine) ||
+            tmpLine.Contains("||") == false)
         {
           continue;
         }
 
         // Data structure is: RequestedHost:MappedHost
         string[] splitter = Regex.Split(tmpLine, @"\|\|");
-
         if (splitter.Length != 2)
         {
           continue;
         }
 
         // Generate regex per host/contentype
-        if (!mappings.ContainsKey(splitter[0]))
+        if (!Mappings.ContainsKey(splitter[0]))
         {
-          mappings.Add(splitter[0].ToLower(),  splitter[1]);
+          Mappings.Add(splitter[0].ToLower(),  splitter[1]);
         }
       }
     }

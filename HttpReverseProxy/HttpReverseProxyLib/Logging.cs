@@ -18,8 +18,6 @@
     private static string logFileName = "HttpProxy.log";
     private object syncObj = new object();
     private List<string> logs = new List<string>();
-    private Loglevel currentlogLevel;
-    private bool isInTestingMode;
 
     #endregion
 
@@ -28,9 +26,9 @@
 
     public static Logging Instance { get { return instance ?? (instance = GetInstance()); } set { } }
 
-    public Loglevel CurrentLoggingLevel { get { return this.currentlogLevel; } set { this.currentlogLevel = value; } }
+    public Loglevel CurrentLoggingLevel { get; set; }
 
-    public bool IsInTestingMode { get { return this.isInTestingMode; } set { this.isInTestingMode = value; } }
+    public bool IsInTestingMode { get; set; }
 
     #endregion
 
@@ -44,7 +42,7 @@
         return;
       }
 
-      if (logLevel < this.currentlogLevel)
+      if (logLevel < this.CurrentLoggingLevel)
       {
         return;
       }
@@ -57,7 +55,7 @@
       try
       {
         // Prepare log message
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         if (messageParams != null && messageParams.Length > 0)
         {
           message = string.Format(message, messageParams);
@@ -67,16 +65,16 @@
 
         lock (this.syncObj)
         {
-          string logMessage = string.Format("{0} {1} {2}: {3}", timestamp, requestId, proxyProtocol, message);
+          var logMessage = $"{timestamp} {requestId} {proxyProtocol}: {message}";
           logFileStreamWriter.WriteLine(logMessage);
           logFileStreamWriter.Flush();
           logFileStreamWriter.BaseStream.Flush();
 
 Console.WriteLine(logMessage);
           // If testing this application add record to array
-          if (this.isInTestingMode)
+          if (this.IsInTestingMode)
           {
-            string logLine = string.Format("{0} {1}: {2}{3}", timestamp, requestId, message, Environment.NewLine);
+            var logLine = $"{timestamp} {requestId}: {message}{Environment.NewLine}";
             this.logs.Add(logLine);
           }
         }
@@ -140,7 +138,7 @@ Console.WriteLine(logMessage);
     /// <param name="logLevel"></param>
     private Logging(Loglevel logLevel = Loglevel.Debug)
     {
-      this.currentlogLevel = logLevel;
+      this.CurrentLoggingLevel = logLevel;
     }
 
 

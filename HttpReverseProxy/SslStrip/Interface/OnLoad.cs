@@ -28,7 +28,7 @@
 
       try
       {
-        this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
+        this.PluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Loaded {0} content type(s)", Plugin.SslStrip.Config.SearchPatterns.Count);
       }
       catch (System.IO.FileNotFoundException)

@@ -13,21 +13,12 @@
     #region MEMBERS
 
     private PluginProperties pluginProperties;
-    private Dictionary<string, string> injectHostPathPair;
+    private string configurationFileFullPath = string.Empty;
+    private Dictionary<string, string> injectHostPathPair = new Dictionary<string, string>();
     private Config pluginConfig = new Config();
-    private string configurationFileFullPath;
 
     #endregion
-
-
-    #region PROPERTIES
-
-    public PluginProperties PluginProperties { get { return this.pluginProperties; } set { this.pluginProperties = value; } }
-
-    public string ConfigurationFileFullPath { get { return this.configurationFileFullPath; } set { } }
-
-    #endregion
-
+    
 
     #region PUBLIC
 
@@ -45,9 +36,6 @@
         IsActive = true,
         SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
-
-      // Host->Path->type->redirect_resource
-      this.injectHostPathPair = new Dictionary<string, string>();
     }
 
     #endregion

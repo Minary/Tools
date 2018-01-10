@@ -13,29 +13,17 @@
   public class Config
   {
 
-    #region MEMBERS
-
-    private static string pluginName = "InjectCode";
-    private static int pluginPriority = 5;
-    private static string pluginVersion = "0.1";
-    private static string configFileName = "plugin.config";
-
-    private static List<InjectCodeConfigRecord> injectCodeRecords = new List<InjectCodeConfigRecord>();
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public static string PluginName { get { return pluginName; } set { } }
+    public static string PluginName { get; private set; } = "InjectCode";
 
-    public static int PluginPriority { get { return pluginPriority; } set { } }
+    public static int PluginPriority { get; private set; } = 5;
 
-    public static string ConfigFileName { get { return configFileName; } set { } }
+    public static string ConfigFileName { get; private set; } = "0.1";
 
-    public static string PluginVersion { get { return pluginVersion; } set { } }
+    public static string PluginVersion { get; private set; } = "plugin.config";
 
-    public static List<InjectCodeConfigRecord> InjectCodeRecords { get { return injectCodeRecords; } set { } }
+    public static List<InjectCodeConfigRecord> InjectCodeRecords { get; set; } = new List<InjectCodeConfigRecord>();
 
     #endregion
 
@@ -58,10 +46,10 @@
         throw new ProxyWarningException("Config file does not exist");
       }
 
-      string[] configFileLines = File.ReadAllLines(configFilePath);
-      injectCodeRecords.Clear();
+      var configFileLines = File.ReadAllLines(configFilePath);
+      InjectCodeRecords.Clear();
       
-      foreach (string tmpLine in configFileLines)
+      foreach (var tmpLine in configFileLines)
       {
         if (string.IsNullOrEmpty(tmpLine))
         {
@@ -76,7 +64,7 @@
         try
         {
           InjectCodeConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
-          injectCodeRecords.Add(newRecord);
+          InjectCodeRecords.Add(newRecord);
         }
         catch (ProxyWarningException pwex)
         {
@@ -96,21 +84,20 @@
 
     protected InjectCodeConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string hostRegex = string.Empty;
-      string pathRegex = string.Empty;
-      string fileContent = string.Empty;
-      string injectionCodeFile = string.Empty;
-      string tag = string.Empty;
-      string tagRegex = string.Empty;
-      TagPosition position = TagPosition.before;
+      var hostRegex = string.Empty;
+      var pathRegex = string.Empty;
+      var fileContent = string.Empty;
+      var injectionCodeFile = string.Empty;
+      var tag = string.Empty;
+      var tagRegex = string.Empty;
+      var position = TagPosition.before;
 
       if (string.IsNullOrEmpty(configFileLine))
       {
         throw new ProxyWarningException("Configuration line is invalid");
       }
       
-      string[] splitter = Regex.Split(configFileLine, @"\|\|");
-
+      var splitter = Regex.Split(configFileLine, @"\|\|");
       if (splitter.Length != 5)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
@@ -124,23 +111,23 @@
 
       if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", hostRegex));
+        throw new ProxyWarningException($"Host parameter is invalid: {hostRegex}");
       }
 
       if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("Path parameter is invalid: {0}", pathRegex));
+        throw new ProxyWarningException($"Path parameter is invalid: {pathRegex}");
       }
 
       if (string.IsNullOrEmpty(injectionCodeFile) || !File.Exists(injectionCodeFile))
       {
-        throw new ProxyWarningException(string.Format("The injection code file parameter is invalid: {0}", injectionCodeFile));
+        throw new ProxyWarningException($"The injection code file parameter is invalid: {injectionCodeFile}");
       }
 
-      if (injectCodeRecords.Where(elem => elem.HostRegex.ToLower() == hostRegex.ToLower() &&
+      if (InjectCodeRecords.Where(elem => elem.HostRegex.ToLower() == hostRegex.ToLower() &&
                                           elem.PathRegex.ToLower() == pathRegex.ToLower()).ToList().Count > 0)
       {
-        throw new ProxyWarningException(string.Format("Record already exists"));
+        throw new ProxyWarningException("Record already exists");
       }
 
       return new InjectCodeConfigRecord(hostRegex, pathRegex, injectionCodeFile, tag, position);
@@ -149,7 +136,7 @@
 
     public bool IsRegexPatternValid(string pattern)
     {
-      bool isValid = false;
+      var isValid = false;
 
       try
       {

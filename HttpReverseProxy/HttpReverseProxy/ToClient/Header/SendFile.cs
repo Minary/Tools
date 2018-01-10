@@ -26,9 +26,10 @@ namespace HttpReverseProxy.ToClient.Header
 
     public static string GetHeader(string injectFilePath, int fileContentLength, string serverNewLine)
     {
-      date = string.Format("Date: {0}", DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture));
-      contentLength = string.Format("Content-Length: {0}", fileContentLength);
-      contentDisposition = string.Format(@"Content-Disposition: attachment; filename=""{0}""", Path.GetFileName(injectFilePath));
+      var tmpDate = DateTime.Now.ToString("ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+      date = $"Date: {tmpDate}";
+      contentLength = $"Content-Length: {fileContentLength}";
+      contentDisposition = $@"Content-Disposition: attachment; filename=""{Path.GetFileName(injectFilePath)}""";
 
       string header = string.Join(
                                   serverNewLine,

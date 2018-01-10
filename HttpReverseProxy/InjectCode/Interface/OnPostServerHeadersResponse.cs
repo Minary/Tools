@@ -16,8 +16,7 @@
     /// <returns></returns>
     public PluginInstruction OnPostServerHeadersResponse(RequestObj requestObj)
     {
-      PluginInstruction instruction = new PluginInstruction();
-      instruction.Instruction = Instruction.DoNothing;
+      PluginInstruction instruction = new PluginInstruction() { Instruction = Instruction.DoNothing };
 
       if (requestObj == null)
       {

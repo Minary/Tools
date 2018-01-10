@@ -236,7 +236,7 @@
       int noBytesTransferred = 0;
       byte[] clientData = clientStreamReader.ReadBinaryLine();
 
-      if (clientData != null && clientData.Length > 0)
+      if (clientData?.Length > 0)
       {
         // Forward received data packets to peer
         webServerStreamWriter.Write(clientData, 0, clientData.Length);

@@ -13,14 +13,7 @@
   {
 
     #region MEMBERS
-
-    private static string pluginName = "SslStrip";
-    private static int pluginPriority = 2;
-    private static string pluginVersion = "0.1";
-    private static string configFileName = "plugin.config";
-
-    private static Dictionary<string, Regex> searchPatterns = new Dictionary<string, Regex>();
-
+    
     private string theSslStripTagPattern = @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>";
     private Regex searchPatternRegex;
 
@@ -29,15 +22,15 @@
 
     #region PROPERTIES
 
-    public static string PluginName { get { return pluginName; } set { } }
+    public static string PluginName { get; private set; } = "SslStrip";
 
-    public static int PluginPriority { get { return pluginPriority; } set { } }
+    public static int PluginPriority { get; private set; } = 2;
 
-    public static string PluginVersion { get { return pluginVersion; } set { } }
+    public static string PluginVersion { get; private set; } = "0.1";
 
-    public static string ConfigFileName { get { return configFileName; } set { } }
+    public static string ConfigFileName { get; private set; } = "plugin.config";
 
-    public static Dictionary<string, Regex> SearchPatterns { get { return searchPatterns; } set { } }
+    public static Dictionary<string, Regex> SearchPatterns { get; private set; } = new Dictionary<string, Regex>();
 
     #endregion
 
@@ -80,9 +73,9 @@
           continue;
         }
 
-        string realPattern = string.Format(this.theSslStripTagPattern, Regex.Escape(configRecord.Host));
+        var realPattern = string.Format(this.theSslStripTagPattern, Regex.Escape(configRecord.Host));
         this.searchPatternRegex = new Regex(this.theSslStripTagPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        searchPatterns[configRecord.ContentType] = this.searchPatternRegex;
+        SearchPatterns[configRecord.ContentType] = this.searchPatternRegex;
       }
     }
 
@@ -93,8 +86,8 @@
 
     protected SslStripConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string host = string.Empty;
-      string contentType = string.Empty;
+      var host = string.Empty;
+      var contentType = string.Empty;
       char[] delimiter = { ':' };
 
       if (string.IsNullOrEmpty(configFileLine))
@@ -114,12 +107,12 @@
       // Parse parameters
       if (string.IsNullOrEmpty(host) || string.IsNullOrWhiteSpace(host))
       {
-        throw new ProxyWarningException(string.Format("Host parameter is invalid: {0}", splitter[0]));
+        throw new ProxyWarningException("Host parameter is invalid: {splitter[0]}");
       }
 
       if (string.IsNullOrEmpty(contentType) || string.IsNullOrWhiteSpace(contentType))
       {
-        throw new ProxyWarningException(string.Format("MIME-Type parameter is invalid: {0}", splitter[1]));
+        throw new ProxyWarningException($"MIME-Type parameter is invalid: {splitter[1]}");
       }
 
       return new SslStripConfigRecord(host, contentType);

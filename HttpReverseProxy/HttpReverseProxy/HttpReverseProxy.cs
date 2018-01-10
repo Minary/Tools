@@ -18,8 +18,7 @@
   {
 
     #region MEMBERS
-
-    private static readonly HttpReverseProxy ReverseProxyServer = new HttpReverseProxy();
+    
     private TcpListener tcpListener;
     private Thread tcpListenerThread;
     private Lib.PluginCalls pluginCalls;
@@ -29,25 +28,13 @@
 
     #region PROPERTIES
 
-    public static HttpReverseProxy Server
-    {
-      get { return ReverseProxyServer; }
-    }
+    public static HttpReverseProxy Server { get; set; } = new HttpReverseProxy();
 
-    public IPAddress ListeningIpInterface
-    {
-      get { return IPAddress.Any; }
-    }
+    public IPAddress ListeningIpInterface { get; private set; } = IPAddress.Any;
 
-    public int ListeningPort
-    {
-      get { return Config.LocalHttpServerPort; }
-    }
+    public int ListeningPort { get; private set; } = Config.LocalHttpServerPort;
 
-    public List<IPlugin> LoadedPlugins
-    {
-      get { return Config.LoadedPlugins; }
-    }
+    public List<IPlugin> LoadedPlugins { get; private set; } = Config.LoadedPlugins;
 
     #endregion
 
@@ -90,7 +77,7 @@
       this.tcpListener.Stop();
 
       // Wait for cRemoteSocket to finish processing current connections...
-      if (this.tcpListenerThread != null && this.tcpListenerThread.IsAlive)
+      if (this.tcpListenerThread?.IsAlive == true)
       {
         this.tcpListenerThread.Abort();
         this.tcpListenerThread.Join();
@@ -112,19 +99,19 @@
 
       try
       {
-        string fileName = Path.GetFileName(pluginFileFullPath);
+        var fileName = Path.GetFileName(pluginFileFullPath);
         fileName = Path.GetFileNameWithoutExtension(fileName);
 
-        string pluginName = string.Format("HttpReverseProxy.Plugin.{0}.{0}", fileName);
+        var pluginName = $"HttpReverseProxy.Plugin.{fileName}.{fileName}";
         Type objType = pluginAssembly.GetType(pluginName, false, false);
         object tmpPluginObj = Activator.CreateInstance(objType, true);
 
-        if (!(tmpPluginObj is HttpReverseProxyLib.DataTypes.Interface.IPlugin))
+        if (!(tmpPluginObj is IPlugin))
         {
           throw new Exception("The plugin file does not support the required plugin interface");
         }
 
-        IPlugin tmpPlugin = (IPlugin)tmpPluginObj;
+        var tmpPlugin = (IPlugin)tmpPluginObj;
         if (Config.LoadedPlugins.Find(elem => elem.Config.Name == tmpPlugin.Config.Name) != null)
         {
           throw new Exception("This plugin was loaded already");
@@ -319,16 +306,19 @@
     /// <param name="pluginData"></param>
     public void RegisterPlugin(IPlugin pluginData)
     {
-      if (pluginData != null)
+      if (pluginData == null)
       {
-        lock (Config.LoadedPlugins)
+        return;
+      }
+
+      lock (Config.LoadedPlugins)
+      {
+        List<IPlugin> foundPlugins = Config.LoadedPlugins.FindAll(elem => elem.Config.Name == pluginData.Config.Name);
+        if (foundPlugins == null || 
+            foundPlugins.Count <= 0)
         {
-          List<IPlugin> foundPlugins = Config.LoadedPlugins.FindAll(elem => elem.Config.Name == pluginData.Config.Name);
-          if (foundPlugins == null || foundPlugins.Count <= 0)
-          {
-            Config.AddNewPlugin(pluginData);
-            Logging.Instance.LogMessage("HttpReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
-          }
+          Config.AddNewPlugin(pluginData);
+          Logging.Instance.LogMessage("HttpReverseProxy", ProxyProtocol.Undefined, Loglevel.Info, "Registered plugin \"{0}\"", pluginData.Config.Name);
         }
       }
     }

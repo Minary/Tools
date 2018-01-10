@@ -32,17 +32,6 @@
     #endregion
 
 
-    #region PROPERTIES
-
-    public int DataDownloadUpperLimit { get { return this.dataDownloadUpperLimit; } set { } }
-
-    public Dictionary<string, bool> SupportedContentTypes { get { return this.supportedContentTypes; } set { } }
-
-    public RequestObj RequestObj { get { return this.requestObj; } set { this.requestObj = value; } }
-
-    #endregion
-
-
     #region PUBLIC
 
     /// <summary>
@@ -95,7 +84,7 @@
         {
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
-          string innerException = (cnex.InnerException != null) ? cnex.InnerException.Message : "No inner exception found";
+          var innerException = cnex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
           break;
         }
@@ -105,25 +94,25 @@
           cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
-          string innerException = (peex.InnerException != null) ? peex.InnerException.Message : "No inner exception found";
+          var innerException = peex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, "HttpReverseProxy.ProcessClientRequest(ProxyErrorException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, peex.Message, peex.StackTrace);
           break;
         }
         catch (WebException wex)
         {
-          string innerException = (wex.InnerException != null) ? wex.InnerException.Message : "No inner exception found";
+          var innerException = wex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(WebException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, wex.Message, wex.StackTrace);
           this.clientErrorHandler.ProcessWebException(this.requestObj, wex);
         }
         catch (System.IO.IOException ioex)
         {
-          string innerException = (ioex.InnerException != null) ? string.Format("INNER EXCEPTION: {0}={1}", ioex.InnerException.GetType(), ioex.InnerException.Message) : "No inner exception found";
+          var innerException = ioex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(IOException): Client system closed the connection");
           break;
         }
         catch (ObjectDisposedException odex)
         {
-          string innerException = (odex.InnerException != null) ? odex.InnerException.Message : "No inner exception found";
+          var innerException = odex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(ObjectDisposedException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, odex.Message, odex.StackTrace);
           break;
         }
@@ -133,13 +122,13 @@
           cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
-          string innerException = (sex.InnerException != null) ? sex.InnerException.Message : "No inner exception found";
+          var innerException = sex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);
           break;
         }
         catch (Exception ex)
         {
-          string innerException = (ex.InnerException != null) ? ex.InnerException.Message : "No inner exception found";
+          var innerException = ex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, "HttpReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
           break;
         }
@@ -352,7 +341,7 @@
     private void ForwardClientRequestToServer()
     {
       // 1. Close old server request streams
-      if (this.RequestObj.ServerRequestHandler != null)
+      if (this.requestObj.ServerRequestHandler != null)
       {
         this.requestObj.ServerRequestHandler.CloseServerConnection();
       }
@@ -365,7 +354,6 @@
       // Reasons : Plugin.SslStripn: Http redirect cache record
       //           Plugin.SslStripn: Hsts cache record
       //           Plugin.SslStripn: SslStrip cache record
-//if (this.requestObj.ClientRequestObj.Scheme == "https")
       if (this.requestObj.ProxyProtocol == ProxyProtocol.Https)
       {
         this.requestObj.ServerRequestHandler = new ToServer.TcpClientSsl(this.requestObj, this.requestObj.ClientRequestObj.ClientBinaryReader, this.requestObj.ClientRequestObj.ClientBinaryWriter);
@@ -399,7 +387,7 @@
     private bool IsServerResponseDataProcessable()
     {
       // 1. Server response "Content-Type" is labelled as "supported"
-      if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
+      if (!this.supportedContentTypes.ContainsKey(this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType))
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.IsServerResponseDataProcessable():\"{0}\" is not processed", this.requestObj.ServerResponseObj.ContentTypeEncoding.ContentType);
         return false;
@@ -419,7 +407,7 @@
     private bool IsClientRequestDataProcessable()
     {
       // 1. Client request "Content-Type" is labelled as "supported"
-      if (!this.SupportedContentTypes.ContainsKey(this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentType))
+      if (!this.supportedContentTypes.ContainsKey(this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentType))
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Info, "HttpReverseProxy.IsClientRequestDataProcessable(): \"{ 0}\" is not processed", this.requestObj.ClientRequestObj.ContentTypeEncoding.ContentType);
         return false;
@@ -444,7 +432,7 @@
         foreach (string key in this.requestObj.ClientRequestObj.ClientRequestHeaders.Keys)
         {
           string logData = string.Join("..", this.requestObj.ClientRequestObj.ClientRequestHeaders[key]);
-          this.requestObj.HttpLogData += string.Format("..{0}: {1}", key, logData);
+          this.requestObj.HttpLogData += $"..{key}: {logData}";
         }
       }
       catch (Exception)
@@ -452,7 +440,7 @@
       }
 
       // Append client request data to the log data string
-      if (sniffedDataChunk != null && sniffedDataChunk.TotalBytesWritten > 0)
+      if (sniffedDataChunk?.TotalBytesWritten > 0)
       {
         this.requestObj.HttpLogData += "...." + sniffedDataChunk.GetDataString();
       }

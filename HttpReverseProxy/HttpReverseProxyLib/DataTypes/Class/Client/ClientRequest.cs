@@ -1,6 +1,5 @@
 ﻿namespace HttpReverseProxyLib.DataTypes.Class.Client
 {
-  using System.Collections;
   using System.Collections.Generic;
   using System.IO;
 
@@ -11,46 +10,33 @@
     #region MEMBERS
 
     private string defaultHost;
-    private ClientRequestLine requestLine;
-    private string host;
-    private string scheme;
-    private bool isClientKeepAlive;
-    private DataContentTypeEncoding contentTypeEncoding;
-
-    private IncomingClientRequest clientWebRequestHandler;
-    private Dictionary<string, List<string>> clientRequestHeaders;
-    private MyBinaryReader clientBinaryReader;
-    private BinaryWriter clientBinaryWriter;
-
-    private int contentLength;
-    private string clientRequestData;
 
     #endregion
 
 
     #region PROPERTIES
 
-    public string Host { get { return this.host; } set { this.host = value; } }
+    public string Host { get; set; }
 
-    public ClientRequestLine RequestLine { get { return this.requestLine; } set { this.requestLine = value; } }
+    public ClientRequestLine RequestLine { get; set; }
 
-    public string Scheme { get { return this.scheme; } set { this.scheme = value; } }
+    public string Scheme { get; set; }
 
-    public bool IsClientKeepAlive { get { return this.isClientKeepAlive; } set { this.isClientKeepAlive = value; } }
+    public bool IsClientKeepAlive { get; set; }
 
-    public DataContentTypeEncoding ContentTypeEncoding { get { return this.contentTypeEncoding; } set { this.contentTypeEncoding = value; } }
+    public DataContentTypeEncoding ContentTypeEncoding { get; set; }
 
-    public IncomingClientRequest ClientWebRequestHandler { get { return this.clientWebRequestHandler; } set { this.clientWebRequestHandler = value; } }
+    public IncomingClientRequest ClientWebRequestHandler { get; set; }
 
-    public Dictionary<string, List<string>> ClientRequestHeaders { get { return this.clientRequestHeaders; } set { this.clientRequestHeaders = value; } }
+    public Dictionary<string, List<string>> ClientRequestHeaders { get; set; }
 
-    public MyBinaryReader ClientBinaryReader { get { return this.clientBinaryReader; } set { this.clientBinaryReader = value; } }
+    public MyBinaryReader ClientBinaryReader { get; set; }
 
-    public BinaryWriter ClientBinaryWriter { get { return this.clientBinaryWriter; } set { this.clientBinaryWriter = value; } }
+    public BinaryWriter ClientBinaryWriter { get; set; }
 
-    public int ContentLength { get { return this.contentLength; } set { this.contentLength = value; } }
+    public int ContentLength { get; set; }
 
-    public string ClientRequestData { get { return this.clientRequestData; } set { this.clientRequestData = value; } }
+    public string ClientRequestData { get; set; }
 
     #endregion
 
@@ -59,18 +45,18 @@
 
     public ClientRequest(string defaultHost)
     {
-      this.requestLine = new ClientRequestLine();
+      this.RequestLine = new ClientRequestLine();
       this.defaultHost = defaultHost;
 
-      this.contentLength = 0;
-      this.clientRequestHeaders = new Dictionary<string, List<string>>();
-      this.contentTypeEncoding = new DataContentTypeEncoding();
-      this.clientBinaryReader = null;
-      this.clientBinaryWriter = null;
+      this.ContentLength = 0;
+      this.ClientRequestHeaders = new Dictionary<string, List<string>>();
+      this.ContentTypeEncoding = new DataContentTypeEncoding();
+      this.ClientBinaryReader = null;
+      this.ClientBinaryWriter = null;
 
-      this.scheme = "http";
-      this.host = string.Empty;
-      this.isClientKeepAlive = false;
+      this.Scheme = "http";
+      this.Host = string.Empty;
+      this.IsClientKeepAlive = false;
     }
 
 
@@ -80,15 +66,15 @@
     /// <returns></returns>
     public string GetRequestedUrl()
     {
-      string requestUrl = string.Empty;
+      var requestUrl = string.Empty;
 
-      if (!string.IsNullOrEmpty(this.host))
+      if (!string.IsNullOrEmpty(this.Host))
       {
-        requestUrl = string.Format("{0}://{1}{2}", this.scheme, this.host, this.requestLine.Path);
+        requestUrl = $"{this.Scheme}://{this.Host}{this.RequestLine.Path}";
       }
       else
       {
-        requestUrl = string.Format("{0}://{1}{2}", this.scheme, this.defaultHost, this.requestLine.Path);
+        requestUrl = $"{this.Scheme}://{this.defaultHost}{this.RequestLine.Path}";
       }
 
       return requestUrl;

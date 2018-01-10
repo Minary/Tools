@@ -61,8 +61,7 @@
         throw new Exception("Host is invalid");
       }
 
-      this.httpWebServerSocket = new TcpClient();
-      this.httpWebServerSocket.NoDelay = true;
+      this.httpWebServerSocket = new TcpClient() { NoDelay = true };
       this.httpWebServerSocket.Connect(host, TcpPortHttps);
 
       this.serverConnectionSslStream = new SslStream(this.httpWebServerSocket.GetStream(), false, new RemoteCertificateValidationCallback(this.ValidateCert));

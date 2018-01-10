@@ -85,7 +85,8 @@ PCONNODE ConnectionNodeExists(PCONNODE conNodesParam, char *id)
   int counter = 0;
   
   EnterCriticalSection(&gCSConnectionsList);
-  if (id != NULL && (tmpConnection = conNodesParam) != NULL)
+  if (id != NULL && 
+      (tmpConnection = conNodesParam) != NULL)
   {
 
     // Go to the end of the list
@@ -264,7 +265,7 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
   {
     // The first entry in the linked list.
     if (now - ((PCONNODE)*conNodesParam)->Created > TCP_MAX_ACTIVITY ||
-      ((PCONNODE)*conNodesParam)->dataLength > MAX_CONNECTION_VOLUME)
+        ((PCONNODE)*conNodesParam)->dataLength > MAX_CONNECTION_VOLUME)
     {
       tempNode = *conNodesParam;
       *conNodesParam = ((PCONNODE)*conNodesParam)->next;

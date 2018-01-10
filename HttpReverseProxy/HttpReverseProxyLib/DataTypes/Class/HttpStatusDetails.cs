@@ -4,22 +4,13 @@
   public class HttpStatusDetails
   {
 
-    #region MEMBERS
-
-    private int code = 0;
-    private string title = string.Empty;
-    private string description = string.Empty;
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public int Code { get { return this.code; } set { } }
+    public int Code { get; private set; }
 
-    public string Title { get { return this.title; } set { } }
+    public string Title { get; private set; }
 
-    public string Description { get { return this.description; } set { } }
+    public string Description { get; private set; }
 
     #endregion
 
@@ -28,9 +19,9 @@
 
     public HttpStatusDetails(int code, string title, string description)
     {
-      this.code = code;
-      this.title = title;
-      this.description = description;
+      this.Code = code;
+      this.Title = title;
+      this.Description = description;
     }
 
     #endregion

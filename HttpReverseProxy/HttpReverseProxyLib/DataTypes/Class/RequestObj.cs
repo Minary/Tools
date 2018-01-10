@@ -12,73 +12,44 @@
   public class RequestObj
   {
 
-    #region MEMBERS
-
-    // Client TCP connection
-    private string srcMac;
-    private string srcIp;
-    private string srcPort;
-    private TcpClient tcpClientConnection;
-    private ProxyProtocol proxyProtocol;
-
-    // Client HTTP connection
-    private ClientRequest clientRequestObj;
-
-    // Server HTTP connection
-    private ServerResponse serverResponseObj;
-    private IOutgoingRequestClient serverRequestHandler;
-    private bool isServerKeepAlive;
-
-    private DataTransmissionMode proxyDataTransmissionModeS2C;
-    private DataTransmissionMode proxyDataTransmissionModeC2S;
-
-    // ...
-    private int counter;
-    private string id;
-
-    private string httpLogData;
-
-    #endregion
-
-
     #region PROPERTIES
 
     // Proxy server TCP connection
-    public string SrcMac { get { return this.srcMac; } set { this.srcMac = value; } }
+    public string SrcMac { get; set; }
 
-    public string SrcIp { get { return this.srcIp; } set { this.srcIp = value; } }
+    public string SrcIp { get; set; }
 
-    public string SrcPort { get { return this.srcPort; } set { this.srcPort = value; } }
+    public string SrcPort { get; set; }
 
-    public TcpClient TcpClientConnection { get { return this.tcpClientConnection; } set { this.tcpClientConnection = value; } }
+    public TcpClient TcpClientConnection { get; set; }
 
-    public ProxyProtocol ProxyProtocol { get { return this.proxyProtocol; } set { this.proxyProtocol = value; } }
+    public ProxyProtocol ProxyProtocol { get; set; }
 
 
     // Client HTTP connection
-    public ClientRequest ClientRequestObj { get { return this.clientRequestObj; } set { } }
+    public ClientRequest ClientRequestObj { get; private set; }
 
 
     // Server HTTP connection
-    public IOutgoingRequestClient ServerRequestHandler { get { return this.serverRequestHandler; } set { this.serverRequestHandler = value; } }
+    public IOutgoingRequestClient ServerRequestHandler { get; set; }
 
-    public ServerResponse ServerResponseObj { get { return this.serverResponseObj; } set { this.serverResponseObj = value; } }
+    public ServerResponse ServerResponseObj { get; set; }
 
-    public bool IsServerKeepAlive { get { return this.isServerKeepAlive; } set { this.isServerKeepAlive = value; } }
-    
+    public bool IsServerKeepAlive { get; set; }
 
 
-    public DataTransmissionMode ProxyDataTransmissionModeS2C { get { return this.proxyDataTransmissionModeS2C; } set { this.proxyDataTransmissionModeS2C = value; } }
 
-    public DataTransmissionMode ProxyDataTransmissionModeC2S { get { return this.proxyDataTransmissionModeC2S; } set { this.proxyDataTransmissionModeC2S = value; } }
-    
+    public DataTransmissionMode ProxyDataTransmissionModeS2C { get; set; }
+
+    public DataTransmissionMode ProxyDataTransmissionModeC2S { get; set; }
+
 
     // ...
-    public int Counter { get { return this.counter; } set { this.counter = value; } }
+    public int Counter { get; set; }
 
-    public string Id { get { return this.id; } set { this.id = value; } }
+    public string Id { get; set; }
 
-    public string HttpLogData { get { return this.httpLogData; } set { this.httpLogData = value; } }
+    public string HttpLogData { get; set; }
 
     #endregion
 
@@ -88,7 +59,7 @@
     public RequestObj(string defaultHost, ProxyProtocol proxyProtocol)
     {
       // Client elements
-      this.clientRequestObj = new ClientRequest(defaultHost);
+      this.ClientRequestObj = new ClientRequest(defaultHost);
 
       // Server elements
       this.ServerResponseObj = new ServerResponse();
@@ -96,7 +67,7 @@
 
       // Request object elements
       this.InitRequestValues();
-      this.proxyProtocol = proxyProtocol;
+      this.ProxyProtocol = proxyProtocol;
       this.IsServerKeepAlive = false;
       this.HttpLogData = string.Empty;
       this.Counter = 0;
@@ -123,7 +94,7 @@
       // Reset client settings
       this.ClientRequestObj.ContentLength = 0;
       this.ClientRequestObj.ClientRequestData = string.Empty;
-      this.clientRequestObj.ClientRequestHeaders.Clear();
+      this.ClientRequestObj.ClientRequestHeaders.Clear();
 
       this.ClientRequestObj.ContentTypeEncoding.ContentCharSet = "UTF-8";
       this.ClientRequestObj.ContentTypeEncoding.ContentCharsetEncoding = Encoding.UTF8;
@@ -131,8 +102,6 @@
 
       this.ClientRequestObj.IsClientKeepAlive = false;
       this.ClientRequestObj.Host = string.Empty;
-//this.ClientRequestObj.Scheme = string.Empty;
-//this.proxyProtocol = ProxyProtocol.Undefined;
 
       // Reset server settings
       this.ServerResponseObj.ContentLength = 0;

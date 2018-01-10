@@ -105,7 +105,7 @@
         throw new Exception("HTTP version is invalid");
       }
 
-      string requestString = string.Format("{0} {1} {2}", requestMethod, path, httpVersion);
+      string requestString = "{requestMethod} {path} {httpVersion}";
       byte[] requestByteArray = Encoding.UTF8.GetBytes(requestString);
 
       this.DumpstringDetails(requestMethod);
@@ -121,7 +121,7 @@
     public void ForwardHeadersC2S(Dictionary<string, List<string>> clientRequestHeaders, byte[] clientNewlineBytes)
     {
       byte[] headerByteArray;
-      string headerString;
+      var headerString = string.Empty;
 
       if (clientRequestHeaders == null || clientRequestHeaders.Keys.Count <= 0)
       {
@@ -129,11 +129,11 @@
       }
 
       // Send headers to server
-      foreach (string tmpHeaderKey in clientRequestHeaders.Keys)
+      foreach (var tmpHeaderKey in clientRequestHeaders.Keys)
       {
-        foreach (string headerValue in clientRequestHeaders[tmpHeaderKey])
+        foreach (var headerValue in clientRequestHeaders[tmpHeaderKey])
         {
-          headerString = string.Format("{0}: {1}", tmpHeaderKey, headerValue);
+          headerString = $"{tmpHeaderKey}: {headerValue}";
           headerByteArray = Encoding.UTF8.GetBytes(headerString);
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientBase.ForwardHeadersC2S(): Header Client2Server: {0}", headerString);
           this.webServerStreamWriter.Write(headerByteArray, 0, headerByteArray.Length);
@@ -233,7 +233,7 @@
 
     public void ForwardStatusLineS2C(ServerResponseStatusLine serverResponseStatusLine)
     {
-      string statusLineStr = string.Format("{0} {1} {2}", serverResponseStatusLine.HttpVersion, serverResponseStatusLine.StatusCode, serverResponseStatusLine.StatusDescription);
+      string statusLineStr = $"{serverResponseStatusLine.HttpVersion} {serverResponseStatusLine.StatusCode} {serverResponseStatusLine.StatusDescription}";
       byte[] statusLineByteArr = Encoding.UTF8.GetBytes(statusLineStr);
 
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "TcpClientBase.ForwardStatusLineS2C(): statusLineStr: |{0}|", statusLineStr);
@@ -244,13 +244,14 @@
 
     public void ForwardHeadersS2C(Dictionary<string, List<string>> serverResponseHeaders, byte[] serverNewlineBytes)
     {
-      string header;
+      var header = string.Empty;
       byte[] headerByteArr;
-      foreach (string tmpHeaderKey in serverResponseHeaders.Keys)
+
+      foreach (var tmpHeaderKey in serverResponseHeaders.Keys)
       {
-        foreach (string headerValue in serverResponseHeaders[tmpHeaderKey])
+        foreach (var headerValue in serverResponseHeaders[tmpHeaderKey])
         {
-          header = string.Format("{0}: {1}", tmpHeaderKey, headerValue);
+          header = $"{tmpHeaderKey}: {headerValue}";
           headerByteArr = Encoding.UTF8.GetBytes(header);
           this.clientStreamWriter.Write(headerByteArr, 0, headerByteArr.Length);
           this.clientStreamWriter.Write(serverNewlineBytes, 0, serverNewlineBytes.Length);

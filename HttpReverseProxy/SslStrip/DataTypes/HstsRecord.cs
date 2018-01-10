@@ -3,20 +3,13 @@
   public class HstsRecord
   {
 
-    #region MEMBER
-
-    private int counter = 0;
-    private string host;
-    private bool encryptSubdomains;
-
-    #endregion
-
-
     #region Properties
 
-    public int Counter { get { return this.counter; } set { this.counter = value; } }
-    public string Host { get { return this.host; } set { this.host = value; } }
-    public bool EncryptSubdomains { get { return encryptSubdomains; } set { encryptSubdomains = value; } }
+    public int Counter { get; set; } = 0;
+
+    public string Host { get; set; } = string.Empty;
+
+    public bool EncryptSubdomains { get; set; } = false;
 
     #endregion
 

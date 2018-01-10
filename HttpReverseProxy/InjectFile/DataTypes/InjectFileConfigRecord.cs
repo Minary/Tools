@@ -4,40 +4,24 @@
   public class InjectFileConfigRecord
   {
 
-    #region MEMBERS
-
-    private string host;
-    private string path;
-    private string replacementResource;
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public string Host { get { return this.host; } set { this.host = value; } }
+    public string Host { get; set; } = string.Empty;
 
-    public string Path { get { return this.path; } set { this.path = value; } }
+    public string Path { get; set; } = string.Empty;
 
-    public string ReplacementResource { get { return this.replacementResource; } set { this.replacementResource = value; } }
+    public string ReplacementResource { get; set; } = string.Empty;
 
     #endregion
 
 
     #region PUBLIC
 
-    public InjectFileConfigRecord()
-    {
-      this.host = string.Empty;
-      this.path = string.Empty;
-      this.replacementResource = string.Empty;
-    }
-
     public InjectFileConfigRecord(string host, string path, string replacementResource)
     {
-      this.host = host;
-      this.path = path;
-      this.replacementResource = replacementResource;
+      this.Host = host;
+      this.Path = path;
+      this.ReplacementResource = replacementResource;
     }
 
     #endregion 

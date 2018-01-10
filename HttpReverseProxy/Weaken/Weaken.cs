@@ -12,14 +12,6 @@
     #region MEMBERS
 
     private PluginProperties pluginProperties;
-    private Config weakenConfig;
-
-    #endregion
-
-
-    #region PROPERTIES
-
-    public PluginProperties PluginProperties { get { return this.pluginProperties; } set { this.pluginProperties = value; } }
 
     #endregion
 

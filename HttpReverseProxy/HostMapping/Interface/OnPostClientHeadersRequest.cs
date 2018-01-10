@@ -25,8 +25,7 @@
       }
 
       string hostName = requestObj.ClientRequestObj.Host.ToLower();
-      if (Plugin.HostMapping.Config.Mappings != null &&
-          Plugin.HostMapping.Config.Mappings.Count > 0 &&
+      if (Plugin.HostMapping.Config.Mappings?.Count > 0 &&
           Plugin.HostMapping.Config.Mappings.ContainsKey(hostName))
       {
         if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))

@@ -11,16 +11,9 @@
   public class CacheSslStrip
   {
 
-    #region MEMBERS
-    
-    private Dictionary<string, HostRecord> cache = new Dictionary<string, HostRecord>();
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public Dictionary<string, HostRecord> SslStripCache { get { return this.cache; } set { } }
+    public Dictionary<string, HostRecord> SslStripCache { get; set; } = new Dictionary<string, HostRecord>();
 
     #endregion
 
@@ -65,9 +58,8 @@
       }
 
       Logging.Instance.LogMessage(id, ProxyProtocol.Undefined, Loglevel.Debug, "CacheSslStrip.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
-
       HostRecord tmpHost = new HostRecord("GET", ProxyProtocol.Https, tmpUriValue.Host, tmpUriValue.PathAndQuery);
-      this.cache.Add(keyLocation, tmpHost);
+      this.SslStripCache.Add(keyLocation, tmpHost);
     }
 
     /// <summary>
@@ -75,9 +67,9 @@
     /// </summary>
     public void EnumerateCache()
     {
-      foreach (string tmpKey in this.cache.Keys)
+      foreach (var tmpKey in this.SslStripCache.Keys)
       {
-        Logging.Instance.LogMessage("SslStrip.CacheSslStrip.EnumerateCache", ProxyProtocol.Undefined, Loglevel.Debug, "Cache.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.cache[tmpKey].Url, cache[tmpKey].Counter);
+        Logging.Instance.LogMessage("SslStrip.CacheSslStrip.EnumerateCache", ProxyProtocol.Undefined, Loglevel.Debug, "Cache.EnumerateCache(): Key:{0} Value:{1}, Counter:{2}", tmpKey, this.SslStripCache[tmpKey].Url, SslStripCache[tmpKey].Counter);
       }
     }
 
@@ -87,9 +79,9 @@
     /// </summary>
     public void ResetCache()
     {
-      if (this.cache != null)
+      if (this.SslStripCache != null)
       {
-        this.cache.Clear();
+        this.SslStripCache.Clear();
       }
     }
 
@@ -106,9 +98,9 @@
         throw new Exception("Key Uri is not well formed");
       }
 
-      if (this.cache.ContainsKey(urlKey))
+      if (this.SslStripCache.ContainsKey(urlKey))
       {
-        return this.cache.Remove(urlKey);
+        return this.SslStripCache.Remove(urlKey);
       }
 
       return false;
@@ -127,12 +119,12 @@
         throw new Exception("The Url is malformed");
       }
 
-      if (!this.cache.ContainsKey(urlKey))
+      if (!this.SslStripCache.ContainsKey(urlKey))
       {
         return null;
       }
 
-      return this.cache[urlKey];
+      return this.SslStripCache[urlKey];
     }
 
 
@@ -146,16 +138,16 @@
       if (Uri.IsWellFormedUriString(urlKey, UriKind.Absolute))
       {
         // Example: Key="http://www.buglist.io/test/boom/ignaz.html"
-        if (this.cache.ContainsKey(urlKey))
+        if (this.SslStripCache.ContainsKey(urlKey))
         {
           return true;
         }
 
         // http://www.buglist.io/ and HSTS enabled
         Uri tmpUri = new Uri(urlKey);
-        string tmpRequestUrl = string.Format("{0}://{1}/", tmpUri.Scheme, tmpUri.Host);
+        string tmpRequestUrl = $"{tmpUri.Scheme}://{tmpUri.Host}/";
 
-        if (this.cache.ContainsKey(urlKey))
+        if (this.SslStripCache.ContainsKey(urlKey))
         {
           return true;
         }

@@ -8,40 +8,25 @@
   public class Config
   {
 
-    #region MEMBERS
-
-    private static string localIp = string.Empty;
-private static string defaultRemoteHost = "www.buglist.io";
-    private static string remoteHostIp = string.Empty;
-    private static int localHttpServerPort = 80;
-    private static int localHttpsServerPort = 443;
-    private static string certificatePath = string.Empty;
-    private static int maxSniffedClientDataSize = 4096;
-    private static List<IPlugin> loadedPlugins = new List<IPlugin>();
-    private static Loglevel currentLoglevel;
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public static string LocalIp { get { return localIp; } set { localIp = value; } }
+    public static string LocalIp { get; set; } = string.Empty;
 
-    public static string DefaultRemoteHost { get { return defaultRemoteHost; } set { defaultRemoteHost = value; } }
+    public static string DefaultRemoteHost { get; private set; } = "minary.io";
 
-    public static string RemoteHostIp { get { return remoteHostIp; } set { remoteHostIp = value; } }
+    public static string RemoteHostIp { get; set; } = string.Empty;
 
-    public static int LocalHttpServerPort { get { return localHttpServerPort; } set { localHttpServerPort = value; } }
+    public static int LocalHttpServerPort { get; set; } = 80;
 
-    public static int LocalHttpsServerPort { get { return localHttpsServerPort; } set { localHttpsServerPort = value; } }
+    public static int LocalHttpsServerPort { get; set; } = 443;
 
-    public static string CertificatePath { get { return certificatePath; } set { certificatePath = value; } }
+    public static string CertificatePath { get; set; } = string.Empty;
 
-    public static List<IPlugin> LoadedPlugins { get { return loadedPlugins; } set { } }
+    public static List<IPlugin> LoadedPlugins { get; set; } = new List<IPlugin>();
 
-    public static int MaxSniffedClientDataSize { get { return maxSniffedClientDataSize; } set { maxSniffedClientDataSize = value; } }
+    public static int MaxSniffedClientDataSize { get; private set; } = 4096;
 
-    public static Loglevel CurrentLoglevel { get { return currentLoglevel; } set { currentLoglevel = value; } }
+    public static Loglevel CurrentLoglevel { get; set; } = Loglevel.Info;
 
     #endregion
 
@@ -51,10 +36,10 @@ private static string defaultRemoteHost = "www.buglist.io";
     public static void AddNewPlugin(IPlugin newPlugin)
     {
       if (newPlugin != null &&
-         loadedPlugins.FindAll(elem => elem.Config.Name == newPlugin.Config.Name).Count <= 0)
+          LoadedPlugins.FindAll(elem => elem.Config.Name == newPlugin.Config.Name).Count <= 0)
       {
-        loadedPlugins.Add(newPlugin);
-        loadedPlugins.Sort((s1, s2) => s1.CompareTo(s2));
+        LoadedPlugins.Add(newPlugin);
+        LoadedPlugins.Sort((s1, s2) => s1.CompareTo(s2));
       }
     }
 

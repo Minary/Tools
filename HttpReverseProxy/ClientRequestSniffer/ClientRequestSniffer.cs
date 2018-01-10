@@ -15,22 +15,15 @@
 
     #region MEMBERS
 
-    private PluginProperties pluginProperties;
+    private PluginProperties pluginProperties = new PluginProperties();
     private NamedPipeClientStream pipeClient = null;
     private StreamWriter pipeWriter = null;
 
     #endregion
 
 
-    #region PROPERTIES
-
-    public PluginProperties PluginProperties { get { return this.pluginProperties; } set { this.pluginProperties = value; } }
-
-    #endregion
-
-
     #region PUBLIC
-    
+
     public ClientRequestSniffer()
     {
       // Set plugin properties
@@ -40,7 +33,7 @@
         Priority = ClientSnifferConfig.PluginPriority,
         Version = ClientSnifferConfig.PluginVersion,
         PluginDirectory = Path.Combine(Directory.GetCurrentDirectory(), "plugins", ClientSnifferConfig.PluginName),
-        IsActive = true,
+        IsActive = true, 
         SupportedProtocols = ProxyProtocol.Http | ProxyProtocol.Https
       };
     }
@@ -53,13 +46,8 @@
     private void SendClientRequestDataToPipe(RequestObj requestObj)
     {
       // 2. Send request/response data to pipe/GUI
-      string pipeData = string.Format("TCP||{0}||{1}||{2}||{3}||{4}||{5}\r\n",
-                                      requestObj.SrcMac,
-                                      requestObj.SrcIp,
-                                      requestObj.SrcPort,
-                                      requestObj.ClientRequestObj.Host,
-                                      80,
-                                      requestObj.HttpLogData);
+      var pipeData = $"TCP||{requestObj.SrcMac}||{requestObj.SrcIp}||{requestObj.SrcPort}||" +
+                     $"{requestObj.ClientRequestObj.Host}||80||{requestObj.HttpLogData}\r\n";
       Task.Run(() => this.WriteToPipe(requestObj, pipeData));
       this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ClientRequestSniffer.SendClientRequestDataToPipe(): Sending data to attack service pipe: {0} ...", pipeData.Trim().Substring(0, 40));
     }
@@ -73,7 +61,7 @@
     /// <returns></returns>
     public bool WriteToPipe(RequestObj requestObj, string pipeData)
     {
-      bool retVal = false;
+      var retVal = false;
 
       // Create Pipe
       try
@@ -88,7 +76,7 @@
           this.pipeClient.Connect(500);
         }
 
-        if (this.pipeClient != null && this.pipeClient.IsConnected)
+        if (this.pipeClient?.IsConnected == true)
         {
           if (this.pipeWriter == null)
           {
@@ -96,11 +84,13 @@
             this.pipeWriter.AutoFlush = true;
           }
 
-          if (this.pipeWriter != null && this.pipeClient.IsConnected && this.pipeClient.CanWrite)
+          if (this.pipeWriter != null && 
+              this.pipeClient.IsConnected && 
+              this.pipeClient.CanWrite)
           {
             if (pipeData.Length > 0)
             {
-              string tmpBuffer = pipeData.Trim();
+              var tmpBuffer = pipeData.Trim();
               this.pipeWriter.WriteLine(tmpBuffer);
             }
 
@@ -159,7 +149,6 @@
     }
 
     #endregion
-
 
   }
 }

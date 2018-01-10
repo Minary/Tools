@@ -6,17 +6,9 @@
 
     #region MEMBERS
 
-    private string requestedHost;
-    private string mappingHost;
+    private string requestedHost = string.Empty;
 
-    #endregion
-
-
-    #region PROPERTIES
-
-    public string RequestedHost { get { return this.requestedHost; } set { this.requestedHost = value; } }
-
-    public string MappingHost { get { return this.mappingHost; } set { this.mappingHost = value; } }
+    private string mappingHost = string.Empty;
 
     #endregion
 
@@ -25,8 +17,6 @@
 
     public HostMappingConfigRecord()
     {
-      this.requestedHost = string.Empty;
-      this.mappingHost = string.Empty;
     }
 
     public HostMappingConfigRecord(string requestedHost, string mappingHost)

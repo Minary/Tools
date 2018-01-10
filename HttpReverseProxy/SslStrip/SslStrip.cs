@@ -22,10 +22,6 @@
     private CacheRedirect cacheRedirect;
     private CacheSslStrip cacheSslStrip;
     private PluginProperties pluginProperties;
-    private string sslStrippedData;
-    private Dictionary<string, bool> sslStrippedHosts = new Dictionary<string, bool>();
-    private Dictionary<string, string> sslStrippedUrls = new Dictionary<string, string>();
-    private Config pluginConfig = new Config();
     private string configurationFileFullPath;
 
     #endregion
@@ -33,13 +29,13 @@
 
     #region PROPERTIES
 
-    public string SslStrippedData { get { return this.sslStrippedData; } set { } }
+    public string SslStrippedData { get; set; } = string.Empty;
 
-    public Dictionary<string, bool> SslStrippedHosts { get { return this.sslStrippedHosts; } set { } }
+    public Dictionary<string, bool> SslStrippedHosts { get; set; } = new Dictionary<string, bool>();
 
-    public Dictionary<string, string> SslStrippedUrls { get { return this.sslStrippedUrls; } set { } }
+    public Dictionary<string, string> SslStrippedUrls { get; set; } = new Dictionary<string, string>();
 
-    public Config PluginConfig { get { return this.pluginConfig; } set { } }
+    public Config PluginConfig { get; set; } = new Config();
 
     #endregion
 
@@ -48,10 +44,6 @@
 
     public SslStrip()
     {
-      this.sslStrippedData = string.Empty;
-      this.sslStrippedHosts = new Dictionary<string, bool>();
-      this.sslStrippedUrls = new Dictionary<string, string>();
-
       this.cacheHsts = new CacheHsts();
       this.cacheRedirect = new CacheRedirect();
 
@@ -75,7 +67,7 @@
         {
           continue;
         }
-
+        
         if (this.cacheHsts.HstsCache.ContainsKey(requestObj.ClientRequestObj.GetRequestedUrl()))
         {
           continue;
@@ -131,10 +123,10 @@
         return RedirectType.Error;
       }
 
-      string requestScheme = "http";
-      string requestUrl = string.Format("{0}{1}", requestObj.ClientRequestObj.Host, requestObj.ClientRequestObj.RequestLine.Path);
-      string redirectUrl = hasRedirectHeader ? (string.Format("{0}{1}", tmpUri.Host, tmpUri.PathAndQuery)) : string.Empty;
-      string redirectScheme = hasRedirectHeader ? tmpUri.Scheme.ToLower() : string.Empty;
+      var requestScheme = "http";
+      var requestUrl = $"{requestObj.ClientRequestObj.Host}{requestObj.ClientRequestObj.RequestLine.Path}";
+      var redirectUrl = hasRedirectHeader ? ($"{tmpUri.Host}{tmpUri.PathAndQuery}") : string.Empty;
+      var redirectScheme = hasRedirectHeader ? tmpUri.Scheme.ToLower() : string.Empty;
 
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "SslStrip.DetermineRedirectType(): {0}://{1} -> Redirected:{2} to {3}://{4}", requestScheme, requestUrl, hasRedirectHeader, redirectScheme, redirectUrl);
 
@@ -188,7 +180,7 @@
 
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "SslStrip.ProcessHeadersSameRedirectLocation(): Redirecting from {0} to {1}", requestedLocation, redirectLocationHttps);
 
-      //string refreshHeader = string.Format("{0}; Url={1}", 1, requestObj.ClientRequestObj.GetRequestedUrl());
+      //string refreshHeader = $"1; Url={requestObj.ClientRequestObj.GetRequestedUrl()}";
       //if (requestObj.ServerResponseMetaDataObj.ResponseHeaders.ContainsKey("Refresh"))
       //  requestObj.ServerResponseMetaDataObj.ResponseHeaders.Remove("Refresh");
 
@@ -306,7 +298,8 @@
         foundHttpsTags.TryAdd(matches.Groups[0].Value, newTag);
 
         // Keep a copy of both URLs in the cache
-        cacheRecords.TryAdd(string.Format("{0}{1}", matchedHost.Replace("https://", "http://"), matchedPath), string.Format("{0}{1}", matchedHost, matchedPath));
+        var tmpMatchedHost = matchedHost.Replace("https://", "http://");
+        cacheRecords.TryAdd($"{tmpMatchedHost}{matchedPath}", $"{matchedHost}{matchedPath}");
 
         // Find next match
         matches = matches.NextMatch();

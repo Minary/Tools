@@ -11,30 +11,18 @@
 
   public class Config
   {
-
-    #region MEMBERS
-
-    private static string pluginName = "RequestRedirect";
-    private static int pluginPriority = 3;
-    private static string pluginVersion = "0.1";
-    private static string configFileName = "plugin.config";
-
-    private static List<RequestRedirectConfigRecord> requestRedirectRecords = new List<RequestRedirectConfigRecord>();
-
-    #endregion
-
-
+    
     #region PROPERTIES
 
-    public static string PluginName { get { return pluginName; } set { } }
+    public static string PluginName { get; private set; } = "RequestRedirect";
 
-    public static int PluginPriority { get { return pluginPriority; } set { } }
+    public static int PluginPriority { get; private set; } = 3;
 
-    public static string ConfigFileName { get { return configFileName; } set { } }
+    public static string ConfigFileName { get; private set; } = "0.1";
 
-    public static string PluginVersion { get { return pluginVersion; } set { } }
+    public static string PluginVersion { get; private set; } = "plugin.config";
 
-    public static List<RequestRedirectConfigRecord> RequestRedirectRecords { get { return requestRedirectRecords; } set { } }
+    public static List<RequestRedirectConfigRecord> RequestRedirectRecords { get; set; } = new List<RequestRedirectConfigRecord>();
 
     #endregion
 
@@ -58,13 +46,13 @@
       }
 
       string[] configFileLines = File.ReadAllLines(configFilePath);
-      requestRedirectRecords.Clear();
+      RequestRedirectRecords.Clear();
 
       foreach (string tmpLine in configFileLines)
       {
         try
         {
-          requestRedirectRecords.Add(this.VerifyRecordParameters(tmpLine));
+          RequestRedirectRecords.Add(this.VerifyRecordParameters(tmpLine));
         }
         catch (ProxyWarningException pwex)
         {
@@ -84,18 +72,18 @@
 
     protected RequestRedirectConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      string redirectType = string.Empty;
-      string redirectDescription = string.Empty;
-      string hostRegex = string.Empty;
-      string pathRegex = string.Empty;
-      string replacementResource = string.Empty;
+      var redirectType = string.Empty;
+      var redirectDescription = string.Empty;
+      var hostRegex = string.Empty;
+      var pathRegex = string.Empty;
+      var replacementResource = string.Empty;
 
       if (string.IsNullOrEmpty(configFileLine))
       {
         throw new ProxyWarningException("Configuration line is invalid");
       }
 
-      string[] splitter = Regex.Split(configFileLine, @"\|\|");
+      var splitter = Regex.Split(configFileLine, @"\|\|");
       if (splitter.Length != 5)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
@@ -119,22 +107,22 @@
 
       if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("The host parameter is invalid: {0}", hostRegex));
+        throw new ProxyWarningException($"The host parameter is invalid: {hostRegex}");
       }
 
       if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
       {
-        throw new ProxyWarningException(string.Format("The path parameter is invalid: {0}", pathRegex));
+        throw new ProxyWarningException($"The path parameter is invalid: {pathRegex}");
       }
 
       if (string.IsNullOrEmpty(replacementResource))
       {
-        throw new ProxyWarningException(string.Format("The replacement resource parameter is invalid: {0}", replacementResource));
+        throw new ProxyWarningException($"The replacement resource parameter is invalid: {replacementResource}");
       }
 
-      if (requestRedirectRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
+      if (RequestRedirectRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
       {
-        throw new ProxyWarningException(string.Format("Record already exists"));
+        throw new ProxyWarningException("Record already exists");
       }
 
       return new RequestRedirectConfigRecord(redirectType, redirectDescription, hostRegex, pathRegex, replacementResource);
@@ -143,7 +131,7 @@
 
     public bool IsRegexPatternValid(string pattern)
     {
-      bool isValid = false;
+      var isValid = false;
 
       try
       {

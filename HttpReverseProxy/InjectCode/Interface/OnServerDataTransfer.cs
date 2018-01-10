@@ -51,7 +51,7 @@
 
             if (injectRecord.Position == DataTypes.TagPosition.before)
             {
-              replacementData = replacementData + foundTag;
+              replacementData += replacementData + foundTag;
             }
             else
             {

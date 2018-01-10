@@ -8,19 +8,11 @@
   public class PluginInstruction
   {
 
-    #region MEMBERS
-
-    private Instruction instruction;
-    private InstructionParams instructionParameters;
-
-    #endregion
-
-
     #region PROPERTIES
 
-    public Instruction Instruction { get { return this.instruction; } set { this.instruction = value; } }
+    public Instruction Instruction { get; set; }
 
-    public InstructionParams InstructionParameters { get { return this.instructionParameters; } set { this.instructionParameters = value; } }
+    public InstructionParams InstructionParameters { get; set; }
 
     #endregion
 
@@ -38,13 +30,13 @@
     /// <param name="httpHeaders"></param>
     public PluginInstruction(Instruction instruction, string url, string status, string data, List<string> httpHeaders)
     {
-      this.instruction = instruction;
-      this.instructionParameters = new InstructionParams();
+      this.Instruction = instruction;
+      this.InstructionParameters = new InstructionParams();
 
-      this.instructionParameters.Url = url;
-      this.instructionParameters.Status = status;
-      this.instructionParameters.Data = data;
-      this.instructionParameters.HttpHeaders = httpHeaders;
+      this.InstructionParameters.Url = url;
+      this.InstructionParameters.Status = status;
+      this.InstructionParameters.Data = data;
+      this.InstructionParameters.HttpHeaders = httpHeaders;
     }
 
 
@@ -54,12 +46,12 @@
     /// </summary>
     public PluginInstruction()
     {
-      this.instruction = Instruction.DoNothing;
-      this.instructionParameters = new InstructionParams();
-      this.instructionParameters.Url = string.Empty;
-      this.instructionParameters.Status = string.Empty;
-      this.instructionParameters.Data = string.Empty;
-      this.instructionParameters.HttpHeaders = new List<string>();
+      this.Instruction = Instruction.DoNothing;
+      this.InstructionParameters = new InstructionParams();
+      this.InstructionParameters.Url = string.Empty;
+      this.InstructionParameters.Status = string.Empty;
+      this.InstructionParameters.Data = string.Empty;
+      this.InstructionParameters.HttpHeaders = new List<string>();
     }
 
     #endregion
