@@ -7,7 +7,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
 PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short transactionId, unsigned char *cname, unsigned char *resolvedHostIp);
 
 
-unsigned char *Add_DNS_HEADER(unsigned char *dataBuffer, PDNS_HEADER header, unsigned int *offset);
+unsigned char *Add_DNS_Header(unsigned char *dataBuffer, PDNS_HEADER header, unsigned int *offset);
 PQUESTION Add_QUESTION(unsigned char *dataBuffer, PQUESTION header, unsigned int *offset);
 unsigned char *Add_DnsHost(unsigned char *dataBuffer, unsigned char *realHostName, unsigned int *offset);
 PR_DATA Add_R_DATA(unsigned char *dataBuffer, PR_DATA responseHeader, unsigned int *offset);

@@ -187,13 +187,16 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   int stop;
   unsigned char *peerName = NULL;
 
-  if (gDnsSpoofingList->next == NULL || ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+  if (gDnsSpoofingList->next == NULL || 
+      ethrHdr == NULL || 
+      htons(ethrHdr->ether_type) != ETHERTYPE_IP)
   {
     goto END;
   }
 
   ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
-  if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+  if (ipHdr == NULL || 
+      ipHdr->proto != IP_PROTO_UDP)
   {
     goto END;
   }
@@ -205,7 +208,9 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   }
 
   updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-  if (updHdr == NULL || updHdr->ulen <= 0 || ntohs(updHdr->dport) != 53)
+  if (updHdr == NULL ||
+      updHdr->ulen <= 0 ||
+      ntohs(updHdr->dport) != 53)
   {
     goto END;
   }

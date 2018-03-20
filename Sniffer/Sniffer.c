@@ -135,17 +135,18 @@ END:
 }
 
 
-void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *outputParam)
+void Stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *outputParam)
 {
-  if (inputParam == NULL || outputParam == NULL)
+  if (inputParam == NULL ||
+      outputParam == NULL)
   {
     return;
   }
 
   for (int counter = 0; counter < inputLengthParam && inputParam[counter] != '\0'; counter++)
   {
-    //    if (pInput[lCounter] < 32 || pInput[lCounter] > 176)
-    if (inputParam[counter] < 32 || inputParam[counter] > 126)
+    if (inputParam[counter] < 32 || 
+        inputParam[counter] > 126)
     {
       outputParam[counter] = '.';
     }
@@ -154,6 +155,33 @@ void stringify(unsigned char *inputParam, int inputLengthParam, unsigned char *o
       outputParam[counter] = inputParam[counter];
     }
   }
+}
+
+
+char *Hexify(unsigned char *inputParam, int inputLengthParam)
+{
+  char *retVal = NULL;
+  char temp[1024];
+
+  if ((retVal = (char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, inputLengthParam * 5 + 5)) == NULL)
+  {
+    return NULL;
+  }
+
+  for (int counter = 0; counter < inputLengthParam; counter++)
+  {
+    if (counter % 8 == 0)
+      strcat(retVal, "   ");
+
+    if (counter % 16 == 0)
+      strcat(retVal, "\r\n");
+
+    ZeroMemory(temp, sizeof(temp));
+    snprintf(temp, sizeof(temp)-1, "%02x ", inputParam[counter]);
+    strcat(retVal, temp);
+  }
+
+  return retVal;
 }
 
 

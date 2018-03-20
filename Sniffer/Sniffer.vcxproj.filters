@@ -27,6 +27,9 @@
     <Filter Include="Source Files\Modes">
       <UniqueIdentifier>{52a523a9-5a25-41c7-a9f7-a9ec5364557a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Dns">
+      <UniqueIdentifier>{bddedcbd-d7cc-49b0-97dd-09571f3e7209}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetworkFunctions.c">
@@ -76,9 +79,6 @@
     <ClInclude Include="Logging.h">
       <Filter>Header Files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="DnsParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,6 +93,12 @@
     </ClInclude>
     <ClInclude Include="Sniffer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsParser.h">
+      <Filter>Header Files\Dns</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsStructs.h">
+      <Filter>Header Files\Dns</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

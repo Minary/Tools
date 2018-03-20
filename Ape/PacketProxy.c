@@ -165,11 +165,8 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
       LogMsg(DBG_ERROR, "Unable to send DATA 2 VICTIM");
     }
 
-
-  /*
-   * Destination IP is not inside the Network range.
-   * Forward packet to the GW
-   */
+  // Destination IP is not inside the Network range.
+  // Forward packet to the GW
   }
   else if (ProcessData2Internet(&packetInfo, scanParams) == FALSE)
   {

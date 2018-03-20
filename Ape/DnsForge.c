@@ -4,7 +4,7 @@
 #include "DnsHelper.h"
 
 
-unsigned char *Add_DNS_HEADER(unsigned char *dataBuffer, PDNS_HEADER header, unsigned int *offset)
+unsigned char *Add_DNS_Header(unsigned char *dataBuffer, PDNS_HEADER header, unsigned int *offset)
 {
   unsigned char * dnsHeaderPtr = NULL;
 
@@ -130,7 +130,7 @@ PRAW_DNS_DATA CreateDnsQueryPacket(unsigned char *reqHostName)
   ZeroMemory(&requestQueryDataPtr, sizeof(requestQueryDataPtr));
 
   // 1. DNS_HEADER
-  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_HEADER(requestBuffer, &requestHeaderData, &offset);
+  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_Header(requestBuffer, &requestHeaderData, &offset);
 
   // 2. DNS host name
   dnsHostName = Add_DnsHost(requestBuffer, reqHostName, &offset);
@@ -164,7 +164,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
   ZeroMemory(&responseData, sizeof(responseData));
 
   // 1.1 DNS_HEADER
-  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_HEADER(responseBuffer, &requestHeaderData, &offset);
+  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_Header(responseBuffer, &requestHeaderData, &offset);
   requestHeaderDataPtr->id = transactionId;
   requestHeaderDataPtr->qr = 1; // this is a response
   requestHeaderDataPtr->ans_count = htons(1); // there is one answer
@@ -217,7 +217,7 @@ PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short
   ZeroMemory(&responseData, sizeof(responseData));
 
   // 1.1 DNS_HEADER
-  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_HEADER(responseBuffer, &requestHeaderData, &offset);
+  requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_Header(responseBuffer, &requestHeaderData, &offset);
   requestHeaderDataPtr->id = transactionId;
   requestHeaderDataPtr->qr = 1; // response
   requestHeaderDataPtr->ans_count = htons(2); // Two answers. CNAME and A

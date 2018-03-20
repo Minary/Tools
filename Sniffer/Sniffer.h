@@ -82,7 +82,8 @@ typedef struct SCANPARAMS
  * Function forward declarations.
  *
  */
-void stringify(unsigned char *pInput, int pInputLen, unsigned char *pOutput);
+void Stringify(unsigned char *pInput, int pInputLen, unsigned char *pOutput);
+char *Hexify(unsigned char *inputParam, int inputLengthParam);
 void ExecCommand(char *pCmd);
 void PrintConfig(SCANPARAMS pScanParams);
 int UserIsAdmin();

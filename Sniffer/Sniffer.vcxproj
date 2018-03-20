@@ -175,6 +175,7 @@
     <ClCompile Include="NetworkFunctions.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DnsStructs.h" />
     <ClInclude Include="Sniffer.h" />
     <ClInclude Include="DnsParser.h" />
     <ClInclude Include="getopt.h" />

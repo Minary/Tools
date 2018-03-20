@@ -5,10 +5,11 @@
 #include <pcap.h>
 #include <Shlwapi.h>
 
-#include "Sniffer.h"
-#include "ModeGenericSniffer.h"
+#include "DnsStructs.h"
 #include "Logging.h"
+#include "ModeGenericSniffer.h"
 #include "NetworkFunctions.h"
+#include "Sniffer.h"
 #include "SniffAndEvaluate.h"
 
 
@@ -163,31 +164,56 @@ printf("ICMP\t%s  %s\n\n", srcIpStr, dstIpStr);
         tcpHdrLength = tcpHdrPtr->doff * 4;
         tcpDataLength = totalLength - ipHdrLength - tcpHdrLength;
 
-printf("TCP\t%s:%d  %s:%d ", srcIpStr, ntohs(tcpHdrPtr->sport), dstIpStr, ntohs(tcpHdrPtr->dport));
+//printf("TCP\t%s:%d  %s:%d ", srcIpStr, ntohs(tcpHdrPtr->sport), dstIpStr, ntohs(tcpHdrPtr->dport));
         if (tcpDataLength > 0)
         {
           strncpy((char *)data, (char *)tcpHdrPtr + tcpHdrLength, tcpDataLength);
           ZeroMemory(realData, sizeof(realData));
-          stringify(data, tcpDataLength, realData);
-
+          Stringify(data, tcpDataLength, realData);
 
           for (counter = 0, readlDataPtr = realData; counter < tcpDataLength; counter += 64)
           {
             ZeroMemory(tempBuffer, sizeof(tempBuffer));
             memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-printf("\n\t%s", tempBuffer);
+////printf("\n\t%s", tempBuffer);
           }
 
           ZeroMemory(tempBuffer, sizeof(tempBuffer));
           memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-printf("\n\t%s|", tempBuffer);
+////printf("\n\t%s|", tempBuffer);
         }
-printf("\n\n");
+//printf("\n");
       }
       else if (ipHdrPtr->proto == IP_PROTO_UDP)
       {
         udpHdrPtr = (PUDPHDR)((u_char*)ipHdrPtr + ipLength);
-printf("UDP\t%s:%d  %s:%d\n\n", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, ntohs(udpHdrPtr->dport));
+
+
+printf("UDP\t%s:%d  %s:%d\n", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, ntohs(udpHdrPtr->dport));
+if (ntohs(udpHdrPtr->sport) == 53)
+{
+  char hostResBuffer[1024];
+  char *hostRes[20];
+  ZeroMemory(hostRes, sizeof(hostRes));
+  ZeroMemory(hostResBuffer, sizeof(hostResBuffer));
+
+  GetHostResolution(udpHdrPtr, hostRes);
+
+  for (int i = 0; i < 20 && hostRes[i] != NULL; i++)
+  {
+    strncat(hostResBuffer, hostRes[i], sizeof(hostResBuffer)-1);
+    strcat(hostResBuffer, ",");
+    HeapFree(GetProcessHeap(), 0, hostRes[i]);
+  }
+
+  //int idx = strnlen(hostResBuffer, sizeof(hostResBuffer) - 1) - 1;
+  //int idx = strlen(hostResBuffer) - 1;
+  //hostResBuffer[idx] = NULL;
+  printf("REC: %s\n", hostResBuffer);
+}
+printf("\n");
+
+
       }
     }
 
@@ -212,3 +238,179 @@ printf("UDP\t%s:%d  %s:%d\n\n", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, nto
     */
   }
 }
+
+
+/*
+void GetHostResolution(unsigned char* udpHdrPtr, char *hostRes[])
+{
+  PDNS_HEADER dnsHdr = (PDNS_HEADER)((unsigned char*)udpHdrPtr + sizeof(UDPHDR));
+  char *hostname = (char *)((unsigned char*)dnsHdr + sizeof(DNS_HEADER));
+  //char **hostRes = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(char[20]));
+  int hostResIndex = 0;
+
+
+  // Packet is a DNS RESPONSE
+  // and packet contains response data
+  if (dnsHdr->qr == 1 &&
+      ntohs(dnsHdr->ans_count) > 0)
+  {
+    int stop = 0;
+    RES_RECORD answers[20];
+    char *buf = dnsHdr;
+    char host[1024];
+
+    ZeroMemory(answers, sizeof(answers));
+    ZeroMemory(host, sizeof(host));
+
+    hostRes[hostResIndex] = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 128);
+    ChangeToDnsNameFormat(dnsHdr + 1, host, sizeof(host));
+    CopyMemory(hostRes[hostResIndex], host, strnlen(host, sizeof(host) - 1));
+    hostResIndex++;
+
+    // move ahead of the dns header and the query field
+    // Add 2 because of the leading and trailing (0) length definition
+    unsigned char *reader = ((char *)dnsHdr) + sizeof(DNS_HEADER) + (strlen((const char*)host) + 2) + sizeof(QUESTION);
+    
+    for (int i = 0; i < ntohs(dnsHdr->ans_count) && i < 20; i++)
+    {
+      answers[i].name = ReadName(reader, buf, &stop);
+      reader = reader + stop;
+      answers[i].resource = (PR_DATA)(reader);
+      reader = reader + sizeof(R_DATA);
+
+      // If its an ipv4 address
+      if (ntohs(answers[i].resource->type) == 1)
+      {
+        answers[i].rdata = (unsigned char*)malloc(ntohs(answers[i].resource->data_len));
+
+        for (int j = 0; j < ntohs(answers[i].resource->data_len); j++)
+        {
+          answers[i].rdata[j] = reader[j];
+        }
+
+        answers[i].rdata[ntohs(answers[i].resource->data_len)] = '\0';
+        reader = reader + ntohs(answers[i].resource->data_len);
+
+        char temp[32];
+        ZeroMemory(temp, sizeof(temp));
+        IpBin2String(answers[i].rdata, temp, sizeof(temp));
+
+        // Create and populate hostname data buffer
+        hostRes[hostResIndex] = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 33);
+        CopyMemory(hostRes[hostResIndex], temp, strnlen(temp, sizeof(temp)-1));
+        hostResIndex++;     
+
+      // IPv6
+      }
+      else if (ntohs(answers[i].resource->type) == 28)
+      {
+        answers[i].rdata = (unsigned char*)malloc(ntohs(answers[i].resource->data_len));
+
+        for (int j = 0; j < ntohs(answers[i].resource->data_len); j++)
+        {
+          answers[i].rdata[j] = reader[j];
+        }
+
+        answers[i].rdata[ntohs(answers[i].resource->data_len)] = '\0';
+        reader = reader + ntohs(answers[i].resource->data_len);
+
+        char temp[128];
+        ZeroMemory(temp, sizeof(temp));
+        Ipv6Bin2String(answers[i].rdata, temp, sizeof(temp));
+
+        // Create and populate hostname data buffer
+        hostRes[hostResIndex] = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 129);
+        CopyMemory(hostRes[hostResIndex], temp, strnlen(temp, sizeof(temp) - 1));
+        hostResIndex++;
+      }
+      else
+      {
+        answers[i].rdata = ReadName(reader, buf, &stop);
+        reader = reader + stop;
+      }
+    }
+  }
+
+  return hostRes;
+}
+
+
+u_char* ReadName(unsigned char* reader, unsigned char* buffer, int* count)
+{
+  unsigned char *name;
+  unsigned int p = 0, jumped = 0, offset;
+  int i, j;
+
+  *count = 1;
+  name = (unsigned char*)malloc(256);
+
+  name[0] = '\0';
+
+  //read the names in 3www6google3com format
+  while (*reader != 0)
+  {
+    if (*reader >= 192)
+    {
+      offset = (*reader) * 256 + *(reader + 1) - 49152; //49152 = 11000000 00000000 ;)
+      reader = buffer + offset - 1;
+      jumped = 1; //we have jumped to another location so counting wont go up!
+    }
+    else
+    {
+      name[p++] = *reader;
+    }
+
+    reader = reader + 1;
+    if (jumped == 0)
+    {
+      *count = *count + 1; //if we havent jumped to another location then we can count up
+    }
+  }
+
+  name[p] = '\0'; //string complete
+  if (jumped == 1)
+  {
+    *count = *count + 1; //number of steps we actually moved forward in the packet
+  }
+
+  //now convert 3www6google3com0 to www.google.com
+  for (i = 0; i<(int)strlen((const char*)name); i++)
+  {
+    p = name[i];
+    for (j = 0; j<(int)p; j++)
+    {
+      name[i] = name[i + 1];
+      i = i + 1;
+    }
+    name[i] = '.';
+  }
+  name[i - 1] = '\0'; //remove the last dot
+  return name;
+}
+
+
+void ChangeToDnsNameFormat(unsigned char* input, unsigned char* output, int outputlen)
+{
+  int len = -1;
+  int i = 0;
+
+  if (input == NULL)
+    return;
+
+  ZeroMemory(output, outputlen);
+
+  while (input[i] != 0 && 
+         i < outputlen)
+  {
+    len = input[i];
+    i++;
+
+    strncat(output, &input[i], len);
+    strcat(output, ".");
+    i += len;
+  }
+
+  output[i-1] = 0;
+}
+
+*/

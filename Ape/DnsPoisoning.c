@@ -86,13 +86,15 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
     }
 
     ethrHdr = (PETHDR)packetData;
-    if (ethrHdr == NULL || htons(ethrHdr->ether_type) != ETHERTYPE_IP)
+    if (ethrHdr == NULL || 
+        htons(ethrHdr->ether_type) != ETHERTYPE_IP)
     {
       continue;
     }
 
     ipHdr = (PIPHDR)(packetData + 14);
-    if (ipHdr == NULL || ipHdr->proto != IP_PROTO_UDP)
+    if (ipHdr == NULL || 
+        ipHdr->proto != IP_PROTO_UDP)
     {
       continue;
     }
@@ -104,7 +106,9 @@ DWORD WINAPI DnsResponseSniffer(LPVOID lpParam)
     }
 
     udpHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-    if (udpHdr == NULL || udpHdr->ulen <= 0 || ntohs(udpHdr->sport) != UDP_DNS)
+    if (udpHdr == NULL || 
+        udpHdr->ulen <= 0 || 
+        ntohs(udpHdr->sport) != UDP_DNS)
     {
       continue;
     }
