@@ -46,7 +46,7 @@
     private void SendClientRequestDataToPipe(RequestObj requestObj)
     {
       // 2. Send request/response data to pipe/GUI
-      var pipeData = $"TCP||{requestObj.SrcMac}||{requestObj.SrcIp}||{requestObj.SrcPort}||" +
+      var pipeData = $"HTTPREQ||{requestObj.SrcMac}||{requestObj.SrcIp}||{requestObj.SrcPort}||" +
                      $"{requestObj.ClientRequestObj.Host}||80||{requestObj.HttpLogData}\r\n";
       Task.Run(() => this.WriteToPipe(requestObj, pipeData));
       this.pluginProperties.PluginHost.LoggingInst.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "ClientRequestSniffer.SendClientRequestDataToPipe(): Sending data to attack service pipe: {0} ...", pipeData.Trim().Substring(0, 40));
