@@ -208,20 +208,32 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
       /*
        * Client opens an HTTPS connection to peer system.
        */
-      if (ntohs(tcpHdrPtrParam->sport) == 443 &&
-          tcpHdrPtrParam->syn == 1 &&
-          tcpHdrPtrParam->ack == 1)
+      //if (ntohs(tcpHdrPtrParam->sport) == 443 &&
+      //    tcpHdrPtrParam->syn == 1 &&
+      //    tcpHdrPtrParam->ack == 1)
+      //{
+      //  char httpsData[1024];
+      //  system.srcPort = ntohs(tcpHdrPtrParam->sport);
+      //  system.dstPort = ntohs(tcpHdrPtrParam->dport);
+
+      //  ZeroMemory(httpsData, sizeof(httpsData));
+      //  snprintf(httpsData, 1024, "HTTPS||%s||%s||%d||%s||%d||CONNECT:%s\r\n",   dstMacStr, system.dstIpStr, system.dstPort, system.srcIpStr, system.srcPort, system.srcIpStr);
+      //  bufferLength = strlen((char *)httpsData);
+      //  WriteOutput(httpsData, bufferLength);
+      //}
+      if (ntohs(tcpHdrPtrParam->dport) == 443 &&
+          tcpHdrPtrParam->syn == 1)
       {
         char httpsData[1024];
         system.srcPort = ntohs(tcpHdrPtrParam->sport);
         system.dstPort = ntohs(tcpHdrPtrParam->dport);
 
         ZeroMemory(httpsData, sizeof(httpsData));
-        snprintf(httpsData, 1024, "HTTPS||%s||%s||%d||%s||%d||CONNECT:%s\r\n", srcMacStr, system.srcIpStr, system.dstPort, system.dstIpStr, system.srcPort, system.srcIpStr);
+        snprintf(httpsData, 1024, "HTTPS||%s||%s||%d||%s||%d||CONNECT:%s\r\n", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, system.dstIpStr);
         bufferLength = strlen((char *)httpsData);
-//printf(httpsData);
         WriteOutput(httpsData, bufferLength);
       }
+
 
       // If packet is an HTTP request sent by a client to the server
       // the packet is processed separately./
@@ -263,7 +275,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
           if (tcpDataLength > 2 &&
              (dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, tcpDataLength + 84)) != NULL)
           {
-            snprintf((char *)dataPipe, tcpDataLength + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, realData);
+            snprintf((char *)dataPipe, tcpDataLength + 80, "HTTPREQ||%s||%s||%d||%s||%d||%s", srcMacStr, system.srcIpStr, system.srcPort, system.dstIpStr, system.dstPort, realData);
             strcat((char *)dataPipe, "\r\n");
             bufferLength = strlen((char *)dataPipe);
 
