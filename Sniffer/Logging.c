@@ -19,8 +19,9 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   char logMessage[MAX_BUF_SIZE + 1];
   DWORD bytesWritten = 0;
   va_list args;
-
-  if (priorityParam < DEBUG_LEVEL || DEBUG_LEVEL == DBG_OFF)
+  
+  if (priorityParam < DEBUG_LEVEL ||
+      DEBUG_LEVEL == DBG_OFF)
   {
     goto END;
   }

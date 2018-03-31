@@ -261,7 +261,8 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
 
   EnterCriticalSection(&gCSConnectionsList);
 
-  if (conNodesParam != NULL && *conNodesParam != NULL && ((PCONNODE)*conNodesParam)->first == 0)
+  if (conNodesParam != NULL && 
+      *conNodesParam != NULL && ((PCONNODE)*conNodesParam)->first == 0)
   {
     // The first entry in the linked list.
     if (now - ((PCONNODE)*conNodesParam)->Created > TCP_MAX_ACTIVITY ||
@@ -282,9 +283,12 @@ void RemoveOldConnections(PPCONNODE conNodesParam)
     }
 
     q = (PCONNODE)*conNodesParam;
-    while (q->next != NULL && q->next->next != NULL && q->first == 0)
+    while (q->next != NULL && 
+           q->next->next != NULL && 
+           q->first == 0)
     {
-      if (now - q->Created > TCP_MAX_ACTIVITY || q->dataLength > MAX_CONNECTION_VOLUME)
+      if (now - q->Created > TCP_MAX_ACTIVITY ||
+          q->dataLength > MAX_CONNECTION_VOLUME)
       {
         tempNode = q->next;
         q->next = tempNode->next;
@@ -319,7 +323,7 @@ void WriteHttpDataToPipe(char *dataParam, int dataLengthParam, char *srcMacStrPa
   // Write data to pipe
   if ((dataPipe = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dataLengthParam + 200)) != NULL)
   {
-    snprintf((char *)dataPipe, dataLengthParam + 80, "TCP||%s||%s||%d||%s||%d||%s", srcMacStrParam, srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam, dataParam);
+    snprintf((char *)dataPipe, dataLengthParam + 80, "HTTPREQ||%s||%s||%d||%s||%d||%s", srcMacStrParam, srcIpStrParam, srcPortParam, dstIpStrParam, dstPortParam, dataParam);
     strcat((char *)dataPipe, "\r\n");
     bufLen = strlen((char *)dataPipe);
 

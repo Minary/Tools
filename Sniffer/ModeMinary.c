@@ -208,19 +208,6 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
       /*
        * Client opens an HTTPS connection to peer system.
        */
-      //if (ntohs(tcpHdrPtrParam->sport) == 443 &&
-      //    tcpHdrPtrParam->syn == 1 &&
-      //    tcpHdrPtrParam->ack == 1)
-      //{
-      //  char httpsData[1024];
-      //  system.srcPort = ntohs(tcpHdrPtrParam->sport);
-      //  system.dstPort = ntohs(tcpHdrPtrParam->dport);
-
-      //  ZeroMemory(httpsData, sizeof(httpsData));
-      //  snprintf(httpsData, 1024, "HTTPS||%s||%s||%d||%s||%d||CONNECT:%s\r\n",   dstMacStr, system.dstIpStr, system.dstPort, system.srcIpStr, system.srcPort, system.srcIpStr);
-      //  bufferLength = strlen((char *)httpsData);
-      //  WriteOutput(httpsData, bufferLength);
-      //}
       if (ntohs(tcpHdrPtrParam->dport) == 443 &&
           tcpHdrPtrParam->syn == 1)
       {
@@ -240,6 +227,10 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
       else if (ntohs(tcpHdrPtrParam->dport) == 80)
       {
         HandleHttpTraffic((char *)srcMacStr, ipHdrPtrParam, tcpHdrPtrParam);
+
+      // When the HTTP server sends a response
+      // concat data to the previous client request data buffer
+      // and send the request/response data pair to the named pipe
       }
       else if (ntohs(tcpHdrPtrParam->sport) == 80)
       {
@@ -357,7 +348,8 @@ BOOL WriteOutput(char *data, int dataLength)
   BOOL retVal = FALSE;
   DWORD dwRead = 0;
 
-  if (data == NULL || dataLength <= 0)
+  if (data == NULL || 
+      dataLength <= 0)
   {
     return NOK;
   }
@@ -366,8 +358,8 @@ BOOL WriteOutput(char *data, int dataLength)
 
   // Write output data to named pipe
   if (gCurrentScanParams.OutputPipeName[0] != NULL &&
-    gOutputPipe != INVALID_HANDLE_VALUE &&
-    gOutputPipe != 0)
+      gOutputPipe != INVALID_HANDLE_VALUE &&
+      gOutputPipe != 0)
   {
     if (!WriteFile(gOutputPipe, data, dataLength, &dwRead, NULL))
     {
@@ -484,11 +476,12 @@ void HandleHttpTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
 
   numberConnections = ConnectionCountNodes(gConnectionList);
 
-  printf("HTTP  Con# : %d\n", numberConnections);
+  printf("HTTP  Con(1)# : %d\n", numberConnections);
 
   // TCP status bits FIN or RST are set. Remove the
   // according list entries.
-  if (tcpHdrPtrParam->fin == 1 || tcpHdrPtrParam->rst == 1)
+  if (tcpHdrPtrParam->fin == 1 ||
+      tcpHdrPtrParam->rst == 1)
   {
     ConnectionDeleteNode(&gConnectionList, connectionId);
   }
