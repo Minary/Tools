@@ -389,7 +389,7 @@ BOOL WriteOutput(char *data, int dataLength)
       }
       __except (filterException(GetExceptionCode(), GetExceptionInformation()))
       {
-        printf("OMG it's a bug!!\r\n");
+        printf("OMG it's a bug!\r\n");
       }
     }
   }
