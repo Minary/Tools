@@ -105,7 +105,7 @@
         throw new Exception("HTTP version is invalid");
       }
 
-      string requestString = "{requestMethod} {path} {httpVersion}";
+      string requestString = $"{requestMethod} {path} {httpVersion}";
       byte[] requestByteArray = Encoding.UTF8.GetBytes(requestString);
 
       this.DumpstringDetails(requestMethod);
