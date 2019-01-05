@@ -198,6 +198,10 @@
       Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ReadClientRequestHeaders(): Data transmission mode C2S is: {0}", this.requestObj.ProxyDataTransmissionModeC2S.ToString());
 
       // Interrupt request if target system is within the private IP address ranges
+      // NOTE: Please explain, why the request has to be interrupted!
+      //       Probably it is because redirecting the request to the own IP address
+      //       would lead to a endless loop of requests to the own IP-Address. Requests to other internal IP addresses
+      //       should not be ignored as they dont lead to an endless loop!
       if (Lib.Common.IsIpPartOfPrivateNetwork(this.requestObj.ClientRequestObj.Host))
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ReadClientRequestHeaders(): Requested host {0} is part of private network", this.requestObj.SrcIp, this.requestObj.ClientRequestObj.Host);
