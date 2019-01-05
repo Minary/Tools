@@ -7,6 +7,7 @@
   using System.Net;
   using System.Net.NetworkInformation;
   using System.Net.Sockets;
+  using System.Text.RegularExpressions;
 
 
   public class Common
@@ -143,6 +144,11 @@
       IPAddress ipAddrObj;
 
       if (string.IsNullOrEmpty(ipAddr) == true)
+      {
+        return false;
+      }
+
+      if (Regex.Match(ipAddr, @"\d+\.\d+\.\d+\.\d+").Success == false)
       {
         return false;
       }
