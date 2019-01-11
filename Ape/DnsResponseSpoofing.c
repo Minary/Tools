@@ -29,11 +29,11 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTN
   // Create DNS response data block
   if (spoofingRecord->Data.Type == RESP_A)
   {
-    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp);
+    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp, spoofingRecord->Data.TTL);
   }
   else if (spoofingRecord->Data.Type == RESP_CNAME)
   {
-    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp);
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp, spoofingRecord->Data.TTL);
   }
 
   if (responseData == NULL)

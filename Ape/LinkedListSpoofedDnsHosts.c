@@ -25,7 +25,7 @@ PHOSTNODE InitHostsList()
 }
 
 
-void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *spoofedIpParam)
+void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned long ttlParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
@@ -35,6 +35,7 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
   }
 
   CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
+  tmpNode->Data.TTL = ttlParam;
   CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
   if (tmpNode->Data.HostName[0] == '*')
   {
@@ -52,7 +53,7 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
 }
 
 
-void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned char *cnameHostParam, unsigned char *spoofedIpParam)
+void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHostParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
@@ -62,6 +63,7 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, un
   }
 
   CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
+  tmpNode->Data.TTL = ttlParam;
   CopyMemory(tmpNode->Data.CnameHost, cnameHostParam, sizeof(tmpNode->Data.CnameHost) - 1);
   CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
   if (tmpNode->Data.HostName[0] == '*')
@@ -134,11 +136,11 @@ void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
   {
     if (listPos->Data.Type == RESP_A)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s/%s -> %s", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.SpoofedIp);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s/%s -> %s, ttl=%lu", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.SpoofedIp, listPos->Data.TTL);
     }
     else if (listPos->Data.Type == RESP_CNAME)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s/%s -> %s/%s", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.CnameHost, listPos->Data.SpoofedIp);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s/%s -> %s/%s, ttl=%lu", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.CnameHost, listPos->Data.SpoofedIp, listPos->Data.TTL);
     }
     else
     {

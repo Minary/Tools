@@ -29,12 +29,12 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISON
   // Create DNS response data block
   if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_A)
   {
-    responseData = CreateDnsResponse_A(spoofingRecord->HostnodeToSpoof->Data.HostName, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp);
+    responseData = CreateDnsResponse_A(spoofingRecord->HostnodeToSpoof->Data.HostName, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
   else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
-LogMsg(DBG_INFO, "DnsRequestSpoofing(0.2): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, "spoofingRecord->Data.SpoofedIp");
-    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToSpoof, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp);
+LogMsg(DBG_DEBUG, "DnsRequestSpoofing(): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s, Data.TTL=%lu", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToSpoof, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
 
   if (responseData == NULL)

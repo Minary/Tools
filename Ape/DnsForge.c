@@ -85,11 +85,11 @@ PQUESTION Add_QUESTION(unsigned char *dataBuffer, PQUESTION question, unsigned i
 }
 
 
-PR_DATA Add_R_DATA(unsigned char *dataBuffer, PR_DATA responseHeader, unsigned int *offset)
+PR_DATA Add_R_DATA(unsigned char *dataBuffer, PR_DATA responseHeader, unsigned int *offset, unsigned long ttl)
 {
   PR_DATA responseDataPtr = NULL;
 
-  responseHeader->ttl = htonl(0x0000011d);
+  responseHeader->ttl = htonl(ttl); // htonl(0x0000011d);
   responseHeader->type = htons(TYPE_A);
   responseHeader->_class = htons(0x01);
   responseHeader->data_len = htons(0x0004);
@@ -145,7 +145,7 @@ PRAW_DNS_DATA CreateDnsQueryPacket(unsigned char *reqHostName)
 }
 
 
-PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short transactionId, unsigned char *resolvedHostIp)
+PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short transactionId, unsigned char *resolvedHostIp, unsigned long ttl)
 {
   unsigned char responseBuffer[1024];
   DNS_HEADER requestHeaderData;
@@ -183,7 +183,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
   Add_RawBytes(responseBuffer, namePosition, 2, &offset);
   
   // 2.1 R_DATA
-  responseHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset);
+  responseHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset, ttl);
   
   // 2.2 IP address
   resolvedIpAddrPtr = Add_ResolvedIp(responseBuffer, resolvedHostIp, &offset);
@@ -196,7 +196,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
 }
 
 
-PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short transactionId, unsigned char *canonicalHostName, unsigned char *resolvedHostIp)
+PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short transactionId, unsigned char *canonicalHostName, unsigned char *resolvedHostIp, unsigned long ttl)
 {
   unsigned char responseBuffer[1024];
   DNS_HEADER requestHeaderData;
@@ -235,7 +235,7 @@ PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short
   Add_RawBytes(responseBuffer, namePosition, 2, &offset);
   
   // 2.1 R_DATA
-  responseCNAMEHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset);
+  responseCNAMEHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset, ttl);
   responseCNAMEHeaderPtr->type = htons(TYPE_CNAME);
   responseCNAMEHeaderPtr->data_len = htons((unsigned short)strlen((char *)canonicalHostName) + 2);
 
@@ -248,7 +248,7 @@ PRAW_DNS_DATA CreateDnsResponse_CNAME(unsigned char *reqHostName, unsigned short
   Add_RawBytes(responseBuffer, cnamePosition, 2, &offset);
 
   // 3.1 R_DATA
-  responseAHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset);
+  responseAHeaderPtr = Add_R_DATA(responseBuffer, &responseData, &offset, ttl);
   responseAHeaderPtr->type = htons(TYPE_A);
   responseAHeaderPtr->data_len = htons(4);
 
