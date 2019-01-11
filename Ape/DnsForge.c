@@ -2,7 +2,7 @@
 
 #include "DnsStructs.h"
 #include "DnsHelper.h"
-
+#include "Logging.h"
 
 unsigned char *Add_DNS_Header(unsigned char *dataBuffer, PDNS_HEADER header, unsigned int *offset)
 {
@@ -162,7 +162,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
   
   ZeroMemory(responseBuffer, sizeof(responseBuffer));
   ZeroMemory(&responseData, sizeof(responseData));
-
+  
   // 1.1 DNS_HEADER
   requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_Header(responseBuffer, &requestHeaderData, &offset);
   requestHeaderDataPtr->id = transactionId;

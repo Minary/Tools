@@ -144,7 +144,6 @@ int main(int argc, char **argv)
   else if (action == 'f')
   {
     LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
-
     ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES);
     InitializeParsePcapDumpFile();
