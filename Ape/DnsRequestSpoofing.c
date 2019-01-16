@@ -33,7 +33,7 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISON
   }
   else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
-LogMsg(DBG_DEBUG, "DnsRequestSpoofing(): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s, Data.TTL=%lu", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+    LogMsg(DBG_DEBUG, "DnsRequestSpoofing(): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s, Data.TTL=%lu", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
     responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToSpoof, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
 
@@ -182,7 +182,7 @@ PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   int ipHdrLen = 0;
   char *data = NULL;
   char *dnsData = NULL;
-  PPOISONING_DATA retVal;
+  PPOISONING_DATA retVal = NULL;
   PHOSTNODE tmpNode = NULL;
   PDNS_HEADER dnsHdr = NULL;
   unsigned char *reader = NULL;
