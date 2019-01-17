@@ -31,7 +31,7 @@
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnLoad(): Loaded {0} configuration record(s)", Plugin.RequestRedirect.Config.RequestRedirectRecords.Count);
       }
-      catch (System.IO.FileNotFoundException)
+      catch (System.IO.FileNotFoundException fnfex)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
