@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ape", "Ape\Ape.vcxproj", "{EE757BA9-3018-40F6-A4BF-B801DD65FF66}"
 EndProject
@@ -28,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpReverseProxy", "HttpReverseProxy\HttpReverseProxy\HttpReverseProxy.csproj", "{613CC690-9772-4A80-8F08-EF9435D471F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpReverseProxyLib", "HttpReverseProxy\HttpReverseProxyLib\HttpReverseProxyLib.csproj", "{E30FA5DF-3DBB-41B1-A325-27D478757FFB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DnsPoisoning", "DnsPoisoning\DnsPoisoning.vcxproj", "{8D083915-5F1C-4393-96B1-7231D076CC49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -175,6 +177,16 @@ Global
 		{E30FA5DF-3DBB-41B1-A325-27D478757FFB}.Release|x64.Build.0 = Release|Any CPU
 		{E30FA5DF-3DBB-41B1-A325-27D478757FFB}.Release|x86.ActiveCfg = Release|Any CPU
 		{E30FA5DF-3DBB-41B1-A325-27D478757FFB}.Release|x86.Build.0 = Release|Any CPU
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Debug|x64.ActiveCfg = Debug|x64
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Debug|x64.Build.0 = Debug|x64
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Debug|x86.ActiveCfg = Debug|Win32
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Debug|x86.Build.0 = Debug|Win32
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Release|Any CPU.ActiveCfg = Release|Win32
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Release|x64.ActiveCfg = Release|x64
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Release|x64.Build.0 = Release|x64
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Release|x86.ActiveCfg = Release|Win32
+		{8D083915-5F1C-4393-96B1-7231D076CC49}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,5 +202,8 @@ Global
 		{F96AC5EF-0EF7-4224-B088-BD864BA0F293} = {DA480286-B228-4666-A19D-FA6D4AA8925C}
 		{613CC690-9772-4A80-8F08-EF9435D471F6} = {D6EA932A-AC2B-45B2-9CD6-77F665283AF7}
 		{E30FA5DF-3DBB-41B1-A325-27D478757FFB} = {D6EA932A-AC2B-45B2-9CD6-77F665283AF7}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3B18B2AD-DFDB-4A9C-AC23-4ABE681C43D8}
 	EndGlobalSection
 EndGlobal

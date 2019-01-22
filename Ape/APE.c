@@ -13,10 +13,9 @@
 #include "Interface.h"
 #include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
-#include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "ModeDePoisoning.h"
-#include "ModeMitm.h"
+#include "ModeArpMitm.h"
 #include "ModePcap.h"
 #include "getopt.h"
 
@@ -41,7 +40,6 @@ CRITICAL_SECTION csSystemsLL;
 
 // Linked lists
 PSYSNODE gTargetSystemsList = NULL;
-PHOSTNODE gDnsSpoofingList = NULL;
 PRULENODE gFwRulesList = NULL;
 
 int gDEBUGLEVEL = DEBUG_LEVEL;
@@ -82,7 +80,6 @@ int main(int argc, char **argv)
 
   gTargetSystemsList = InitSystemList();
   gFwRulesList = InitFirewallRules();
-  gDnsSpoofingList = InitHostsList();
 
   // Parse command line parameters
   while ((opt = getopt(argc, argv, "d:lf:x:")) != -1)
@@ -133,7 +130,7 @@ int main(int argc, char **argv)
     goto END;
 
 
-    // ARP depoisening
+  // ARP depoisening
   }
   else if (action == 'd')
   {
@@ -144,7 +141,6 @@ int main(int argc, char **argv)
   else if (action == 'f')
   {
     LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
-    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES);
     InitializeParsePcapDumpFile();
 
@@ -158,9 +154,8 @@ int main(int argc, char **argv)
   }
   else if (action == 'x')
   {
-    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
     ParseFirewallConfigFile(FILE_FIREWALL_RULES);
-    InitializeMitm();
+    InitializeArpMitm();
   }
   else
   {
@@ -190,9 +185,6 @@ void PrintUsage(char *pAppName)
   printf("\n\n\nAdd the ARP cache poisoning target system IP and MAC addresses \nto the file .targethosts\n\n");
   printf("192.168.0.58,00:1B:77:53:5C:F8\n");
   printf("192.168.0.59,00:3A:21:3C:11:27\n");
-  printf("\n\n\nAdd the DNS poisoning target host names and the spoofed IP \naddresses to the file .dnshosts\n\n");
-  printf("www.facebook.com,192.168.0.58\n");
-  printf("www.ebay.com,192.168.0.58\n");
   printf("\n\n\nAdd the system data from blocked connections\nto the file .fwrules\n\n");
   printf("TCP:192.168.0.4:1:65535:0.0.0.0:80:80\n");
   printf("UDP:192.168.0.4:1:65535:7.7.7.7:53:53\n");
@@ -242,7 +234,6 @@ BOOL APE_ControlHandler(DWORD pControlType)
 
   case CTRL_CLOSE_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Close event : Starting depoisoning process");
-    StartUnpoisoningProcess();
     return FALSE;
 
   case CTRL_BREAK_EVENT:

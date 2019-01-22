@@ -3,16 +3,7 @@
   <ItemGroup>
     <ClCompile Include="APE.c" />
     <ClCompile Include="getopt.c" />
-    <ClCompile Include="DnsHelper.c">
-      <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
-    <ClCompile Include="DnsPoisoning.c">
-      <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedListFirewallRules.c">
-      <Filter>Source files\LinkedList</Filter>
-    </ClCompile>
-    <ClCompile Include="LinkedListSpoofedDnsHosts.c">
       <Filter>Source files\LinkedList</Filter>
     </ClCompile>
     <ClCompile Include="ArpPoisoning.c">
@@ -21,20 +12,8 @@
     <ClCompile Include="Interface.c">
       <Filter>Source files</Filter>
     </ClCompile>
-    <ClCompile Include="PacketProxy.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="SLRE.c">
       <Filter>Source files</Filter>
-    </ClCompile>
-    <ClCompile Include="DnsForge.c">
-      <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
-    <ClCompile Include="DnsRequestSpoofing.c">
-      <Filter>Source files\DnsPoisoning</Filter>
-    </ClCompile>
-    <ClCompile Include="DnsResponseSpoofing.c">
-      <Filter>Source files\DnsPoisoning</Filter>
     </ClCompile>
     <ClCompile Include="ModeDePoisoning.c">
       <Filter>Source files\Modes</Filter>
@@ -51,11 +30,14 @@
     <ClCompile Include="NetworkHelperFunctions.c">
       <Filter>Source files\Network</Filter>
     </ClCompile>
-    <ClCompile Include="ModeMitm.c">
-      <Filter>Source files\Modes</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedListTargetSystems.c">
       <Filter>Source files\LinkedList</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeArpMitm.c">
+      <Filter>Source files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandlerArpMitm.c">
+      <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,38 +50,14 @@
     <ClInclude Include="Interface.h">
       <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="PacketProxy.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="SLRE.h">
       <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsForge.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsHelper.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsPoisoning.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsStructs.h">
-      <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
     <ClInclude Include="LinkedListFirewallRules.h">
       <Filter>Header files\LinkedList</Filter>
     </ClInclude>
-    <ClInclude Include="LinkedListSpoofedDnsHosts.h">
-      <Filter>Header files\LinkedList</Filter>
-    </ClInclude>
     <ClInclude Include="ArpPoisoning.h">
       <Filter>Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsRequestSpoofing.h">
-      <Filter>Header files\DnsPoisoning</Filter>
-    </ClInclude>
-    <ClInclude Include="DnsResponseSpoofing.h">
-      <Filter>Header files\DnsPoisoning</Filter>
     </ClInclude>
     <ClInclude Include="Logging.h">
       <Filter>Header files\Logging</Filter>
@@ -122,8 +80,11 @@
     <ClInclude Include="LinkedListTargetSystems.h">
       <Filter>Header files\LinkedList</Filter>
     </ClInclude>
-    <ClInclude Include="ModeMitm.h">
+    <ClInclude Include="ModeArpMitm.h">
       <Filter>Header files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketHandlerArpMitm.h">
+      <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -141,12 +102,6 @@
     </Filter>
     <Filter Include="Source files\ArpPoisoning">
       <UniqueIdentifier>{8c72eaa0-5c26-49c4-8fd3-72d62116f743}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header files\DnsPoisoning">
-      <UniqueIdentifier>{d0466b33-c10a-486a-81e6-b4a435285bcd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source files\DnsPoisoning">
-      <UniqueIdentifier>{92068d20-1442-49ea-aa07-03c7b4d66315}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source files\Logging">
       <UniqueIdentifier>{fb0b2fb3-cf3e-4742-8a77-7de002e6766f}</UniqueIdentifier>

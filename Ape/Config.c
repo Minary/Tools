@@ -3,7 +3,6 @@
 #include <Windows.h>
 
 #include "APE.h"
-#include "LinkedListSpoofedDnsHosts.h"
 #include "LinkedListFirewallRules.h"
 #include "LinkedListTargetSystems.h"
 #include "Logging.h"
@@ -12,7 +11,6 @@
 
 extern PRULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
-extern PHOSTNODE gDnsSpoofingList;
 
 
 void PrintConfig(SCANPARAMS scanParamsParam)
@@ -177,83 +175,4 @@ END:
   return retVal;
 }
 
-
-int ParseDnsPoisoningConfigFile(char *configFileParam)
-{
-  int retVal = 0;
-  FILE *fileHandle = NULL;
-  char tmpLine[MAX_BUF_SIZE + 1];
-  unsigned char hostname[MAX_BUF_SIZE + 1];
-  unsigned char ttlStr[MAX_BUF_SIZE + 1];
-  unsigned long ttlLong;
-  unsigned char responseType[MAX_BUF_SIZE + 1];
-  unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
-  unsigned char cnameHost[MAX_BUF_SIZE + 1];
-
-  if (configFileParam == NULL)
-  {
-    goto END;
-  }
-
-  if (!PathFileExists(configFileParam))
-  {
-    goto END;
-  }
-
-  if ((fileHandle = fopen(configFileParam, "r")) == NULL)
-  {
-    goto END;
-  }
-
-  ZeroMemory(tmpLine, sizeof(tmpLine));
-  ZeroMemory(hostname, sizeof(hostname));
-  ZeroMemory(ttlStr, sizeof(ttlStr));
-  ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-  ZeroMemory(responseType, sizeof(responseType));
-  ZeroMemory(cnameHost, sizeof(cnameHost));
-
-  while (fgets(tmpLine, sizeof(tmpLine), fileHandle) != NULL)
-  {
-    // Remove trailing CR/LF
-    while (tmpLine[strlen(tmpLine) - 1] == '\r' || 
-           tmpLine[strlen(tmpLine) - 1] == '\n')
-    {
-      tmpLine[strlen(tmpLine) - 1] = '\0';
-    }
-
-    // Parse values and add them to the list.
-    if (sscanf(tmpLine, "%[^,],%[^,],%[^,],%s", hostname, responseType, ttlStr, spoofedIpAddr) == 4)
-    {
-      ttlLong = atol(ttlStr);
-      if (StrCmpI(responseType, "A") == 0)
-      {
-        AddSpoofedIpToList(&gDnsSpoofingList, hostname, ttlLong, spoofedIpAddr);        
-      }
-      else if (StrCmpI(responseType, "CNAME") == 0 &&
-               StrChr(spoofedIpAddr, ',') != NULL)
-      {
-        strncpy(tmpLine, spoofedIpAddr, sizeof(tmpLine) - 1);
-        sscanf(tmpLine, "%[^,],%s", cnameHost, spoofedIpAddr);
-        AddSpoofedCnameToList(&gDnsSpoofingList, hostname, ttlLong, cnameHost, spoofedIpAddr);
-      }
-
-      retVal++;
-    }
-
-    ZeroMemory(tmpLine, sizeof(tmpLine));
-    ZeroMemory(hostname, sizeof(hostname));
-    ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
-    ZeroMemory(responseType, sizeof(responseType));
-    ZeroMemory(cnameHost, sizeof(cnameHost));
-  }
-
-END:
-
-  if (fileHandle != NULL)
-  {
-    fclose(fileHandle);
-  }
-
-  return retVal;
-}
 

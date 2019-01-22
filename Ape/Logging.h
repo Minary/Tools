@@ -12,7 +12,7 @@
 #define DBG_ERROR  6
 #define DBG_FATAL  7
 
-#define DBG_LOGFILE "c:\\debug.log"
+#define DBG_LOGFILE "debug.ape.log"
 
 BOOLEAN InitLogging();
 void StopLogging();

@@ -27,9 +27,12 @@ typedef struct
 PACKET_INFO, *PPACKET_INFO;
 
 
-
+/*
+ * Function forward declarations
+ *
+ */
 void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader, const u_char *data);
-DWORD WINAPI ForwardPackets(LPVOID lpParam);
+DWORD WINAPI PacketHandlerArpMitm(LPVOID lpParam);
 void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo);
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize);
 BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);

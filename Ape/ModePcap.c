@@ -7,17 +7,15 @@
 #include "APE.h"
 #include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
-#include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "ModePcap.h"
 #include "NetworkHelperFunctions.h"
-#include "PacketProxy.h"
+#include "PacketHandlerArpMitm.h"
 
 
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;
-extern PHOSTNODE gDnsSpoofingList;
 
 
 int InitializeParsePcapDumpFile()
@@ -63,7 +61,6 @@ int InitializeParsePcapDumpFile()
     goto END;
   }
 
-  PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
   PrintTargetSystems(gTargetSystemsList);
     
   WriteDepoisoningFile();

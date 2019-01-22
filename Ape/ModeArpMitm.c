@@ -4,19 +4,16 @@
 
 #include "APE.h"
 #include "ArpPoisoning.h"
-#include "DnsPoisoning.h"
 #include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
-#include "LinkedListSpoofedDnsHosts.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
-#include "PacketProxy.h"
+#include "PacketHandlerArpMitm.h"
 
 
 extern int gDEBUGLEVEL;
 extern RULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
-extern PHOSTNODE gDnsSpoofingList;
 extern SCANPARAMS gScanParams;
 
 DWORD gRESENDThreadID = 0;
@@ -38,19 +35,18 @@ HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
  *
  */
 
-void InitializeMitm()
+void InitializeArpMitm()
 {
   AdminCheck(gScanParams.ApplicationName);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
-  LogMsg(2, "InitializeMITM(): -x %s\n", gScanParams.InterfaceName);
+  LogMsg(2, "InitializeArpMitm(): -x %s\n", gScanParams.InterfaceName);
   
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.LocalIpBin, gScanParams.LocalIpStr, MAX_IP_LEN);
-
   MacBin2String(gScanParams.GatewayMacBin, gScanParams.GatewayMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.GatewayIpBin, gScanParams.GatewayIpStr, MAX_IP_LEN);
 
@@ -80,15 +76,13 @@ void InitializeMitm()
     fprintf(stderr, "No target hosts were defined!\n");
     goto END;
   }
-  
-  PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
-  PrintTargetSystems(gTargetSystemsList);
 
+  PrintTargetSystems(gTargetSystemsList);
   WriteDepoisoningFile();
 
   // 1. Start Ethernet FORWARDING thread
-  if ((gRESENDThreadHandle = CreateThread(NULL, 0, ForwardPackets, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
-       gRESENDThreadHandle == INVALID_HANDLE_VALUE)
+  if ((gRESENDThreadHandle = CreateThread(NULL, 0, PacketHandlerArpMitm, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
+      gRESENDThreadHandle == INVALID_HANDLE_VALUE)
   {
     LogMsg(DBG_ERROR, "main(): Can't start Listener thread : %d", GetLastError());
     goto END;
