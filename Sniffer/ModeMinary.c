@@ -599,7 +599,7 @@ void GetHostResolution(unsigned char* udpHdrPtr, char *hostRes[])
   {
     int stop = 0;
     RES_RECORD answers[20];
-    char *buf = dnsHdr;
+    char *buf = (char *)dnsHdr;
     char host[1024];
 
     ZeroMemory(answers, sizeof(answers));
@@ -674,7 +674,7 @@ void GetHostResolution(unsigned char* udpHdrPtr, char *hostRes[])
     }
   }
 
-  return hostRes;
+//  return hostRes;
 }
 
 

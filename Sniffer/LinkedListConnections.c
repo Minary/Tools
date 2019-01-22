@@ -6,6 +6,7 @@
 #include "Sniffer.h"
 #include "SniffAndEvaluate.h"
 #include "LinkedListConnections.h"
+#include "ModeMinary.h"
 
 
 extern CRITICAL_SECTION gCSConnectionsList;

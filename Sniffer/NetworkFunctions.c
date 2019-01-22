@@ -54,7 +54,6 @@ void Ipv6Bin2String(unsigned char ipAddrParam[BIN_IPv6_LEN], unsigned char *outp
 }
 
 
-
 int GetAliasByIfcIndex(int ifcIndex, char *aliasNameBuffer, int bufferLength)
 {
   int retVal = NOK;
