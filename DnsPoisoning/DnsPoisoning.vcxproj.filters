@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Logging">
+      <UniqueIdentifier>{c52eb181-70e6-4937-b8ce-b8aece9849b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\DnsPoisoning">
+      <UniqueIdentifier>{89753633-eb2d-4a8c-8d9a-dcad99051dac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LinkedList">
+      <UniqueIdentifier>{a9299931-5547-4518-9f64-c8c13911a17b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Network">
+      <UniqueIdentifier>{6694a9e5-dbc4-4b97-b03c-cef00a27a39b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LinkedList">
+      <UniqueIdentifier>{9e1087e6-7486-4c34-b25d-a2428721224f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network">
+      <UniqueIdentifier>{6c48bf43-abf3-4b8f-9928-b29f9810d192}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Modes">
+      <UniqueIdentifier>{37aa9e01-3599-43a4-be58-6a1652f8136f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Modes">
+      <UniqueIdentifier>{02cfffcb-6370-42fa-a87c-fe2948d7ec8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DnsPoisoning">
+      <UniqueIdentifier>{3557bebd-fcce-48dc-ab4c-afebc2c18eee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DnsPoisoning.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging.c">
+      <Filter>Source Files\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListSpoofedDnsHosts.c">
+      <Filter>Source Files\LinkedList</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkHelperFunctions.c">
+      <Filter>Source Files\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeDnsPoisoning.c">
+      <Filter>Source Files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsForge.c">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsHelper.c">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsRequestSpoofing.c">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="DnsResponseSpoofing.c">
+      <Filter>Source Files\DnsPoisoning</Filter>
+    </ClCompile>
+    <ClCompile Include="ModePcap.c">
+      <Filter>Source Files\Modes</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedListTargetSystems.c">
+      <Filter>Source Files\LinkedList</Filter>
+    </ClCompile>
+    <ClCompile Include="ThsPacketHandlerDP.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketHandlerDP.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsPoisoning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListSpoofedDnsHosts.h">
+      <Filter>Header Files\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkStructs.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkHelperFunctions.h">
+      <Filter>Header Files\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsForge.h">
+      <Filter>Header Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsHelper.h">
+      <Filter>Header Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsRequestSpoofing.h">
+      <Filter>Header Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsResponseSpoofing.h">
+      <Filter>Header Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="DnsStructs.h">
+      <Filter>Header Files\DnsPoisoning</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeDnsPoisoning.h">
+      <Filter>Header Files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="ModePcap.h">
+      <Filter>Header Files\Modes</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedListTargetSystems.h">
+      <Filter>Header Files\LinkedList</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
