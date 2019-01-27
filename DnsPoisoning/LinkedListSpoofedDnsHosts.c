@@ -68,6 +68,7 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, lo
   tmpNode->Data.TTL = ttlParam;
   CopyMemory(tmpNode->Data.CnameHost, cnameHostParam, sizeof(tmpNode->Data.CnameHost) - 1);
   CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
+
   if (tmpNode->Data.HostName[0] == '*')
   {
     FillInWildcardHostname(tmpNode);

@@ -55,13 +55,13 @@ void InitializeDP()
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
     printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
-    goto END;
+//    goto END;
   }
 
   if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
     printf("No target hosts were defined!\n");
-    goto END;
+//    goto END;
   }
 
   PrintTargetSystems(gTargetSystemsList);
