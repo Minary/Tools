@@ -11,10 +11,8 @@
 #include <icmpapi.h>
 
 #include "APE.h"
-#include "PacketHandlerArpMitm.h"
 #include "LinkedListTargetSystems.h"
 #include "NetworkHelperFunctions.h"
-
 
 
 void MacBin2String(unsigned char macAddrParam[BIN_MAC_LEN], unsigned char *outputParam, int outputLengthParam)

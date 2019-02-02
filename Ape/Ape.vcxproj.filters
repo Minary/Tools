@@ -18,9 +18,6 @@
     <ClCompile Include="ModeDePoisoning.c">
       <Filter>Source files\Modes</Filter>
     </ClCompile>
-    <ClCompile Include="ModePcap.c">
-      <Filter>Source files\Modes</Filter>
-    </ClCompile>
     <ClCompile Include="Logging.c">
       <Filter>Source files\Logging</Filter>
     </ClCompile>
@@ -35,9 +32,6 @@
     </ClCompile>
     <ClCompile Include="ModeArpMitm.c">
       <Filter>Source files\Modes</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketHandlerArpMitm.c">
-      <Filter>Source files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -62,9 +56,6 @@
     <ClInclude Include="Logging.h">
       <Filter>Header files\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="ModePcap.h">
-      <Filter>Header files\Modes</Filter>
-    </ClInclude>
     <ClInclude Include="ModeDePoisoning.h">
       <Filter>Header files\Modes</Filter>
     </ClInclude>
@@ -82,9 +73,6 @@
     </ClInclude>
     <ClInclude Include="ModeArpMitm.h">
       <Filter>Header files\Modes</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketHandlerArpMitm.h">
-      <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

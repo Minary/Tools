@@ -36,10 +36,8 @@ DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
   char tempBuffer[PCAP_ERRBUF_SIZE];
   SYSTEMNODE systemList[MAX_SYSTEMS_COUNT];
 
-
   ZeroMemory(&scanParams, sizeof(scanParams));
   CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
-
 
   // Open interface.
   LogMsg(DBG_LOW, "ArpPoisoningLoop(): Starting");
@@ -225,7 +223,6 @@ END:
 }
 
 
-
 BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
 {
   BOOL retVal = FALSE;
@@ -264,4 +261,3 @@ BOOL SendArpPacket(void *interfaceHandleParam, PArpPacket arpPacketParam)
 
   return retVal;
 }
-

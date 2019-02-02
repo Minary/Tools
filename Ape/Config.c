@@ -9,7 +9,6 @@
 #include "NetworkHelperFunctions.h"
 
 
-extern PRULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
 
 
@@ -92,87 +91,4 @@ END:
 
   return retVal;
 }
-
-
-int ParseFirewallConfigFile(char *firewallRulesFile)
-{
-  int retVal = 0;
-  unsigned short srcPortLower = 0;
-  unsigned short srcPortUpper = 0;
-  unsigned short dstPortLower = 0;
-  unsigned short dstPortUpper = 0;
-  char srcIpStr[MAX_IP_LEN] = { 0 };
-  char dstIPStr[MAX_IP_LEN] = { 0 };
-  FILE *fileHandle = NULL;
-  int funcRetVal = 0;
-  char protocol[12] = { 0 };
-  char tempBuffer[MAX_BUF_SIZE + 1] = { 0 };
-  PRULENODE tempNode = NULL;
-
-  if (firewallRulesFile == NULL)
-  {
-    goto END;
-  }
-
-  if (!PathFileExists(firewallRulesFile))
-  {
-    goto END;
-  }
-
-  if ((fileHandle = fopen(FILE_FIREWALL_RULES, "r")) == NULL)
-  {
-    goto END;
-  }
-
-  while (!feof(fileHandle))
-  {
-    fgets(tempBuffer, sizeof(tempBuffer), fileHandle);
-    ZeroMemory(srcIpStr, sizeof(srcIpStr));
-    ZeroMemory(dstIPStr, sizeof(dstIPStr));
-
-    // Remove trailing CR/LF
-    while (tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\r' || tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] == '\n')
-    {
-      tempBuffer[strnlen(tempBuffer, sizeof(tempBuffer)) - 1] = 0;
-    }
-
-    if ((funcRetVal = sscanf(tempBuffer, "%[^:]:%[^:]:%hu:%hu:%[^:]:%hu:%hu", protocol, srcIpStr, &srcPortLower, &srcPortUpper, dstIPStr, &dstPortLower, &dstPortUpper)) != 7 ||
-      tempBuffer[0] == '#')
-    {
-      continue;
-    }
-
-    if ((tempNode = (PRULENODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(RULENODE))) == NULL)
-    {
-      continue;
-    }
-
-    ZeroMemory(tempNode, sizeof(RULENODE));
-    tempNode->DstIPBin = inet_addr(dstIPStr);
-    strncpy(tempNode->DstIPStr, dstIPStr, sizeof(tempNode->DstIPStr) - 1);
-    tempNode->DstPortLower = dstPortLower;
-    tempNode->DstPortUpper = dstPortUpper;
-
-    tempNode->SrcIPBin = inet_addr(srcIpStr);
-    strncpy(tempNode->SrcIPStr, srcIpStr, sizeof(tempNode->SrcIPStr) - 1);
-    tempNode->SrcPortLower = srcPortLower;
-    tempNode->SrcPortUpper = srcPortUpper;
-
-    strncpy(tempNode->Protocol, protocol, sizeof(tempNode->Protocol) - 1);
-    snprintf(tempNode->Descr, sizeof(tempNode->Descr) - 1, "%s %s:(%d-%d) -> %s:(%d-%d)", tempNode->Protocol, tempNode->SrcIPStr, tempNode->SrcPortLower, tempNode->SrcPortUpper, tempNode->DstIPStr, tempNode->DstPortLower, tempNode->DstPortUpper);
-
-    AddRuleToList(&gFwRulesList, tempNode);
-    retVal++;
-  }
-
-END:
-
-  if (fileHandle != NULL)
-  {
-    fclose(fileHandle);
-  }
-
-  return retVal;
-}
-
 

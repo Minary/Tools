@@ -164,12 +164,10 @@
     <ClInclude Include="Logging.h" />
     <ClInclude Include="ModeDePoisoning.h" />
     <ClInclude Include="ModeArpMitm.h" />
-    <ClInclude Include="ModePcap.h" />
     <ClInclude Include="NetworkStructs.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="LinkedListTargetSystems.h" />
     <ClInclude Include="NetworkHelperFunctions.h" />
-    <ClInclude Include="PacketHandlerArpMitm.h" />
     <ClInclude Include="SLRE.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,9 +181,7 @@
     <ClCompile Include="Logging.c" />
     <ClCompile Include="ModeDePoisoning.c" />
     <ClCompile Include="ModeArpMitm.c" />
-    <ClCompile Include="ModePcap.c" />
     <ClCompile Include="NetworkHelperFunctions.c" />
-    <ClCompile Include="PacketHandlerArpMitm.c" />
     <ClCompile Include="SLRE.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

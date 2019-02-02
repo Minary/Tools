@@ -9,7 +9,6 @@
 #define APE_VERSION "0.15"
 
 #define FILE_HOST_TARGETS ".targethosts"
-#define FILE_FIREWALL_RULES ".fwrules"
 #define FILE_UNPOISON ".UNPOISON"
 
 

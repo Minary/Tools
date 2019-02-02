@@ -8,7 +8,6 @@
 #include "LinkedListFirewallRules.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
-#include "PacketHandlerArpMitm.h"
 
 
 extern int gDEBUGLEVEL;
@@ -16,10 +15,7 @@ extern RULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
 extern SCANPARAMS gScanParams;
 
-DWORD gRESENDThreadID = 0;
 DWORD gPOISONINGThreadID = 0;
-
-HANDLE gRESENDThreadHandle = INVALID_HANDLE_VALUE;
 HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
 
 /*
@@ -55,7 +51,6 @@ void InitializeArpMitm()
 
   // Set GW IP static.
   SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)gScanParams.GatewayIpStr, (char *)gScanParams.GatewayMacStr);
-
   if (gDEBUGLEVEL > DBG_INFO)
   {
     PrintConfig(gScanParams);
@@ -80,37 +75,21 @@ void InitializeArpMitm()
   PrintTargetSystems(gTargetSystemsList);
   WriteDepoisoningFile();
 
-  // 1. Start Ethernet FORWARDING thread
-  if ((gRESENDThreadHandle = CreateThread(NULL, 0, PacketHandlerArpMitm, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
-      gRESENDThreadHandle == INVALID_HANDLE_VALUE)
-  {
-    LogMsg(DBG_ERROR, "main(): Can't start Listener thread : %d", GetLastError());
-    goto END;
-  }
-
   // 2. Start POISONING the ARP caches.
   if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL ||
        gPOISONINGThreadHandle == INVALID_HANDLE_VALUE)
   {
-    LogMsg(DBG_ERROR, "main(): Can't start NetworkScanner thread : %d", GetLastError());
+    LogMsg(DBG_ERROR, "InitializeArpMitm(): Can't start NetworkScanner thread : %d", GetLastError());
     goto END;
   }
 
   DWORD waitStatus = 0;
-  while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE && 
-         gRESENDThreadHandle != INVALID_HANDLE_VALUE)
+  while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE)
   {
     if ((waitStatus = WaitForSingleObject(gPOISONINGThreadHandle, 30)) != WAIT_TIMEOUT &&
          waitStatus != WAIT_OBJECT_0)
     {
-      LogMsg(DBG_ERROR, "main(): ARP poisoning thread stopped");
-      break;
-    }
-
-    if ((waitStatus = WaitForSingleObject(gRESENDThreadHandle, 30)) != WAIT_TIMEOUT &&
-         waitStatus != WAIT_OBJECT_0)
-    {
-      LogMsg(DBG_ERROR, "main(): Packet forarder thread was stopped");
+      LogMsg(DBG_ERROR, "InitializeArpMitm(): ARP poisoning thread stopped");
       break;
     }
 

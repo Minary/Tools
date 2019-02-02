@@ -16,7 +16,6 @@
 #include "Logging.h"
 #include "ModeDePoisoning.h"
 #include "ModeArpMitm.h"
-#include "ModePcap.h"
 #include "getopt.h"
 
 #pragma comment(lib, "wpcap.lib")
@@ -136,25 +135,11 @@ int main(int argc, char **argv)
   {
     InitializeDePoisoning();
 
-  // Process data from pcap data dump file
-  }
-  else if (action == 'f')
-  {
-    LogMsg(2, "main(): -f %s pcapFile=%s\n", gScanParams.InterfaceName, gScanParams.PcapFilePath);
-    ParseFirewallConfigFile(FILE_FIREWALL_RULES);
-    InitializeParsePcapDumpFile();
 
-
-
-    // Start ...
-    //  - ARP cache poisoning
-    //  - Firewall blocking
-    //  - DNS poisoning 
-    //  - forwarding data packets
+  // Start ARP cache poisoning
   }
   else if (action == 'x')
   {
-    ParseFirewallConfigFile(FILE_FIREWALL_RULES);
     InitializeArpMitm();
   }
   else
