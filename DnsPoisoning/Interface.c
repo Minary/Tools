@@ -18,9 +18,9 @@
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 int ListInterfaceDetails()
 {
   int retVal = 0;
@@ -176,9 +176,9 @@ END:
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -266,9 +266,9 @@ END:
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 int GetInterfaceName(char *interfaceNameParam, char *realInterfaceNameParam, int bufferLengthParam)
 {
   int retVal = 0;
