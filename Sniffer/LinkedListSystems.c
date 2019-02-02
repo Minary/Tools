@@ -10,9 +10,9 @@ extern CRITICAL_SECTION csSystemsLL;
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 {
   int counter = 0;
@@ -44,9 +44,9 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 PSYSNODE InitSystemList()
 {
   PSYSNODE firstSysNode = NULL;
@@ -67,9 +67,9 @@ PSYSNODE InitSystemList()
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
 {
   PSYSNODE tempNode = NULL;
@@ -128,9 +128,9 @@ void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -171,9 +171,9 @@ PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN
 
 
 /*
-*
-*
-*/
+ *
+ *
+ */
 PSYSNODE GetNodeByMac(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -213,14 +213,10 @@ PSYSNODE GetNodeByMac(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
 }
 
 
-
-
-
-
 /*
-*
-*
-*/
+ *
+ *
+ */
 int CountNodes(PSYSNODE sysNodesParam)
 {
   int retVal = 0;
@@ -233,4 +229,3 @@ int CountNodes(PSYSNODE sysNodesParam)
 
   return retVal;
 }
-
