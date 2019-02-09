@@ -37,7 +37,7 @@ HANDLE gRESENDThreadHandle = INVALID_HANDLE_VALUE;
 void InitializeRouterIPv4()
 {
   AdminCheck(gScanParams.ApplicationName);
-  LogMsg(2, "InitializeArpMitm(): -x %s\n", gScanParams.InterfaceName);
+  LogMsg(2, "InitializeArpMitm(): -x %s", gScanParams.InterfaceName);
 
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
@@ -59,13 +59,15 @@ void InitializeRouterIPv4()
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
-    printf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+    LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts file \"%s\"", FILE_HOST_TARGETS);
+    Sleep(1000);
     goto END;
   }
 
   if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
-    fprintf(stderr, "No target hosts were defined!\n");
+    LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts were defined");
+    Sleep(1000);
     goto END;
   }
 
