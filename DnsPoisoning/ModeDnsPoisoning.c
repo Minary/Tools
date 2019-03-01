@@ -34,7 +34,7 @@ HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
 void InitializeDP()
 {
   AdminCheck(gScanParams.ApplicationName);
-  LogMsg(2, "InitializeDP(): -x %s\n", gScanParams.InterfaceName);
+  LogMsg(2, "InitializeDP(): -x %s", gScanParams.InterfaceName);
 
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
@@ -55,13 +55,11 @@ void InitializeDP()
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
     printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
-//    goto END;
   }
 
   if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
     printf("No target hosts were defined!\n");
-//    goto END;
   }
 
   PrintTargetSystems(gTargetSystemsList);

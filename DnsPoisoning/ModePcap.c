@@ -22,9 +22,7 @@ int InitializeParsePcapDumpFile()
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
   int retVal = -1;
-
-  printf("InitializeParsePcapDumpFile(0): Starting\n");
-
+  
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
@@ -41,8 +39,7 @@ int InitializeParsePcapDumpFile()
     PrintConfig(gScanParams);
   }
 
-  LogMsg(DBG_INFO, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s",
-    gScanParams.InterfaceName, gScanParams.PcapFilePath);
+  LogMsg(DBG_INFO, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s", gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
   // Open Pcap input file
   if (OpenPcapFileHandle(&gScanParams) == FALSE)
@@ -64,8 +61,7 @@ int InitializeParsePcapDumpFile()
   {
     if (funcRetVal == 1)
     {
-//PacketForwarding_handler((unsigned char *)&gScanParams, packetHeader, packetData);
-      printf("OOOOPS!!!\n");
+      DnsPoisoning_handler((unsigned char *)&gScanParams, packetHeader, packetData);
     }
   }
 

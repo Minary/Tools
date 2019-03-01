@@ -167,8 +167,7 @@ PRAW_DNS_DATA CreateDnsResponse_A(unsigned char *reqHostName, unsigned short tra
   requestHeaderDataPtr = (PDNS_HEADER)Add_DNS_Header(responseBuffer, &requestHeaderData, &offset);
   requestHeaderDataPtr->id = transactionId;
   requestHeaderDataPtr->qr = 1; // this is a response
-  requestHeaderDataPtr->ans_count = htons(1); // there is one answer
-  
+  requestHeaderDataPtr->ans_count = htons(1); // there is one answer  
   requestHeaderDataPtr->ra = 1;
 
   // 1.2 DNS host name

@@ -55,9 +55,22 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   DWORD waitResult = -1;
   char time[MAX_BUF_SIZE + 1];
 
-  if (priorityParam < DEBUG_LEVEL || DEBUG_LEVEL == DBG_OFF)
+  if (priorityParam < DEBUG_LEVEL || 
+      DEBUG_LEVEL == DBG_OFF)
   {
     goto END;
+  }
+
+  if (logMessageParam == NULL)
+  {
+    goto END;
+  }
+
+  // Remove trailing \n
+  while (logMessageParam[strlen(logMessageParam) - 1] == '\n' ||
+         logMessageParam[strlen(logMessageParam) - 1] == '\r')
+  {
+    logMessageParam[strlen(logMessageParam) - 1] = 0;
   }
 
   ZeroMemory(tempBuffer, sizeof(tempBuffer));

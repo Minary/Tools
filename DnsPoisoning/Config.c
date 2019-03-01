@@ -46,7 +46,8 @@ int ParseTargetHostsConfigFile(char *targetsFile)
   while (fgets(tempLine, sizeof(tempLine), fileHandle) != NULL)
   {
     // Remove trailing CR/LF
-    while (tempLine[strlen(tempLine) - 1] == '\r' || tempLine[strlen(tempLine) - 1] == '\n')
+    while (tempLine[strlen(tempLine) - 1] == '\r' || 
+           tempLine[strlen(tempLine) - 1] == '\n')
     {
       tempLine[strlen(tempLine) - 1] = '\0';
     }
@@ -104,11 +105,16 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   unsigned char responseType[MAX_BUF_SIZE + 1];
   unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
   unsigned char cnameHost[MAX_BUF_SIZE + 1];
+  unsigned char cwd[MAX_BUF_SIZE + 1];
+
 
   if (configFileParam == NULL)
   {
     goto END;
   }
+
+  ZeroMemory(cwd, sizeof(cwd));
+  GetCurrentDirectory(sizeof(cwd) - 1, cwd);
 
   if (!PathFileExists(configFileParam))
   {

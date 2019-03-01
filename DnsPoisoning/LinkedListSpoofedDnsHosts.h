@@ -20,6 +20,7 @@ typedef struct
   unsigned char SpoofedIp[MAX_IP_LEN + 1];
   unsigned char CnameHost[MAX_BUF_SIZE + 1];
   unsigned long TTL;
+  BOOL IsWildcard;
   DNS_RESPONSE_TYPE Type;
 } HOSTDATA;
 
@@ -35,7 +36,7 @@ typedef struct
 
 typedef struct
 {
-  char HostnameToSpoof[256];
+  char HostnameToResolve[256];
   PHOSTNODE HostnodeToSpoof;
 } POISONING_DATA, *PPOISONING_DATA;
 

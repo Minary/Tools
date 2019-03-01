@@ -6,4 +6,4 @@
 
 BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp);
 void FixNetworkLayerData4Response(unsigned char * data, PRAW_DNS_DATA responseData);
-void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam);
+PPOISONING_DATA *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam);

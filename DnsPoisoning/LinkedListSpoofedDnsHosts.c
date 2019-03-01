@@ -102,7 +102,7 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
   {
     // Break if current hostname equals the hostname in the list
     if (tmpSys != NULL &&
-      !strncmp((char *)tmpSys->Data.HostName, (char *)hostnameParam, sizeof(tmpSys->Data.HostName) - 1))
+       !strncmp((char *)tmpSys->Data.HostName, (char *)hostnameParam, sizeof(tmpSys->Data.HostName) - 1))
     {
       retVal = tmpSys;
       break;
@@ -111,8 +111,8 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
     // Break if current hostname matches the wildcard leading
     // host in the list
     if (tmpSys != NULL &&
-      tmpSys->Data.HostNameWithWildcard[0] == '*' &&
-      StrStrIA((char *)hostnameParam, (char *)(tmpSys->Data.HostNameWithWildcard + 1)) != NULL)
+        tmpSys->Data.HostNameWithWildcard[0] == '*' &&
+        StrStrIA((char *)hostnameParam, (char *)(tmpSys->Data.HostNameWithWildcard + 1)) != NULL)
     {
       retVal = tmpSys;
       break;
@@ -168,4 +168,5 @@ void FillInWildcardHostname(PHOSTNODE tmpNode)
   CopyMemory(tmpNode->Data.HostNameWithWildcard, tmpNode->Data.HostName, strnlen(tmpNode->Data.HostName, sizeof(tmpNode->Data.HostName) - 1));
   strncpy(tmpBuf, &tmpNode->Data.HostName[1], sizeof(tmpBuf) - 1);
   strncpy(tmpNode->Data.HostName, tmpBuf, sizeof(tmpNode->Data.HostName) - 1);
+  tmpNode->Data.IsWildcard = TRUE;
 }

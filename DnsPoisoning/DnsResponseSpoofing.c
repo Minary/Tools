@@ -25,7 +25,7 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTN
   PDNS_HEADER dnsBasicHdr = (PDNS_HEADER)(rawPacket + basePacketSize);
   PRAW_DNS_DATA responseData = NULL;
   int counter = 0;
-
+  
   // Create DNS response data block
   if (spoofingRecord->Data.Type == RESP_A)
   {
@@ -173,7 +173,7 @@ void FixNetworkLayerData4Response(unsigned char * data, PRAW_DNS_DATA responseDa
 }
 
 
-void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
+PPOISONING_DATA *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
 {
   PETHDR ethrHdr = (PETHDR)dataParam;
   PIPHDR ipHdr = NULL;
@@ -181,12 +181,13 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
   int ipHdrLen = 0;
   char *data = NULL;
   char *dnsData = NULL;
-  PHOSTNODE retVal = NULL;
+  PPOISONING_DATA retVal = NULL;
+  PHOSTNODE tmpNode = NULL;
   PDNS_HEADER dnsHdr = NULL;
   unsigned char *reader = NULL;
   int stop;
   unsigned char *peerName = NULL;
-
+  
   if (gDnsSpoofingList->next == NULL || 
       ethrHdr == NULL || 
       htons(ethrHdr->ether_type) != ETHERTYPE_IP)
@@ -228,13 +229,22 @@ void *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
 
   reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
   stop = 0;
-
   if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) == NULL)
   {
     goto END;
   }
+  
+  tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName);
+  if ((retVal = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(POISONING_DATA))) == NULL)
+  {
+    goto END;
+  }
 
-  retVal = GetNodeByHostname(gDnsSpoofingList, peerName);
+  strncpy(retVal->HostnameToResolve, peerName, strnlen(peerName, sizeof(retVal->HostnameToResolve) - 1));
+  if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
+  {
+    retVal->HostnodeToSpoof = tmpNode;
+  }
 
 END:
   if (peerName != NULL)
@@ -242,5 +252,12 @@ END:
     HeapFree(GetProcessHeap(), 0, peerName);
   }
 
+  if (tmpNode == NULL &&
+    retVal != NULL)
+  {
+    HeapFree(GetProcessHeap(), 0, retVal);
+    retVal = NULL;
+  }
+  
   return retVal;
 }

