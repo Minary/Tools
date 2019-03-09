@@ -55,13 +55,8 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   DWORD waitResult = -1;
   char time[MAX_BUF_SIZE + 1];
 
-  if (priorityParam < DEBUG_LEVEL || 
-      DEBUG_LEVEL == DBG_OFF)
-  {
-    goto END;
-  }
-
-  if (logMessageParam == NULL)
+  if (priorityParam < DEBUG_LEVEL ||
+      logMessageParam == NULL)
   {
     goto END;
   }

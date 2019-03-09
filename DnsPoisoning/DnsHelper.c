@@ -9,6 +9,72 @@
 #include "NetworkStructs.h"
 
 
+BOOL GetHostnameFromPcapDnsPacket(u_char *dataParam, u_char *hostname, int hostnameBufLen)
+{
+  BOOL retVal = FALSE;
+  PETHDR ethrHdr = (PETHDR)dataParam;
+  PIPHDR ipHdr = NULL;
+  PUDPHDR updHdr = NULL;
+  int ipHdrLen = 0;
+  char *dnsData = NULL;
+  PDNS_HEADER dnsHdr = NULL;
+  unsigned char *reader = NULL;
+  int stop;
+  unsigned char *peerName = NULL;
+
+  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
+  if (ipHdr == NULL ||
+      ipHdr->proto != IP_PROTO_UDP)
+  {
+    goto END;
+  }
+
+  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
+  if (ipHdrLen <= 0)
+  {
+    goto END;
+  }
+
+  updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
+  if (updHdr == NULL ||
+      updHdr->ulen <= 0 ||
+      (ntohs(updHdr->dport) != 53 && ntohs(updHdr->sport) != 53))
+  {
+    goto END;
+  }
+
+  dnsData = ((char*)updHdr + sizeof(UDPHDR));
+  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
+  {
+    goto END;
+  }
+
+  if (ntohs(dnsHdr->q_count) <= 0)
+  {
+    goto END;
+  }
+
+  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
+  stop = 0;
+  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) == NULL)
+  {
+    goto END;
+  }
+
+  int peerNameLen = strnlen(peerName, hostnameBufLen-1);
+  RtlZeroMemory(hostname, hostnameBufLen);
+  strncpy(hostname,peerName, hostnameBufLen-1);
+  retVal = TRUE;
+END:
+  if (peerName != NULL)
+  {
+    HeapFree(GetProcessHeap(), 0, peerName);
+  }
+
+  return retVal;
+}
+
+
 // convert 3www6google3com0 to www.google.com\0
 unsigned char* ChangeDnsNameToTextFormat(unsigned char* reader, unsigned char* buffer, int* count)
 {

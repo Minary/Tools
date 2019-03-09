@@ -175,80 +175,34 @@ void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseDat
 PPOISONING_DATA DnsRequestPoisonerGetHost2Spoof(u_char *dataParam)
 {
   PETHDR ethrHdr = (PETHDR)dataParam;
-  PIPHDR ipHdr = NULL;
-  PUDPHDR updHdr = NULL;
-  int ipHdrLen = 0;
-  char *data = NULL;
-  char *dnsData = NULL;
   PPOISONING_DATA retVal = NULL;
   PHOSTNODE tmpNode = NULL;
-  PDNS_HEADER dnsHdr = NULL;
-  unsigned char *reader = NULL;
-  int stop;
-  unsigned char *peerName = NULL;
+  u_char hostname[256];
   
   if (gDnsSpoofingList->next == NULL || 
-      ethrHdr == NULL || 
+      dataParam == NULL || 
       htons(ethrHdr->ether_type) != ETHERTYPE_IP)
   {
     goto END;
-  }
-  
-  ipHdr = (PIPHDR)(dataParam + sizeof(ETHDR));
-  if (ipHdr == NULL || 
-      ipHdr->proto != IP_PROTO_UDP)
-  {
-    goto END;
-  }
-  
-  ipHdrLen = (ipHdr->ver_ihl & 0xf) * 4;
-  if (ipHdrLen <= 0)
-  {
-    goto END;
-  }
- 
-  updHdr = (PUDPHDR)((unsigned char*)ipHdr + ipHdrLen);
-  if (updHdr == NULL ||
-      updHdr->ulen <= 0 ||
-      ntohs(updHdr->dport) != 53)
-  {
-    goto END;
-  }
-  
-  dnsData = ((char*)updHdr + sizeof(UDPHDR));
-  if ((dnsHdr = (PDNS_HEADER)&dnsData[sizeof(DNS_HEADER)]) == NULL)
-  {
-    goto END;
-  }
-  
-  if (ntohs(dnsHdr->q_count) <= 0)
+  }  
+
+  if (GetHostnameFromPcapDnsPacket(dataParam, hostname, 255) == FALSE)
   {
     goto END;
   }
 
-  reader = (unsigned char *)&dnsData[sizeof(DNS_HEADER)];
-  stop = 0;
-  if ((peerName = ChangeDnsNameToTextFormat(reader, (unsigned char *)dnsHdr, &stop)) == NULL)
-  {
-    goto END;
-  }
-  
   if ((retVal = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(POISONING_DATA))) == NULL)
   {
     goto END;
   }
 
-  strncpy(retVal->HostnameToResolve, peerName, strnlen(peerName, MAX_BUF_SIZE - 1));
-  if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, peerName)) != NULL)
+  strncpy(retVal->HostnameToResolve, hostname, sizeof(retVal->HostnameToResolve) - 1);
+  if ((tmpNode = GetNodeByHostname(gDnsSpoofingList, hostname)) != NULL)
   {
     retVal->HostnodeToSpoof = tmpNode;
   }
   
 END:
-  if (peerName != NULL)
-  {
-    HeapFree(GetProcessHeap(), 0, peerName);
-  }
 
   if (tmpNode == NULL &&
       retVal != NULL)
