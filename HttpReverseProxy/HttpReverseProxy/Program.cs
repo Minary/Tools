@@ -56,7 +56,8 @@
       {
         Console.WriteLine("{0}\r\n\r\n", result.ErrorText);
       }
-      else if (!string.IsNullOrEmpty(certificateHost) && !string.IsNullOrWhiteSpace(certificateHost))
+      else if (!string.IsNullOrEmpty(certificateHost) && 
+               !string.IsNullOrWhiteSpace(certificateHost))
       {
         CreateCertificate(certificateHost);
       }
