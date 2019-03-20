@@ -6,6 +6,7 @@
 
 #include "DnsPoisoning.h"
 #include "LinkedListSpoofedDnsHosts.h"
+#include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "ModePcap.h"
 #include "NetworkHelperFunctions.h"
@@ -14,6 +15,7 @@
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PHOSTNODE gDnsSpoofingList;
+extern PSYSNODE gTargetSystemsList;
 
 
 int InitializeParsePcapDumpFile()
@@ -23,6 +25,10 @@ int InitializeParsePcapDumpFile()
   unsigned char *packetData = NULL;
   int retVal = -1;
   
+
+
+
+
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
@@ -38,6 +44,29 @@ int InitializeParsePcapDumpFile()
   {
     PrintConfig(gScanParams);
   }
+
+  // 1. Parse target file
+  if (!PathFileExists(FILE_HOST_TARGETS))
+  {
+    printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+  }
+
+  if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
+  {
+    printf("No target hosts were defined!\n");
+  }
+
+  // Parse DNS spoofing hosts
+  if (!PathFileExists(FILE_DNS_POISONING))
+  {
+    printf("No DNS spoofing hosts were defined!\n");
+  }
+  else
+  {
+    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
+  }
+
+  PrintTargetSystems(gTargetSystemsList);
 
   LogMsg(DBG_INFO, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s", gScanParams.InterfaceName, gScanParams.PcapFilePath);
 

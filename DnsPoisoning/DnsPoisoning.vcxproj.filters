@@ -40,6 +40,12 @@
     <Filter Include="Source Files\DnsPoisoning">
       <UniqueIdentifier>{3557bebd-fcce-48dc-ab4c-afebc2c18eee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{c217c1b6-f0af-498c-b8ea-5e10e4443b08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\map">
+      <UniqueIdentifier>{1ad2afb2-11a0-4293-9f30-f0c6bd23e4f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DnsPoisoning.c">
@@ -84,11 +90,14 @@
     <ClCompile Include="LinkedListTargetSystems.c">
       <Filter>Source Files\LinkedList</Filter>
     </ClCompile>
-    <ClCompile Include="ThsPacketHandlerDP.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PacketHandlerDP.h">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThePacketHandlerDP.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="map.c">
+      <Filter>Libs\map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="LinkedListTargetSystems.h">
       <Filter>Header Files\LinkedList</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>Libs\map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

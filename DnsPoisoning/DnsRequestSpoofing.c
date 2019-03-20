@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <pcap.h>
 #include <excpt.h>
@@ -7,8 +8,8 @@
 #include "DnsForge.h"
 #include "DnsHelper.h"
 #include "DnsRequestSpoofing.h"
-#include "DnsStructs.h"
 #include "LinkedListSpoofedDNSHosts.h"
+#include "DnsStructs.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
 
@@ -28,7 +29,6 @@ BOOL DnsRequestSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISON
   if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_A)
   {
     responseData = CreateDnsResponse_A(spoofingRecord->HostnameToResolve, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
-
   }
   else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
@@ -167,7 +167,7 @@ void FixNetworkLayerData4Request(unsigned char * data, PRAW_DNS_DATA responseDat
   ZeroMemory(dstIpStr, sizeof(dstIpStr));
   snprintf((char *)srcIpStr, sizeof(srcIpStr) - 1, "%i.%i.%i.%i", srcIpBin[0], srcIpBin[1], srcIpBin[2], srcIpBin[3]);
   snprintf((char *)dstIpStr, sizeof(dstIpStr) - 1, "%i.%i.%i.%i", dstIpBin[0], dstIpBin[1], dstIpBin[2], dstIpBin[3]);
-  LogMsg(DBG_LOW, "FixNetworkLayerData4Request(): %s:%d -> %s:%d udpDataLength=%d",
+  LogMsg(DBG_DEBUG, "FixNetworkLayerData4Request(): %s:%d -> %s:%d udpDataLength=%d",
     srcIpStr, ntohs(srcPort), dstIpStr, ntohs(dstPort), ntohs(udpHdr->ulen));
 }
 

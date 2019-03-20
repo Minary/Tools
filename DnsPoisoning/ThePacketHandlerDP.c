@@ -182,7 +182,7 @@ BOOL ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
   if (packetInfo->udpHdr != NULL &&
      (poisoningData = (PPOISONING_DATA)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-    LogMsg(DBG_DEBUG, "Request DNS poisoning C2I succeeded : %s/%s -> %s", poisoningData->HostnodeToSpoof->Data.HostName, poisoningData->HostnodeToSpoof->Data.HostNameWithWildcard, poisoningData->HostnodeToSpoof->Data.SpoofedIp);
+    LogMsg(DBG_DEBUG, "Request DNS poisoning C2I succeeded : Requested:%s, Pattern:%s/%s -> %s", poisoningData->HostnameToResolve, poisoningData->HostnodeToSpoof->Data.HostName, poisoningData->HostnodeToSpoof->Data.HostNameWithWildcard, poisoningData->HostnodeToSpoof->Data.SpoofedIp);
     retVal = DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, poisoningData, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
     HeapFree(GetProcessHeap(), 0, poisoningData);
 
@@ -234,7 +234,7 @@ BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
   if (packetInfo->udpHdr != NULL &&
       (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-    LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s -> %s", tmpNode->Data.HostName, tmpNode->Data.SpoofedIp);
+    LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s/%s -> %s/%s", tmpNode->Data.HostName, tmpNode->Data.HostNameWithWildcard, tmpNode->Data.SpoofedIp, tmpNode->Data.CnameHost);
     return  DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
   }
 

@@ -68,6 +68,7 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, lo
   tmpNode->Data.TTL = ttlParam;
   CopyMemory(tmpNode->Data.CnameHost, cnameHostParam, sizeof(tmpNode->Data.CnameHost) - 1);
   CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
+  CopyMemory(tmpNode->Data.CnameHost, cnameHostParam, sizeof(tmpNode->Data.CnameHost) - 1);
 
   if (tmpNode->Data.HostName[0] == '*')
   {
@@ -82,7 +83,7 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, lo
   tmpNode->next = (HOSTNODE *)*listHead;
   ((PHOSTNODE)*listHead)->prev = (HOSTNODE *)tmpNode;
   *listHead = tmpNode;
-  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/CNAME record added: %s/%s", hostNameParam, spoofedIpParam);
+  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/CNAME record added: %s/%s/%s", hostNameParam, cnameHostParam, spoofedIpParam);
 }
 
 

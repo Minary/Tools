@@ -62,8 +62,17 @@ void InitializeDP()
     printf("No target hosts were defined!\n");
   }
 
-  PrintTargetSystems(gTargetSystemsList);
+  // Parse DNS spoofing hosts
+  if (!PathFileExists(FILE_DNS_POISONING))
+  {
+    printf("No DNS spoofing hosts were defined!\n");
+  }
+  else
+  {
+    ParseDnsPoisoningConfigFile(FILE_DNS_POISONING);
+  }
 
+  PrintTargetSystems(gTargetSystemsList);
 
   // 1. Start Ethernet FORWARDING thread
   if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, PacketHandlerDP, &gScanParams, 0, &gPOISONINGThreadID)) == NULL ||

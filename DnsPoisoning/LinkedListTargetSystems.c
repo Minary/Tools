@@ -57,7 +57,6 @@ PSYSNODE InitSystemList()
 }
 
 
-
 void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
 {
   PSYSNODE tmpNode = NULL;
@@ -67,7 +66,10 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   time_t clock;
 
   EnterCriticalSection(&csSystemsLL);
-  if (listHead == NULL || *listHead == NULL || sysMacParam == NULL || sysIpParam == NULL)
+  if (listHead == NULL || 
+      *listHead == NULL || 
+      sysMacParam == NULL ||
+      sysIpParam == NULL)
   {
     goto END;
   }

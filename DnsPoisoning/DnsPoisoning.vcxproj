@@ -169,7 +169,8 @@
     <ClCompile Include="ModeDnsPoisoning.c" />
     <ClCompile Include="ModePcap.c" />
     <ClCompile Include="NetworkHelperFunctions.c" />
-    <ClCompile Include="ThsPacketHandlerDP.c" />
+    <ClCompile Include="map.c" />
+    <ClCompile Include="ThePacketHandlerDP.c" />
     <ClCompile Include="PacketHandlerDP.h" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +186,7 @@
     <ClInclude Include="LinkedListSpoofedDnsHosts.h" />
     <ClInclude Include="LinkedListTargetSystems.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="ModeDnsPoisoning.h" />
     <ClInclude Include="ModePcap.h" />
     <ClInclude Include="NetworkHelperFunctions.h" />
