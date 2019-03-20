@@ -18,9 +18,9 @@
 
     public static int PluginPriority { get; private set; } = 3;
 
-    public static string ConfigFileName { get; private set; } = "0.1";
+    public static string ConfigFileName { get; private set; } = "plugin.config";
 
-    public static string PluginVersion { get; private set; } = "plugin.config";
+    public static string PluginVersion { get; private set; } = "0.1";
 
     public static List<RequestRedirectConfigRecord> RequestRedirectRecords { get; set; } = new List<RequestRedirectConfigRecord>();
 
