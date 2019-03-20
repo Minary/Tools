@@ -4,6 +4,8 @@
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
+  using System.Collections.Generic;
+  using System.Linq;
 
 
   public partial class HostMapping
@@ -24,22 +26,46 @@
         return instruction;
       }
 
+      
       string hostName = requestObj.ClientRequestObj.Host.ToLower();
-      if (Plugin.HostMapping.Config.Mappings?.Count > 0 &&
-          Plugin.HostMapping.Config.Mappings.ContainsKey(hostName))
+
+      // If hostname is mapped without wildcard
+      if (Plugin.HostMapping.Config.MappingsHostname?.Count > 0 &&
+          Plugin.HostMapping.Config.MappingsHostname.ContainsKey(hostName) &&
+          requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
       {
-        if (requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage(
+                                                                "HostMapping",
+                                                                ProxyProtocol.Undefined,
+                                                                Loglevel.Debug,
+                                                                "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\" (by hostname)",
+                                                                requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(),
+                                                                Plugin.HostMapping.Config.MappingsHostname[hostName]);
+        requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
+        requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.MappingsHostname[hostName]);
+        requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.MappingsHostname[hostName];
+
+      }
+      else if (Plugin.HostMapping.Config.MappingsHostWildcards?.Count > 0)
+      {
+        foreach (var key in Plugin.HostMapping.Config.MappingsHostWildcards.Keys)
         {
-          this.pluginProperties.PluginHost.LoggingInst.LogMessage(
-                                                                  "HostMapping",
-                                                                  ProxyProtocol.Undefined,
-                                                                  Loglevel.Debug,
-                                                                  "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\"",
-                                                                  requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(),
-                                                                  Plugin.HostMapping.Config.Mappings[hostName]);
-          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
-          requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.Mappings[hostName]);
-          requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.Mappings[hostName];
+          if (hostName.EndsWith(key))
+          {
+            this.pluginProperties.PluginHost.LoggingInst.LogMessage(
+                                                                    "HostMapping",
+                                                                    ProxyProtocol.Undefined,
+                                                                    Loglevel.Debug,
+                                                                    "HostMapping.OnPostClientHeadersRequest(): Replacing host \"{0}\" by \"{1}\" (by hostname wildcard)",
+                                                                    requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0].ToString(),
+                                                                    Plugin.HostMapping.Config.MappingsHostWildcards[key]);
+            requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Clear();
+            requestObj.ClientRequestObj.ClientRequestHeaders["Host"].Add(Plugin.HostMapping.Config.MappingsHostWildcards[key]);
+            requestObj.ClientRequestObj.Host = Plugin.HostMapping.Config.MappingsHostWildcards[key];
+            break;
+          }
+
+//Plugin.HostMapping.Config.MappingsHostWildcards.Where(elem => hostName.EndsWith(elem.Key))
         }
       }
 
