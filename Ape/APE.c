@@ -157,7 +157,6 @@ END:
 }
 
 
-
 void PrintUsage(char *pAppName)
 {
   system("cls");
@@ -179,7 +178,6 @@ void PrintUsage(char *pAppName)
   printf("WinPcap version\n---------------\n\n");
   printf("%s\n\n", pcap_lib_version());
 }
-
 
 
 void Stringify(unsigned char *inputParam, int inputLenthParam, unsigned char *outputParam)
@@ -204,7 +202,6 @@ void Stringify(unsigned char *inputParam, int inputLenthParam, unsigned char *ou
     }
   }
 }
-
 
 
 BOOL APE_ControlHandler(DWORD pControlType)
