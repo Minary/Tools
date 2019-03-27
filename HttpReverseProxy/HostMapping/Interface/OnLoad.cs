@@ -28,9 +28,13 @@
       try
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Info, "HostMapping.OnLoad(): Loaded {0} configuration record(s)", HostMappingConfig.MappingsHostname?.Count ?? 0);
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", 
+                                                                ProxyProtocol.Undefined, Loglevel.Info, 
+                                                                "HostMapping.OnLoad(): Loaded {0}/{1} configuration record(s)",
+                                                                HostMappingConfig.MappingsHostname?.Count ?? 0,
+                                                                HostMappingConfig.MappingsHostWildcards?.Count ?? 0);
       }
-      catch (System.IO.FileNotFoundException)
+      catch (FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Info, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);

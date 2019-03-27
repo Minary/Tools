@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="DataTypes\HostMappingConfigRecord.cs" />
+    <Compile Include="DataTypes\MappingPair.cs" />
     <Compile Include="HostMapping.cs" />
     <Compile Include="Interface\OnLoad.cs" />
     <Compile Include="Interface\OnPostClientHeadersRequest.cs" />

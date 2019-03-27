@@ -1,5 +1,6 @@
 ﻿namespace HttpReverseProxy.Plugin.HostMapping
 {
+  using HttpReverseProxy.Plugin.HostMapping.DataTypes;
   using HttpReverseProxyLib.Exceptions;
   using System.Collections.Generic;
   using System.IO;
@@ -21,7 +22,7 @@
 
     public static Dictionary<string, string> MappingsHostname { get; set; } = new Dictionary<string, string>();
 
-    public static Dictionary<string, string> MappingsHostWildcards { get; set; } = new Dictionary<string, string>();
+    public static Dictionary<string, MappingPair> MappingsHostWildcards { get; set; } = new Dictionary<string, MappingPair>();
 
     #endregion
 
@@ -60,14 +61,18 @@
           continue;
         }
 
-        // If host name starts with an asterisk (*) 
+        // If host name starts WITH an asterisk (*) 
         // save it as wildcard host mapping.
-        // The host name characters are escaped (the . character) and 
-        // all asterisks are replaced by Regex /[^\.]{1}/
-        if (splitter[0].StartsWith("*") == true)
+        // The host name characters are escaped (because of the . character) and 
+        // all asterisks are replaced by Regex /[^\.]+/
+        if (splitter[0].Contains("*") == true)
         {
-          var hostnameEnding = splitter[0].Replace("*", "");
-          MappingsHostWildcards.Add(hostnameEnding.ToLower(),  splitter[1]);
+System.Console.WriteLine($"SPLITTER:{splitter[0]}/{splitter[1]}");
+          var tmpRegex = splitter[0].Replace("*", "ASTERISK");
+          tmpRegex = Regex.Escape(tmpRegex);
+          tmpRegex = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\.]+?");
+          var compRegex = new Regex(tmpRegex, RegexOptions.Compiled|RegexOptions.IgnoreCase);
+          MappingsHostWildcards.Add(splitter[1], new MappingPair(compRegex, splitter[0]));
 
         // If hostname does not contain any asterisk (*) characters
         // save it as a regular host mapping
