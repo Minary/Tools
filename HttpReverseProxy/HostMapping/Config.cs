@@ -67,7 +67,6 @@
         // all asterisks are replaced by Regex /[^\.]+/
         if (splitter[0].Contains("*") == true)
         {
-System.Console.WriteLine($"SPLITTER:{splitter[0]}/{splitter[1]}");
           var tmpRegex = splitter[0].Replace("*", "ASTERISK");
           tmpRegex = Regex.Escape(tmpRegex);
           tmpRegex = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\.]+?");

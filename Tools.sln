@@ -33,7 +33,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DnsPoisoning", "DnsPoisonin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RouterIPv4", "RouterIPv4\RouterIPv4.vcxproj", "{FC402BCB-BA6A-464E-BBA2-F4ED4A8945DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins", "UnitTestProject1\Plugins.csproj", "{0BA46265-4090-4F50-A124-88F4FC963443}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins", "TestsPlugins\Plugins.csproj", "{0BA46265-4090-4F50-A124-88F4FC963443}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9F991ABA-D640-466B-B833-78B7EB5E8807}"
 EndProject
