@@ -47,7 +47,6 @@
 
       string[] configFileLines = File.ReadAllLines(configFilePath);
       RequestRedirectRecords.Clear();
-
       foreach (string tmpLine in configFileLines)
       {
         try
@@ -105,12 +104,14 @@
         throw new ProxyWarningException("The redirect description is invalid");
       }
 
-      if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
+      if (string.IsNullOrEmpty(hostRegex) || 
+          this.IsRegexPatternValid(hostRegex) == false)
       {
         throw new ProxyWarningException($"The host parameter is invalid: {hostRegex}");
       }
 
-      if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
+      if (string.IsNullOrEmpty(pathRegex) || 
+          this.IsRegexPatternValid(pathRegex) == false)
       {
         throw new ProxyWarningException($"The path parameter is invalid: {pathRegex}");
       }

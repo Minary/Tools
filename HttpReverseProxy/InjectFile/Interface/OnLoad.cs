@@ -31,7 +31,7 @@
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Info, "InjectFile.OnLoad(): Loaded {0} configuration record(s)", Plugin.InjectFile.Config.InjectFileRecords.Count);
       }
-      catch (System.IO.FileNotFoundException)
+      catch (FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectFile", ProxyProtocol.Undefined, Loglevel.Info, "InjectFile.OnLoad(): Config file \"...\\{0}\" does not exist", tmpConfigFile);

@@ -75,13 +75,14 @@
       var pathRegex = string.Empty;
       var replacementResource = string.Empty;
 
+
+
       if (string.IsNullOrEmpty(configFileLine))
       {
         throw new ProxyWarningException("Configuration line is invalid");
       }
 
-      string[] splitter = Regex.Split(configFileLine, @"\|\|");
-
+      var splitter = Regex.Split(configFileLine, @"\|\|");
       if (splitter.Length != 3)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
@@ -91,12 +92,16 @@
       pathRegex = splitter[1];
       replacementResource = splitter[2];
 
-      if(string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
+
+
+      if(string.IsNullOrEmpty(hostRegex) || 
+         this.IsRegexPatternValid(hostRegex) == false)
       {
         throw new ProxyWarningException($"Host parameter is invalid: {hostRegex}");
       }
 
-      if(string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
+      if(string.IsNullOrEmpty(pathRegex) || 
+         this.IsRegexPatternValid(pathRegex) == false)
       {
         throw new ProxyWarningException($"Path parameter is invalid: {pathRegex}");
       }
