@@ -9,8 +9,10 @@ using HttpReverseProxyLib.DataTypes.Enum;
 using HttpReverseProxyLib.DataTypes.Interface;
 using HttpReverseProxyLib;
 
-namespace TestPlugins
+
+namespace TestsPluginsHostmapping
 {
+
   [TestClass]
   public class HostMapping
   {
@@ -21,6 +23,8 @@ namespace TestPlugins
 
     #endregion
 
+
+    #region (DE)INIT
 
     [TestInitialize]
     public void TestInit()
@@ -40,14 +44,16 @@ namespace TestPlugins
         }
         catch (Exception ex)
         {
-          Console.WriteLine($"TestClearn(EXC): {ex.Message}");
+          Console.WriteLine($"TestClean(EXC): {ex.Message}");
         }
       }
     }
 
+    #endregion
+
 
     [TestMethod]
-    public void LoadConfig_Wildcard()
+    public void HostMapping_LoadConfig_Wildcard()
     {
       File.AppendAllText(this.pathInputFile, "*oogle.c*||www.altavista.com");
       var conf = new Config();
@@ -59,7 +65,7 @@ namespace TestPlugins
 
 
     [TestMethod]
-    public void LoadConfig_FixHostname()
+    public void HostMapping_LoadConfig_FixHostname()
     {
       File.AppendAllText(this.pathInputFile, $"google.com||www.altavista.com{Environment.NewLine}www.google.com||www.altavista.com");
       var conf = new Config();
