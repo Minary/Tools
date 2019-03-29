@@ -6,9 +6,9 @@
 
     #region PROPERTIES
 
-    public string Host { get; set; } = string.Empty;
+    public string HostRegex { get; set; } = string.Empty;
 
-    public string Path { get; set; } = string.Empty;
+    public string PathRegex { get; set; } = string.Empty;
 
     public string ReplacementResource { get; set; } = string.Empty;
 
@@ -19,8 +19,8 @@
 
     public InjectFileConfigRecord(string host, string path, string replacementResource)
     {
-      this.Host = host;
-      this.Path = path;
+      this.HostRegex = host;
+      this.PathRegex = path;
       this.ReplacementResource = replacementResource;
     }
 

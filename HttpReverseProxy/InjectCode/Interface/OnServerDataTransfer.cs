@@ -20,25 +20,25 @@
     /// <param name="dataChunk"></param>
     public void OnServerDataTransfer(RequestObj requestObj, DataChunk dataChunk)
     {
-      if(requestObj == null)
+      if (requestObj == null)
       {
         throw new ProxyWarningException("The request object is invalid");
       }
 
-      if(dataChunk == null)
+      if (dataChunk == null)
       {
-        throw new ProxyWarningException("The request object is invalid");
+        throw new ProxyWarningException("The data chunk object is invalid");
       }
 
-      if(HttpReverseProxy.Plugin.InjectCode.Config.InjectCodeRecords.Count <= 0)
+      if (Plugin.InjectCode.Config.InjectCodeRecords.Count <= 0)
       {
         return;
       }
-
-      foreach(InjectCodeConfigRecord injectRecord in HttpReverseProxy.Plugin.InjectCode.Config.InjectCodeRecords)
+     
+      foreach (InjectCodeConfigRecord injectRecord in Plugin.InjectCode.Config.InjectCodeRecords)
       {
-        if (Regex.Match(requestObj.ClientRequestObj.Host, injectRecord.HostRegex, RegexOptions.IgnoreCase).Success == true &&
-            Regex.Match(requestObj.ClientRequestObj.RequestLine.Path, injectRecord.PathRegex, RegexOptions.IgnoreCase).Success == true)
+        if (injectRecord.HostnameRegex.Match(requestObj.ClientRequestObj.Host).Success == true  &&
+            injectRecord.PathRegex.Match(requestObj.ClientRequestObj.RequestLine.Path).Success == true)
         {
           // 2. Decode bytes to UTF8
           string readableData = Encoding.UTF8.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
@@ -49,7 +49,7 @@
             string foundTagEscaped = Regex.Escape(foundTag);
             string replacementData = injectRecord.InjectionCodeFileContent;
 
-            if (injectRecord.Position == DataTypes.TagPosition.before)
+            if (injectRecord.Position == TagPosition.before)
             {
               replacementData += replacementData + foundTag;
             }
@@ -60,7 +60,7 @@
 
             readableData = Regex.Replace(readableData, foundTagEscaped, replacementData);
             Logging.Instance.LogMessage(requestObj.Id, ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnServerDataTransfer(): Injected code from file {0} {1} the tag {2}. hostPattern={3}, pathPattern={4}",
-              Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag, injectRecord.HostRegex, injectRecord.PathRegex);
+              Path.GetFileName(injectRecord.InjectionCodeFile), injectRecord.Position, injectRecord.Tag, injectRecord.HostnameStr, injectRecord.PathStr);
 
             // Write data back to datapacket
             dataChunk.ContentData = Encoding.UTF8.GetBytes(readableData);

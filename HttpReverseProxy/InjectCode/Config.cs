@@ -19,9 +19,9 @@
 
     public static int PluginPriority { get; private set; } = 5;
 
-    public static string ConfigFileName { get; private set; } = "plugin.config";
-
     public static string PluginVersion { get; private set; } = "0.1";
+
+    public static string ConfigFileName { get; private set; } = "plugin.config";
 
     public static List<InjectCodeConfigRecord> InjectCodeRecords { get; set; } = new List<InjectCodeConfigRecord>();
 
@@ -48,7 +48,7 @@
 
       var configFileLines = File.ReadAllLines(configFilePath);
       InjectCodeRecords.Clear();
-      
+
       foreach (var tmpLine in configFileLines)
       {
         if (string.IsNullOrEmpty(tmpLine))
@@ -60,10 +60,17 @@
         {
           continue;
         }
-
+        
         try
         {
           InjectCodeConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
+
+          // Make regex from hostname/path
+          newRecord.HostnameStr = this.RegexifyHostname(newRecord.HostnameStr);
+          newRecord.HostnameRegex = new Regex(newRecord.HostnameStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+          newRecord.PathStr = this.RegexifyPath(newRecord.PathStr);
+          newRecord.PathRegex = new Regex(newRecord.PathStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
           InjectCodeRecords.Add(newRecord);
         }
         catch (ProxyWarningException pwex)
@@ -80,7 +87,40 @@
     #endregion
 
 
+
     #region PROTECTED
+
+    private string RegexifyHostname(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\.]*?");
+
+      return wildcardBuffer;
+    }
+
+
+    private string RegexifyPath(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\/\.\+\~\=\&\?]*?");
+
+      return wildcardBuffer;
+    }
+
 
     protected InjectCodeConfigRecord VerifyRecordParameters(string configFileLine)
     {
@@ -96,36 +136,37 @@
       {
         throw new ProxyWarningException("Configuration line is invalid");
       }
-      
+
       var splitter = Regex.Split(configFileLine, @"\|\|");
       if (splitter.Length != 5)
       {
         throw new ProxyWarningException("Wrong numbers of configuration parameters");
       }
-      
+
       tag = splitter[0];
       position = splitter[1].ToLower().Trim() == "before" ? TagPosition.before : TagPosition.after;
       injectionCodeFile = splitter[2];
       hostRegex = splitter[3]?.ToLower();
       pathRegex = splitter[4];
 
-      if (string.IsNullOrEmpty(hostRegex) || this.IsRegexPatternValid(hostRegex) == false)
+      if (string.IsNullOrEmpty(hostRegex))
       {
         throw new ProxyWarningException($"Host parameter is invalid: {hostRegex}");
       }
 
-      if (string.IsNullOrEmpty(pathRegex) || this.IsRegexPatternValid(pathRegex) == false)
+      if (string.IsNullOrEmpty(pathRegex))
       {
         throw new ProxyWarningException($"Path parameter is invalid: {pathRegex}");
       }
 
-      if (string.IsNullOrEmpty(injectionCodeFile) || !File.Exists(injectionCodeFile))
+      if (string.IsNullOrEmpty(injectionCodeFile) ||
+          !File.Exists(injectionCodeFile))
       {
         throw new ProxyWarningException($"The injection code file parameter is invalid: {injectionCodeFile}");
       }
 
-      if (InjectCodeRecords.Where(elem => elem.HostRegex.ToLower() == hostRegex.ToLower() &&
-                                          elem.PathRegex.ToLower() == pathRegex.ToLower()).ToList().Count > 0)
+      if (InjectCodeRecords.Where(elem => elem.HostnameStr.ToLower() == hostRegex.ToLower() &&
+                                          elem.PathStr.ToLower() == pathRegex.ToLower()).ToList().Count > 0)
       {
         throw new ProxyWarningException("Record already exists");
       }
@@ -154,3 +195,7 @@
 
   }
 }
+
+
+
+

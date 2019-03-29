@@ -1,6 +1,7 @@
 ﻿namespace HttpReverseProxy.Plugin.InjectCode.DataTypes
 {
   using System.IO;
+  using System.Text.RegularExpressions;
 
 
   public class InjectCodeConfigRecord
@@ -8,9 +9,13 @@
   
     #region PROPERTIES
 
-    public string HostRegex { get; set; } = string.Empty;
+    public string HostnameStr { get; set; } = string.Empty;
 
-    public string PathRegex { get; set; } = string.Empty;
+    public Regex HostnameRegex { get; set; }
+
+    public string PathStr { get; set; } = string.Empty;
+
+    public Regex PathRegex { get; set; }
 
     public string InjectionCodeFile { get; set; } = string.Empty;
 
@@ -29,8 +34,8 @@
 
     public InjectCodeConfigRecord(string hostRegex, string pathRegex, string injectionCodeFile, string tag, TagPosition position)
     {
-      this.HostRegex = hostRegex;
-      this.PathRegex = pathRegex;
+      this.HostnameStr = hostRegex;
+      this.PathStr = pathRegex;
       this.InjectionCodeFile = injectionCodeFile;
       this.Tag = tag;
       this.Position = position;      

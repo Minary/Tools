@@ -111,7 +111,7 @@
         throw new ProxyWarningException($"Replacement resource parameter is invalid: {replacementResource}");
       }
 
-      if (InjectFileRecords.Exists(elem => elem.Host == hostRegex && elem.Path == pathRegex))
+      if (InjectFileRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
       {
         throw new ProxyWarningException("Record already exists");
       }
