@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HttpReverseProxy.Plugin.HostMapping;
+using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using HttpReverseProxy.Plugin.HostMapping;
-using HttpReverseProxyLib.DataTypes.Class;
-using HttpReverseProxyLib.DataTypes.Enum;
-using HttpReverseProxyLib.DataTypes.Interface;
-using HttpReverseProxyLib;
+using TestsPlugins;
 
 
 namespace TestsPluginsHostmapping
@@ -74,17 +69,16 @@ namespace TestsPluginsHostmapping
       Assert.IsTrue(Config.MappingsHostWildcards.Count == 0);
       Assert.IsTrue(Config.MappingsHostname.Count == 2);
     }
-
-
+    
 
     [TestMethod]
     public void HostRegex_Find()
     {
       File.AppendAllText(this.pathInputFile, $"*oogle.c*||www.altavista.com{Environment.NewLine}*20min.ch||watson.ch");
       var conf = new Config();
-      var reqObj = this.GenerateBasicRequest("http", "www.google.com");
+      var reqObj = HelperMethods.Inst.GenerateBasicRequest("http", "www.google.com", "/");
       var pluginHostMapping = new HttpReverseProxy.Plugin.HostMapping.HostMapping();
-      pluginHostMapping.PluginProperties.PluginHost = this.GeneratePluginHost();
+      pluginHostMapping.PluginProperties.PluginHost = HelperMethods.Inst.GeneratePluginHost();
       conf.ParseConfigurationFile(this.pathInputFile);
       pluginHostMapping.OnPostClientHeadersRequest(reqObj);
 
@@ -93,41 +87,9 @@ namespace TestsPluginsHostmapping
       Assert.IsTrue(reqObj.ClientRequestObj.ClientRequestHeaders["Host"][0] == "www.altavista.com");
     }
 
+
     #region PRIVATE
-
-    private RequestObj GenerateBasicRequest(string scheme, string host)
-    {
-      var reqObj = new RequestObj("minary.io", ProxyProtocol.Http);
-      reqObj.ClientRequestObj.Scheme = scheme;
-      reqObj.ClientRequestObj.Host = host;
-      reqObj.ClientRequestObj.ClientRequestHeaders = new Dictionary<string, List<string>>() { { "Host", new List<string>() { host } } };
-
-      return reqObj;
-    }
-
-
-    private IPluginHost GeneratePluginHost()
-    {
-      IPluginHost retVal = new PluginHost();
-
-      return retVal;
-    }
-
-
-    private class PluginHost : IPluginHost
-    {
-      public Logging LoggingInst { get; set; }
-
-      public void RegisterPlugin(IPlugin pluginData)
-      {
-        //throw new NotImplementedException();
-      }
-
-      public PluginHost()
-      {
-        this.LoggingInst = HttpReverseProxyLib.Logging.Instance;
-      }
-    }
+    
 
     #endregion
 
