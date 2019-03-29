@@ -6,6 +6,7 @@ using HttpReverseProxyLib;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 
@@ -65,6 +66,22 @@ namespace TestsPlugins
       IPluginHost retVal = new PluginHost();
 
       return retVal;
+    }
+
+
+    public void RemoveFile(string path)
+    {
+      if (File.Exists(path))
+      {
+        try
+        {
+          File.Delete(path);
+        }
+        catch (Exception ex)
+        {
+          Console.WriteLine($"TestClean(EXC): {ex.Message}");
+        }
+      }
     }
 
     #endregion

@@ -38,8 +38,8 @@ namespace TestsPluginsHostmapping
     [TestCleanup]
     public void TestClean()
     {
-      this.RemoveFile(this.tempInputFilePath);
-      this.RemoveFile(this.injectFilePath);
+      TestsPlugins.HelperMethods.Inst.RemoveFile(this.tempInputFilePath);
+      TestsPlugins.HelperMethods.Inst.RemoveFile(this.injectFilePath);
     }
 
     #endregion
@@ -93,25 +93,6 @@ namespace TestsPluginsHostmapping
       Assert.IsNotNull(responseStr);
       Assert.IsFalse(responseStr.ToLower().Contains(injectFileData));
     }
-
-    #region PRIVATE
-
-    private void RemoveFile(string path)
-    {
-      if (File.Exists(path))
-      {
-        try
-        {
-          File.Delete(path);
-        }
-        catch (Exception ex)
-        {
-          Console.WriteLine($"TestClean(EXC): {ex.Message}");
-        }
-      }
-    }
-
-    #endregion
 
   }
 
