@@ -48,7 +48,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HelperMethods.cs" />
     <Compile Include="HostMapping.cs" />
+    <Compile Include="InjectCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +64,18 @@
     <ProjectReference Include="..\HttpReverseProxy\HttpReverseProxyLib\HttpReverseProxyLib.csproj">
       <Project>{e30fa5df-3dbb-41b1-a325-27d478757ffb}</Project>
       <Name>HttpReverseProxyLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpReverseProxy\InjectCode\InjectCode.csproj">
+      <Project>{588ab45a-1289-4f7b-a86e-4a2a1e6c377d}</Project>
+      <Name>InjectCode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpReverseProxy\InjectFile\InjectFile.csproj">
+      <Project>{fd78f8c5-a16a-4605-9391-9fa74200442d}</Project>
+      <Name>InjectFile</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\HttpReverseProxy\RequestRedirect\RequestRedirect.csproj">
+      <Project>{de17e245-ad36-452a-9555-5eb5ddabd183}</Project>
+      <Name>RequestRedirect</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
