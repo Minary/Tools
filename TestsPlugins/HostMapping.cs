@@ -87,13 +87,6 @@ namespace TestsPluginsHostmapping
       Assert.IsTrue(reqObj.ClientRequestObj.ClientRequestHeaders["Host"][0] == "www.altavista.com");
     }
 
-
-    #region PRIVATE
     
-
-    #endregion
-
-
-  }
-
+  } 
 }
