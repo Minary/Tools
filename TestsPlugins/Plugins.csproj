@@ -51,6 +51,7 @@
     <Compile Include="HelperMethods.cs" />
     <Compile Include="HostMapping.cs" />
     <Compile Include="InjectCode.cs" />
+    <Compile Include="InjectFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

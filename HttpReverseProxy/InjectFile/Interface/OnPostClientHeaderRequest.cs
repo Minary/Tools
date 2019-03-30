@@ -46,8 +46,8 @@
 
       foreach (DataTypes.InjectFileConfigRecord tmpRecord in HttpReverseProxy.Plugin.InjectFile.Config.InjectFileRecords)
       {
-        if (Regex.Match(host, tmpRecord.HostRegex, RegexOptions.IgnoreCase).Success &&
-            Regex.Match(path, tmpRecord.PathRegex, RegexOptions.IgnoreCase).Success)
+        if (tmpRecord.HostnameRegex.Match(host).Success &&
+            tmpRecord.PathRegex.Match(path).Success)
         {
           instruction.Instruction = Instruction.SendBackLocalFile;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;

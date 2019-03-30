@@ -6,6 +6,7 @@
   using HttpReverseProxyLib.Exceptions;
   using System.Collections.Generic;
   using System.IO;
+  using System.Linq;
   using System.Text.RegularExpressions;
 
 
@@ -47,11 +48,20 @@
 
       var configFileLines = File.ReadAllLines(configFilePath);
       InjectFileRecords.Clear();
+
       foreach (var tmpLine in configFileLines)
       {
         try
         {
-          InjectFileRecords.Add(this.VerifyRecordParameters(tmpLine));
+          InjectFileConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
+
+          // Make regex from hostname/path
+          newRecord.HostnameStr = this.RegexifyHostname(newRecord.HostnameStr);
+          newRecord.HostnameRegex = new Regex(newRecord.HostnameStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+          newRecord.PathStr = this.RegexifyPath(newRecord.PathStr);
+          newRecord.PathRegex = new Regex(newRecord.PathStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+          InjectFileRecords.Add(newRecord);
         }
         catch (ProxyWarningException pwex)
         {
@@ -69,11 +79,45 @@
 
     #region PROTECTED
 
+    private string RegexifyHostname(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\.]*?");
+
+      return wildcardBuffer;
+    }
+
+
+    private string RegexifyPath(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\/\.\+\~\=\&\?]*?");
+
+      return wildcardBuffer;
+    }
+
+
     protected InjectFileConfigRecord VerifyRecordParameters(string configFileLine)
     {
       var hostRegex = string.Empty;
       var pathRegex = string.Empty;
       var replacementResource = string.Empty;
+
+
 
 
 
@@ -94,48 +138,31 @@
 
 
 
-      if(string.IsNullOrEmpty(hostRegex) || 
-         this.IsRegexPatternValid(hostRegex) == false)
+      if (string.IsNullOrEmpty(hostRegex) == true)
       {
         throw new ProxyWarningException($"Host parameter is invalid: {hostRegex}");
       }
 
-      if(string.IsNullOrEmpty(pathRegex) || 
-         this.IsRegexPatternValid(pathRegex) == false)
+      if (string.IsNullOrEmpty(pathRegex) == true)
       {
         throw new ProxyWarningException($"Path parameter is invalid: {pathRegex}");
       }
 
-      if (string.IsNullOrEmpty(replacementResource) || Regex.Match(hostRegex, @"[\r\n\s]").Success)
+      if (string.IsNullOrEmpty(replacementResource) == true ||
+          File.Exists(replacementResource) == false)
       {
         throw new ProxyWarningException($"Replacement resource parameter is invalid: {replacementResource}");
       }
 
-      if (InjectFileRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
+      if (InjectFileRecords.Exists(elem => elem.HostnameStr == hostRegex && 
+                                           elem.PathStr == pathRegex))
       {
         throw new ProxyWarningException("Record already exists");
       }
 
       return new InjectFileConfigRecord(hostRegex, pathRegex, replacementResource);
     }
-
-
-    public bool IsRegexPatternValid(string pattern)
-    {
-      var isValid = false;
-
-      try
-      {
-        new Regex(pattern);
-        isValid = true;
-      }
-      catch
-      {
-      }
-
-      return isValid;
-    }
-
+    
     #endregion
 
   }

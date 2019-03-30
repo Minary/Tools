@@ -51,12 +51,8 @@
 
       foreach (var tmpLine in configFileLines)
       {
-        if (string.IsNullOrEmpty(tmpLine))
-        {
-          continue;
-        }
-
-        if (!tmpLine.Contains("||"))
+        if (string.IsNullOrEmpty(tmpLine) ||
+            tmpLine.Contains("||") == false)
         {
           continue;
         }
@@ -85,8 +81,7 @@
     }
 
     #endregion
-
-
+    
 
     #region PROTECTED
 
@@ -172,23 +167,6 @@
       }
 
       return new InjectCodeConfigRecord(hostRegex, pathRegex, injectionCodeFile, tag, position);
-    }
-
-
-    public bool IsRegexPatternValid(string pattern)
-    {
-      var isValid = false;
-
-      try
-      {
-        new Regex(pattern);
-        isValid = true;
-      }
-      catch
-      {
-      }
-
-      return isValid;
     }
 
     #endregion
