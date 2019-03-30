@@ -45,13 +45,22 @@
         throw new ProxyWarningException("Config file does not exist");
       }
 
-      string[] configFileLines = File.ReadAllLines(configFilePath);
+      var configFileLines = File.ReadAllLines(configFilePath);
       RequestRedirectRecords.Clear();
-      foreach (string tmpLine in configFileLines)
+
+      foreach (var tmpLine in configFileLines)
       {
         try
         {
-          RequestRedirectRecords.Add(this.VerifyRecordParameters(tmpLine));
+          RequestRedirectConfigRecord newRecord = this.VerifyRecordParameters(tmpLine);
+
+          // Make regex from hostname/path
+          newRecord.HostnameStr = this.RegexifyHostname(newRecord.HostnameStr);
+          newRecord.HostnameRegex = new Regex(newRecord.HostnameStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+          newRecord.PathStr = this.RegexifyPath(newRecord.PathStr);
+          newRecord.PathRegex = new Regex(newRecord.PathStr, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+          RequestRedirectRecords.Add(newRecord);
         }
         catch (ProxyWarningException pwex)
         {
@@ -69,12 +78,44 @@
 
     #region PROTECTED
 
+    private string RegexifyHostname(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\.]*?");
+
+      return wildcardBuffer;
+    }
+
+
+    private string RegexifyPath(string wildcardBuffer)
+    {
+      if (string.IsNullOrEmpty(wildcardBuffer) ||
+          wildcardBuffer.Contains("*") == false)
+      {
+        return wildcardBuffer;
+      }
+
+      var tmpRegex = wildcardBuffer.Replace("*", "ASTERISK");
+      tmpRegex = Regex.Escape(tmpRegex);
+      wildcardBuffer = tmpRegex.Replace("ASTERISK", @"[\d\w\-_\/\.\+\~\=\&\?]*?");
+
+      return wildcardBuffer;
+    }
+
+
     protected RequestRedirectConfigRecord VerifyRecordParameters(string configFileLine)
     {
       var redirectType = string.Empty;
       var redirectDescription = string.Empty;
-      var hostRegex = string.Empty;
-      var pathRegex = string.Empty;
+      var hostname = string.Empty;
+      var path = string.Empty;
       var replacementResource = string.Empty;
 
       if (string.IsNullOrEmpty(configFileLine))
@@ -90,8 +131,8 @@
 
       redirectType = splitter[0];
       redirectDescription = splitter[1];
-      hostRegex = splitter[2].ToLower();
-      pathRegex = splitter[3];
+      hostname = splitter[2].ToLower();
+      path = splitter[3];
       replacementResource = splitter[4];
 
       if (string.IsNullOrEmpty(redirectType))
@@ -104,16 +145,14 @@
         throw new ProxyWarningException("The redirect description is invalid");
       }
 
-      if (string.IsNullOrEmpty(hostRegex) || 
-          this.IsRegexPatternValid(hostRegex) == false)
+      if (string.IsNullOrEmpty(hostname) == true)
       {
-        throw new ProxyWarningException($"The host parameter is invalid: {hostRegex}");
+        throw new ProxyWarningException($"The host parameter is invalid: {hostname}");
       }
 
-      if (string.IsNullOrEmpty(pathRegex) || 
-          this.IsRegexPatternValid(pathRegex) == false)
+      if (string.IsNullOrEmpty(path) == true)
       {
-        throw new ProxyWarningException($"The path parameter is invalid: {pathRegex}");
+        throw new ProxyWarningException($"The path parameter is invalid: {path}");
       }
 
       if (string.IsNullOrEmpty(replacementResource))
@@ -121,29 +160,12 @@
         throw new ProxyWarningException($"The replacement resource parameter is invalid: {replacementResource}");
       }
 
-      if (RequestRedirectRecords.Exists(elem => elem.HostRegex == hostRegex && elem.PathRegex == pathRegex))
+      if (RequestRedirectRecords.Exists(elem => elem.HostnameStr == hostname && elem.PathStr == path))
       {
         throw new ProxyWarningException("Record already exists");
       }
 
-      return new RequestRedirectConfigRecord(redirectType, redirectDescription, hostRegex, pathRegex, replacementResource);
-    }
-
-
-    public bool IsRegexPatternValid(string pattern)
-    {
-      var isValid = false;
-
-      try
-      {
-        new Regex(pattern);
-        isValid = true;
-      }
-      catch
-      {
-      }
-
-      return isValid;
+      return new RequestRedirectConfigRecord(redirectType, redirectDescription, hostname, path, replacementResource);
     }
 
     #endregion

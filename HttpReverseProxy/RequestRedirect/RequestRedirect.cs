@@ -18,7 +18,14 @@
     private Config pluginConfig = new Config();
 
     #endregion
-    
+
+
+    #region PROPERTIES
+
+    public PluginProperties PluginProperties { get { return this.pluginProperties; } set { } }
+
+    #endregion
+
 
     #region PUBLIC
 

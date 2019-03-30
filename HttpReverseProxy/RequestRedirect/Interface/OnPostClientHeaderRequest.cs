@@ -4,7 +4,6 @@
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
-  using System.Text.RegularExpressions;
 
 
   public partial class RequestRedirect
@@ -46,8 +45,8 @@
 
       foreach (DataTypes.RequestRedirectConfigRecord tmpRecord in HttpReverseProxy.Plugin.RequestRedirect.Config.RequestRedirectRecords)
       {
-        if (Regex.Match(host, tmpRecord.HostRegex, RegexOptions.IgnoreCase).Success &&
-            Regex.Match(path, tmpRecord.PathRegex, RegexOptions.IgnoreCase).Success)
+        if (tmpRecord.HostnameRegex.Match(host).Success &&
+            tmpRecord.PathRegex.Match(path).Success)
         {
           instruction.Instruction = Instruction.RedirectToNewUrl;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
