@@ -2,6 +2,7 @@
 {
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.DataTypes.Interface;
+  using HttpReverseProxyLib.Exceptions;
   using System;
   using System.IO;
   using HostMappingConfig = HttpReverseProxy.Plugin.HostMapping.Config;
@@ -29,7 +30,8 @@
       {
         this.pluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", 
-                                                                ProxyProtocol.Undefined, Loglevel.Info, 
+                                                                ProxyProtocol.Undefined, 
+                                                                Loglevel.Info, 
                                                                 "HostMapping.OnLoad(): Loaded {0}/{1} configuration record(s)",
                                                                 HostMappingConfig.MappingsHostname?.Count ?? 0,
                                                                 HostMappingConfig.MappingsHostWildcards?.Count ?? 0);
@@ -38,6 +40,10 @@
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("HostMapping", ProxyProtocol.Undefined, Loglevel.Info, "HostMapping.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);
+      }
+      catch (ProxyErrorException peex)
+      {
+        this.pluginProperties.PluginHost.LoggingInst.LogMessage("InjectCode", ProxyProtocol.Undefined, Loglevel.Info, "InjectCode.OnLoad(): {0}", peex.Message);
       }
       catch (Exception ex)
       {

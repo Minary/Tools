@@ -4,8 +4,6 @@
   using HttpReverseProxyLib.DataTypes.Class;
   using HttpReverseProxyLib.DataTypes.Enum;
   using HttpReverseProxyLib.Exceptions;
-  using System.Collections.Generic;
-  using System.Linq;
 
 
   public partial class HostMapping

@@ -45,7 +45,10 @@
         throw new ProxyWarningException("Config file does not exist");
       }
 
-      string[] configFileLines = File.ReadAllLines(configFilePath);
+      var configFileLines = File.ReadAllLines(configFilePath);
+      MappingsHostname.Clear();
+      MappingsHostWildcards.Clear();
+
       foreach (string tmpLine in configFileLines)
       {
         if (string.IsNullOrEmpty(tmpLine) ||
@@ -54,7 +57,7 @@
           continue;
         }
 
-        // Data structure is: RequestedHost:MappedHost
+        // Data structure is: RequestedHost||MappedHost
         string[] splitter = Regex.Split(tmpLine, @"\|\|");
         if (splitter.Length != 2)
         {
