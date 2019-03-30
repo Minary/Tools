@@ -9,10 +9,12 @@
 
   public partial class RequestRedirect
   {
+
     /// <summary>
-    ///
+    /// 
     /// </summary>
-    /// <param name="pluginHost"></param>
+    /// <param name="requestObj"></param>
+    /// <returns></returns>
     public PluginInstruction OnPostClientHeadersRequest(RequestObj requestObj)
     {
       PluginInstruction instruction = new PluginInstruction();
@@ -47,8 +49,6 @@
         if (Regex.Match(host, tmpRecord.HostRegex, RegexOptions.IgnoreCase).Success &&
             Regex.Match(path, tmpRecord.PathRegex, RegexOptions.IgnoreCase).Success)
         {
-//this.pluginProperties.PluginHost.LoggingInst.LogMessage("RequestRedirect", ProxyProtocol.Undefined, Loglevel.Info, "RequestRedirect.OnPostClientHeadersRequest(): Requesting \"{0}{1}\" ---{2}--> \"{3}\"",
-//  host, path, tmpRecord.RedirectType, tmpRecord.ReplacementResource);
           instruction.Instruction = Instruction.RedirectToNewUrl;
           instruction.InstructionParameters.Data = tmpRecord.ReplacementResource;
           instruction.InstructionParameters.Status = tmpRecord.RedirectType;
