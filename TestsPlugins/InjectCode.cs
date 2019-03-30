@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using HttpReverseProxy.Plugin.InjectCode;
@@ -58,7 +57,7 @@ namespace TestsPluginsHostmapping
 
 
     [TestMethod]
-    public void InjectCode_After_BODY()
+    public void InjectCode_After_BODY_success()
     {
       File.AppendAllText(this.tempInputFilePath, $@"body||after||{this.injectFilePath}||*google.c*||/dir/file*.php");
       var conf = new Config();
@@ -95,5 +94,4 @@ namespace TestsPluginsHostmapping
     }
 
   }
-
 }
