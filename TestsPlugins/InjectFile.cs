@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HttpReverseProxy.Plugin.InjectFile;
+using HttpReverseProxyLib.DataTypes;
+using HttpReverseProxyLib.DataTypes.Enum;
+using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using HttpReverseProxy.Plugin.InjectFile;
-
+using TestsPlugins;
 
 namespace TestsPluginsHostmapping
 {
@@ -15,8 +16,8 @@ namespace TestsPluginsHostmapping
     #region MEMBERS
 
     private string tempInputFilePath;
-    private string injectFilePath = @"c:\temp\code_inject.txt";
-    private string injectFileData = "<inject>...</inject>";
+    private string injectFilePath = @"c:\temp\file_inject.txt";
+    private string injectFileData = "INJECTED_FILE_DATA";
 
     #endregion
 
@@ -44,6 +45,7 @@ namespace TestsPluginsHostmapping
 
     #endregion
 
+
     // *google.c*||/path/to/file*.php||c:\tmp\injectfile.jpg
     [TestMethod]
     public void InjectFile_LoadConfig_Wildcard()
@@ -53,6 +55,40 @@ namespace TestsPluginsHostmapping
       conf.ParseConfigurationFile(this.tempInputFilePath);
 
       Assert.IsTrue(Config.InjectFileRecords.Count == 1);
+    }
+
+
+    [TestMethod]
+    public void Inject_file_success()
+    {
+      File.AppendAllText(this.tempInputFilePath, $@"*google.c*||/path/to/file*.php||{this.injectFilePath}");
+      var conf = new Config();
+      var reqObj = TestsPlugins.HelperMethods.Inst.GenerateBasicRequest("http", "www.google.com", "/path/to/file/random.php");
+      var pluginInjectFile = new HttpReverseProxy.Plugin.InjectFile.InjectFile();
+      pluginInjectFile.PluginProperties.PluginHost = HelperMethods.Inst.GeneratePluginHost();
+      conf.ParseConfigurationFile(this.tempInputFilePath);
+      PluginInstruction instr = pluginInjectFile.OnPostClientHeadersRequest(reqObj);
+
+      Assert.IsTrue(Config.InjectFileRecords.Count == 1);
+      Assert.IsTrue(instr.Instruction == Instruction.SendBackLocalFile);
+      Assert.IsTrue(instr.InstructionParameters.Data == injectFilePath);
+    }
+
+
+    [TestMethod]
+    public void Inject_file_no()
+    {
+      File.AppendAllText(this.tempInputFilePath, $@"*google.c*||/path/to/file*.php||{this.injectFilePath}");
+      var conf = new Config();
+      var reqObj = TestsPlugins.HelperMethods.Inst.GenerateBasicRequest("http", "www.google.com", "/path/to/file/random.php");
+      var pluginInjectFile = new HttpReverseProxy.Plugin.InjectFile.InjectFile();
+      pluginInjectFile.PluginProperties.PluginHost = HelperMethods.Inst.GeneratePluginHost();
+      conf.ParseConfigurationFile(this.tempInputFilePath);
+      PluginInstruction instr = pluginInjectFile.OnPostClientHeadersRequest(reqObj);
+
+      Assert.IsTrue(Config.InjectFileRecords.Count == 1);
+      Assert.IsTrue(instr.Instruction == Instruction.SendBackLocalFile);
+      Assert.IsTrue(instr.InstructionParameters.Data == injectFilePath);
     }
 
   }
