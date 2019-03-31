@@ -158,15 +158,5 @@
 
     #endregion
 
-
-    #region PRIVATE
-
-    private CacheSslStrip()
-    {
-    }
-
-    #endregion
-
-
   }
 }

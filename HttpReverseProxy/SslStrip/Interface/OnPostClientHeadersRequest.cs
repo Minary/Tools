@@ -22,17 +22,16 @@
     {
       PluginInstruction instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
-
       if (requestObj == null)
       {
         throw new ProxyWarningException("The request object is invalid");
       }
-
+      
       string requestedUrl = $"{requestObj.ProxyProtocol.ToString().ToLower()}://{requestObj.ClientRequestObj.Host}{requestObj.ClientRequestObj.RequestLine.Path}";
 
       // 1. If requested Url was HTML SSL stripped
       //    -> replace "http" by "https"
-      if (this.cacheSslStrip.NeedsRequestBeMapped(requestedUrl))
+      if (this.cacheSslStrip.NeedsRequestBeMapped(requestedUrl) == true)
       {
         HostRecord tmpHost = this.cacheSslStrip.GetElement(requestObj.ClientRequestObj.GetRequestedUrl());
         requestObj.ProxyProtocol = tmpHost.ProxyProtocol;
@@ -51,7 +50,7 @@
         requestObj.ClientRequestObj.RequestLine.Path = tmpHost.Path;
         Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Info, "SslStrip.OnPostClientHeadersRequest(): HTTP redirect(301/302) from {0} {1} to {2}://{3}{4}", requestObj.ClientRequestObj.RequestLine.MethodString, requestedUrl, tmpHost.ProxyProtocol.ToString().ToLower(), tmpHost.Host, tmpHost.Path);
       }
-
+      
       // 3. If requested host was flaged to use HTTPS because of HSTS
       //    -> replace scheme "http://" by "https://"
       if (this.cacheHsts.GetElement(requestObj.ClientRequestObj.Host) != null)

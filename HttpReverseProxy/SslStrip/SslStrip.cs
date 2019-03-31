@@ -46,6 +46,7 @@
     {
       this.cacheHsts = new CacheHsts();
       this.cacheRedirect = new CacheRedirect();
+      this.cacheSslStrip = new CacheSslStrip();
 
       this.pluginProperties = new PluginProperties()
       {
