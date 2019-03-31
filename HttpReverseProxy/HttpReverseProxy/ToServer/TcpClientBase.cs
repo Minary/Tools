@@ -502,17 +502,17 @@
 
       if (!headers.ContainsKey("Content-Type"))
       {
-        throw new ProxyWarningException("The content type headerByteArray is invalid");
+        throw new ProxyWarningException("The content type headerByteArray is invalid(0)");
       }
 
       if (headers["Content-Type"].Count <= 0)
       {
-        throw new ProxyWarningException("The content type headerByteArray is invalid");
+        throw new ProxyWarningException("The content type headerByteArray is invalid(1)");
       }
 
       if (string.IsNullOrEmpty(headers["Content-Type"][0].ToString()))
       {
-        throw new ProxyWarningException("The content type headerByteArray is invalid");
+        throw new ProxyWarningException("The content type headerByteArray is invalid(2)");
       }
 
       // If there is no content type headerByteArray set the default values
