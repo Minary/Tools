@@ -192,6 +192,9 @@
     <ClInclude Include="NetworkHelperFunctions.h" />
     <ClInclude Include="NetworkStructs.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Tests\DNS_Poisoning_w5.fest.ch.pcap" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

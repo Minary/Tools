@@ -25,10 +25,6 @@ int InitializeParsePcapDumpFile()
   unsigned char *packetData = NULL;
   int retVal = -1;
   
-
-
-
-
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);

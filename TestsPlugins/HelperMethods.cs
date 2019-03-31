@@ -86,8 +86,7 @@ namespace TestsPlugins
 
     #endregion
 
-
-
+    
     #region PRIVATE
 
     private class PluginHost : IPluginHost

@@ -49,11 +49,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HelperMethods.cs" />
-    <Compile Include="HostMapping.cs" />
-    <Compile Include="InjectCode.cs" />
-    <Compile Include="InjectFile.cs" />
+    <Compile Include="Tests\HostMapping.cs" />
+    <Compile Include="Tests\InjectCode.cs" />
+    <Compile Include="Tests\InjectFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestRedirect.cs" />
+    <Compile Include="Tests\RequestRedirect.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
