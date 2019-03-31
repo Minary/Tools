@@ -205,9 +205,6 @@
 
         RequestHandlerHttp requestHandler = new RequestHandlerHttp(requestObj);
         requestHandler.ProcessClientRequest();
-
-
-
       }
       catch (Exception ex)
       {
