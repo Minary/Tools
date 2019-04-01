@@ -101,20 +101,20 @@
         throw new Exception("Request object is invalid");
       }
 
-      if (string.IsNullOrEmpty(requestObj.ClientRequestObj.RequestLine.RequestLine))
+      if (string.IsNullOrEmpty(requestObj?.ClientRequestObj?.RequestLine?.RequestLine))
       {
-        ClientNotificationException exception = new ClientNotificationException();
+        ClientNotificationException exception = new ClientNotificationException("The RequestLine is undefined");
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
-
+      
       if (!requestObj.ClientRequestObj.RequestLine.RequestLine.Contains(' '))
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
-
+      
       string[] requestSplitBuffer = requestObj.ClientRequestObj.RequestLine.RequestLine.Split(new char[] { ' ' }, 3);
       if (requestSplitBuffer.Count() != 3)
       {
@@ -122,21 +122,21 @@
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
-
+      
       if (!Regex.Match(requestSplitBuffer[0].ToLower(), @"^\s*(get|put|post|head|trace|delete|options|connect)\s*$").Success)
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.MethodNotAllowed);
         throw exception;
       }
-
+      
       if (!requestSplitBuffer[1].StartsWith("/"))
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
-
+      
       if (!requestSplitBuffer[2].StartsWith("HTTP/1."))
       {
         ClientNotificationException exception = new ClientNotificationException();
@@ -148,7 +148,7 @@
       requestObj.ClientRequestObj.RequestLine.MethodString = requestSplitBuffer[0];
       requestObj.ClientRequestObj.RequestLine.Path = requestSplitBuffer[1];
       requestObj.ClientRequestObj.RequestLine.HttpVersion = requestSplitBuffer[2];
-
+      
       if (requestObj.ClientRequestObj.RequestLine.MethodString == "GET")
       {
         requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.GET;
@@ -186,12 +186,12 @@
       {
         requestObj.ClientRequestObj.RequestLine.RequestMethod = RequestMethod.Undefined;
       }
-
+      
       if (!requestObj.ClientRequestObj.RequestLine.Path.StartsWith("/"))
       {
         requestObj.ClientRequestObj.RequestLine.Path = $"/{requestObj.ClientRequestObj.RequestLine.Path}";
       }
-
+      
       requestObj.HttpLogData = requestObj.ClientRequestObj.RequestLine.RequestLine.Trim();
     }
 
