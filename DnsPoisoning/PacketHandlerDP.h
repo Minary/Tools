@@ -39,7 +39,7 @@ PACKET_INFO, *PPACKET_INFO;
  * Function forward declarations
  *
  */
-DWORD WINAPI PacketHandlerDP(LPVOID lpParam);
+DWORD PacketHandlerDP(PSCANPARAMS lpParam);
 BOOL ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAMS scanParams);
