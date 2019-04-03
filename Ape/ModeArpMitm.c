@@ -62,7 +62,7 @@ void InitializeArpMitm()
   // 1. Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
-    printf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
+    fprintf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
     goto END;
   }
 

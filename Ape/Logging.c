@@ -28,7 +28,7 @@ BOOLEAN InitLogging()
     return FALSE;
   }
 
-  printf("InitLogging(): Mutex handle (%s/%d) and logfile handle (%d) created successfully\r\n", logMutexName, loggingMutex, fileHandle);
+  printf("InitLogging(): Mutex handle (%s/%d) and logfile handle (%d) created successfully\r\n", logMutexName, (int)loggingMutex, (int)fileHandle);
   return TRUE;
 }
 
@@ -79,7 +79,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
   switch (waitResult)
   {
     case WAIT_FAILED: 
-      printf("LogMsg(): Error! Opening logging mutex (%d) failed with error no. %d\r\n", loggingMutex, GetLastError());
+      printf("LogMsg(): Error! Opening logging mutex (%d) failed with error no. %d\r\n", (int)loggingMutex, GetLastError());
       break;
 
     case WAIT_TIMEOUT:
