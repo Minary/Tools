@@ -76,25 +76,7 @@ void InitializeArpMitm()
   WriteDepoisoningFile();
 
   // 2. Start POISONING the ARP caches.
-  if ((gPOISONINGThreadHandle = CreateThread(NULL, 0, ArpPoisoningLoop, &gScanParams, 0, &gPOISONINGThreadID)) == NULL ||
-       gPOISONINGThreadHandle == INVALID_HANDLE_VALUE)
-  {
-    LogMsg(DBG_ERROR, "InitializeArpMitm(): Can't start NetworkScanner thread : %d", GetLastError());
-    goto END;
-  }
-
-  DWORD waitStatus = 0;
-  while (gPOISONINGThreadHandle != INVALID_HANDLE_VALUE)
-  {
-    if ((waitStatus = WaitForSingleObject(gPOISONINGThreadHandle, 30)) != WAIT_TIMEOUT &&
-         waitStatus != WAIT_OBJECT_0)
-    {
-      LogMsg(DBG_ERROR, "InitializeArpMitm(): ARP poisoning thread stopped");
-      break;
-    }
-
-    Sleep(50);
-  }
+  ArpPoisoningLoop(&gScanParams);
 
   // MARKER : CORRECT THREAD SHUTDOWN!!
   printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");

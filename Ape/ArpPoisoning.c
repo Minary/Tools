@@ -18,11 +18,10 @@ extern PSYSNODE gTargetSystemsList;
 
 
 
-DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
+DWORD ArpPoisoningLoop(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
   int roundCounter = 0;
-  PSCANPARAMS tmpParams = (PSCANPARAMS)scanParamsParam;
   SCANPARAMS scanParams;
   ArpPacket arpPacket;
   unsigned char *date = NULL;
@@ -37,7 +36,7 @@ DWORD WINAPI ArpPoisoningLoop(LPVOID scanParamsParam)
   SYSTEMNODE systemList[MAX_SYSTEMS_COUNT];
 
   ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
+  CopyMemory(&scanParams, scanParamsParam, sizeof(scanParams));
 
   // Open interface.
   LogMsg(DBG_LOW, "ArpPoisoningLoop(): Starting");

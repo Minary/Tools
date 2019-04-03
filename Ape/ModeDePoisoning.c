@@ -142,11 +142,10 @@ void ExecCommand(char *commandParam)
 
 
 
-DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
+DWORD ArpDePoisoning(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
   ArpPacket arpPacket;
-  PSCANPARAMS lTmpParams = (PSCANPARAMS)scanParamsParam;
   SCANPARAMS scanParams;
   unsigned char remoteIpString[MAX_IP_LEN + 1];
   FILE *fileHandle = NULL;
@@ -166,7 +165,7 @@ DWORD WINAPI ArpDePoisoning(LPVOID scanParamsParam)
 
   LogMsg(DBG_LOW, "ArpDePoisoning(): Starting");
   ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, lTmpParams, sizeof(scanParams));
+  CopyMemory(&scanParams, scanParamsParam, sizeof(scanParams));
   memset(arpBroadcast, 255, BIN_MAC_LEN);
 
   // Open device list.
