@@ -104,7 +104,6 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
   PSYSNODE readlDstSystem = NULL;
   PARPHDR arpData = NULL;
   unsigned short type = htons(ethrHdr->ether_type);
-  char payload[1506];
   char *payloadPtr = NULL;
 
   ZeroMemory(&scanParams, sizeof(scanParams));
@@ -315,7 +314,7 @@ void SniffAndParseCallback(unsigned char *scanParamsParam, struct pcap_pkthdr *p
             char *hostRes[20];
             ZeroMemory(hostRes, sizeof(hostRes));
             ZeroMemory(hostResBuffer, sizeof(hostResBuffer));
-            GetHostResolution(udpHdrPtr, hostRes);
+            GetHostResolution((unsigned char *) udpHdrPtr, hostRes);
 
             for (int i = 0; i < 20 && hostRes[i] != NULL; i++)
             {
@@ -358,8 +357,8 @@ BOOL WriteOutput(char *data, int dataLength)
 
   // Write output data to named pipe
   if (gCurrentScanParams.OutputPipeName[0] != NULL &&
-      gOutputPipe != INVALID_HANDLE_VALUE &&
-      gOutputPipe != 0)
+      ((int)gOutputPipe) != INVALID_HANDLE_VALUE &&
+      ((int)gOutputPipe) != 0)
   {
     if (!WriteFile(gOutputPipe, data, dataLength, &dwRead, NULL))
     {
@@ -387,7 +386,7 @@ BOOL WriteOutput(char *data, int dataLength)
       {
         puts(data);
       }
-      __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+      __except (FilterException(GetExceptionCode(), GetExceptionInformation()))
       {
         printf("OMG it's a bug!\r\n");
       }
@@ -492,7 +491,7 @@ void HandleHttpTraffic(char *srcMacStrParam, PIPHDR ipHdrPtrParam, PTCPHDR tcpHd
 }
 
 
-int filterException(int code, PEXCEPTION_POINTERS ex)
+int FilterException(int code, PEXCEPTION_POINTERS ex)
 {
   printf("EXCEPTION: Filtering %d\r\n", code);
   return EXCEPTION_EXECUTE_HANDLER;
@@ -550,7 +549,7 @@ BOOL GetPcapDevice()
     {
       netMask = ((struct sockaddr_in *)(device->addresses->netmask))->sin_addr.S_un.S_addr;
     }
-    __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+    __except (FilterException(GetExceptionCode(), GetExceptionInformation()))
     {
       netMask = 0xffffff;
     }
@@ -606,7 +605,7 @@ void GetHostResolution(unsigned char* udpHdrPtr, char *hostRes[])
     ZeroMemory(host, sizeof(host));
 
     hostRes[hostResIndex] = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, 128);
-    ChangeToDnsNameFormat(dnsHdr + 1, host, sizeof(host));
+    ChangeToDnsNameFormat((unsigned char *) (dnsHdr + 1), (unsigned char *)host, sizeof(host));
     CopyMemory(hostRes[hostResIndex], host, strnlen(host, sizeof(host) - 1));
     hostResIndex++;
 

@@ -19,8 +19,6 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 extern char *optarg;
 
 

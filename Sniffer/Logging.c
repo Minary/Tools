@@ -4,6 +4,7 @@
 
 #include "Sniffer.h"
 #include "Logging.h"
+#include "ModeMinary.h"
 
 char *gLogPriority[] = { "OFF", "DEBUG", "INFO", "LOW", "MEDIUM", "HIGH", "ERROR", "FATAL" };
 
@@ -58,7 +59,7 @@ void LogMsg(int priorityParam, char *logMessageParam, ...)
     snprintf(logMessage, sizeof(logMessage) - 1, "%s %-7s: %s\n", time, gLogPriority[priorityParam], tempBuffer);
     puts(logMessage);
   }
-  __except (filterException(GetExceptionCode(), GetExceptionInformation()))
+  __except (FilterException(GetExceptionCode(), GetExceptionInformation()))
   {
     puts("OMG it's a bug!!\r\n");
     return;
