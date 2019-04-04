@@ -32,7 +32,7 @@ PACKET_INFO, *PPACKET_INFO;
  *
  */
 void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader, const u_char *data);
-DWORD WINAPI PacketHandlerRouterIPv4(LPVOID lpParam);
+DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam);
 void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo);
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize);
 BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);

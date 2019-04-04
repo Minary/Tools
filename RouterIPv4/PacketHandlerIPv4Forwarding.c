@@ -24,7 +24,7 @@ extern PRULENODE gFwRulesList;
 * Receive, parse, resend
 *
 */
-DWORD WINAPI PacketHandlerRouterIPv4(LPVOID lpParam)
+DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
 {
   char filter[MAX_BUF_SIZE + 1];
   DWORD retVal = 0;
@@ -33,7 +33,6 @@ DWORD WINAPI PacketHandlerRouterIPv4(LPVOID lpParam)
   int ifcNum = 0;
   struct bpf_program ifcCode;
   unsigned int netMask = 0;
-  PSCANPARAMS tmpParams = (PSCANPARAMS)lpParam;
   SCANPARAMS scanParams;
   int funcRetVal = 0;
   struct pcap_pkthdr *packetHeader = NULL;
@@ -41,7 +40,7 @@ DWORD WINAPI PacketHandlerRouterIPv4(LPVOID lpParam)
 
   ZeroMemory(pcapErrorBuffer, sizeof(pcapErrorBuffer));
   ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, tmpParams, sizeof(scanParams));
+  CopyMemory(&scanParams, lpParam, sizeof(scanParams));
 
   // Open interface.
   if ((scanParams.InterfaceReadHandle = pcap_open_live((char *)scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)

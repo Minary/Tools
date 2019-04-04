@@ -73,26 +73,8 @@ void InitializeRouterIPv4()
 
   PrintTargetSystems(gTargetSystemsList);
 
-  // 1. Start Ethernet FORWARDING thread
-  if ((gRESENDThreadHandle = CreateThread(NULL, 0, PacketHandlerRouterIPv4, &gScanParams, 0, &gRESENDThreadID)) == NULL ||
-       gRESENDThreadHandle == INVALID_HANDLE_VALUE)
-  {
-    LogMsg(DBG_ERROR, "InitializeRouterIPv4(): Can't start Listener thread : %d", GetLastError());
-    goto END;
-  }
-
-  DWORD waitStatus = 0;
-  while (gRESENDThreadHandle != INVALID_HANDLE_VALUE)
-  {
-    if ((waitStatus = WaitForSingleObject(gRESENDThreadHandle, 30)) != WAIT_TIMEOUT &&
-      waitStatus != WAIT_OBJECT_0)
-    {
-      LogMsg(DBG_ERROR, "InitializeRouterIPv4(): Packet forarder thread was stopped");
-      break;
-    }
-
-    Sleep(50);
-  }
+  // 1. Start IPv4 router
+  PacketHandlerRouterIPv4(&gScanParams);
 
   // MARKER : CORRECT THREAD SHUTDOWN!!
   printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");
