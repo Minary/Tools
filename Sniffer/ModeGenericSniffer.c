@@ -26,6 +26,9 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
   struct bpf_program filterCode;
   unsigned int netMask = 0;
 
+  // Set exit function to trigger depoisoning functions and command.
+  SetConsoleCtrlHandler((PHANDLER_ROUTINE)Sniffer_ControlHandler, TRUE);
+
   // Open device list.
   if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
   {
@@ -236,5 +239,37 @@ printf("\n");
 
     printf("\nSRC %s/%s -> DST %s/%s - Type [%s]", lSrcMAC, lSrcIP, lDstMAC, lDstIP, (ntohs(lARPData->opcode) == ARP_REQUEST)? "ARP Request" : "ARP Reply");
     */
+  }
+}
+
+
+BOOL Sniffer_ControlHandler(DWORD pControlType)
+{
+  switch (pControlType)
+  {
+    // Handle the CTRL-C signal. 
+  case CTRL_C_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-C event : Exiting process");
+    return FALSE;
+
+  case CTRL_CLOSE_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Close event : Exiting process");
+    return FALSE;
+
+  case CTRL_BREAK_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Break event : Exiting process");
+    return FALSE;
+
+  case CTRL_LOGOFF_EVENT:
+    printf("Ctrl-Logoff event : Exiting process");
+    return FALSE;
+
+  case CTRL_SHUTDOWN_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : Exiting process");
+    return FALSE;
+
+  default:
+    LogMsg(DBG_INFO, "Unknown event \"%d\" : Exiting process", pControlType);
+    return FALSE;
   }
 }

@@ -5,3 +5,4 @@
 
 int ModeGenericSnifferStart(PSCANPARAMS pScanParams);
 void GenericSnifferCallback(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
+BOOL Sniffer_ControlHandler(DWORD pControlType);
