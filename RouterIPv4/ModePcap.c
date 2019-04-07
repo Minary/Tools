@@ -18,6 +18,7 @@
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;
+extern pcap_t *gPcapHandle;
 
 
 int InitializeParsePcapDumpFile()
@@ -82,7 +83,7 @@ int InitializeParsePcapDumpFile()
 
   // Start processing packets
   LogMsg(DBG_INFO, "CaptureIncomingPackets(): Pcap packet handling started ...");
-  while ((funcRetVal = pcap_next_ex((pcap_t*)gScanParams.PcapFileHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex(gPcapHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
@@ -92,9 +93,9 @@ int InitializeParsePcapDumpFile()
 
 END:
 
-  if (gScanParams.PcapFileHandle != NULL)
+  if (gPcapHandle != NULL)
   {
-    pcap_close(gScanParams.PcapFileHandle);
+    pcap_close(gPcapHandle);
   }
 
   return retVal;
@@ -107,7 +108,7 @@ BOOL OpenPcapFileHandle(PSCANPARAMS scanParams)
   BOOL retVal = FALSE;
   char errbuf[PCAP_ERRBUF_SIZE];
 
-  if ((scanParams->PcapFileHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
+  if ((gPcapHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
   {
     fprintf(stderr, "Unable to open the file %s.\nerror=%s\n", gScanParams.PcapFilePath, errbuf);
     retVal = FALSE;

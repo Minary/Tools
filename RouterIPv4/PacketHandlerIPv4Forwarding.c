@@ -19,7 +19,7 @@
 // Global/external variables
 extern PSYSNODE gTargetSystemsList;
 extern PRULENODE gFwRulesList;
-pcap_t *gPcapHandle;
+extern pcap_t *gPcapHandle;
 
 
 
