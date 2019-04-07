@@ -65,5 +65,5 @@ typedef struct SCANPARAMS
  */
 void PrintUsage(char *pAppName);
 int ParseDnsPoisoningConfigFile(char *configFileParam);
-BOOL RouterIPv4_ControlHandler(DWORD pControlType);
 void Stringify(unsigned char *inputParam, int inputLenthParam, unsigned char *outputParam);
+BOOL RouterIPv4_ControlHandler(DWORD pControlType);

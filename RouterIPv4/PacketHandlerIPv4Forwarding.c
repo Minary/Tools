@@ -16,14 +16,17 @@
 #define MAX_INJECT_RETRIES 4
 
 
+// Global/external variables
 extern PSYSNODE gTargetSystemsList;
 extern PRULENODE gFwRulesList;
+pcap_t *gPcapHandle;
+
 
 
 /*
-* Receive, parse, resend
-*
-*/
+ * Receive, parse, resend
+ *
+ */
 DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
 {
   char filter[MAX_BUF_SIZE + 1];
@@ -37,6 +40,10 @@ DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
   int funcRetVal = 0;
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
+
+
+  // Set exit function to trigger depoisoning functions and command.
+  SetConsoleCtrlHandler((PHANDLER_ROUTINE)RouterIPv4_ControlHandler, TRUE);
 
   ZeroMemory(pcapErrorBuffer, sizeof(pcapErrorBuffer));
   ZeroMemory(&scanParams, sizeof(scanParams));
@@ -120,7 +127,7 @@ void PacketForwarding_handler(u_char *param, const struct pcap_pkthdr *pktHeader
   }
 
   ZeroMemory(&packetInfo, sizeof(packetInfo));
-  PrepareDataPacketStructure(data, &packetInfo);
+  PrepareDataPacketStructure(data,(PPACKET_INFO) &packetInfo);
   packetInfo.pcapDataLen = pktHeader->len;
 
 
@@ -214,11 +221,11 @@ BOOL ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 }
 
 
-void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo)
+void PrepareDataPacketStructure(const u_char *data, PPACKET_INFO packetInfo)
 {
   ZeroMemory(packetInfo, sizeof(PACKET_INFO));
 
-  packetInfo->pcapData = data;
+  packetInfo->pcapData = (u_char *)data;
   packetInfo->etherHdr = (PETHDR)data;
   packetInfo->ipHdr = (PIPHDR)(data + 14);
   packetInfo->ipHdrLen = (packetInfo->ipHdr->ver_ihl & 0xf) * 4;
@@ -273,4 +280,48 @@ BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dat
   }
 
   return retVal;
+}
+
+
+BOOL RouterIPv4_ControlHandler(DWORD pControlType)
+{
+  switch (pControlType)
+  {
+    // Handle the CTRL-C signal. 
+  case CTRL_C_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-C event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  case CTRL_CLOSE_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Close event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  case CTRL_BREAK_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Break event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  case CTRL_LOGOFF_EVENT:
+    printf("Ctrl-Logoff event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  case CTRL_SHUTDOWN_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  default:
+    LogMsg(DBG_INFO, "Unknown event \"%d\" : Exiting process", pControlType);
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+  }
 }

@@ -12,9 +12,9 @@
 #include "NetworkHelperFunctions.h"
 #include "PacketHandlerIPv4Forwarding.h"
 #include "RouterIPv4.h"
-// #include "PacketHandlerArpMitm.h"
 
 
+// GLobal/external variables
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;

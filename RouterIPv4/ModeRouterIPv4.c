@@ -1,8 +1,11 @@
-#include <Windows.h>
+#define HAVE_REMOTE
+
+#include <pcap.h>
 #include <stdio.h>
 #include <Shlwapi.h>
+#include <Windows.h>
 
-//#include "ArpPoisoning.h"
+#include "Config.h"
 #include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "Logging.h"
@@ -11,7 +14,7 @@
 #include "PacketHandlerIPv4Forwarding.h"
 #include "RouterIPv4.h"
 
-
+// Global variables
 extern int gDEBUGLEVEL;
 extern RULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
@@ -19,6 +22,7 @@ extern SCANPARAMS gScanParams;
 
 DWORD gRESENDThreadID = 0;
 HANDLE gRESENDThreadHandle = INVALID_HANDLE_VALUE;
+
 
 /*
  * All-in-one solution, target range
@@ -46,8 +50,6 @@ void InitializeRouterIPv4()
   MacBin2String(gScanParams.GatewayMacBin, gScanParams.GatewayMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.GatewayIpBin, gScanParams.GatewayIpStr, MAX_IP_LEN);
 
-  // Set exit function to trigger depoisoning functions and command.
-  SetConsoleCtrlHandler((PHANDLER_ROUTINE)RouterIPv4_ControlHandler, TRUE);
   if (gDEBUGLEVEL > DBG_INFO)
   {
     PrintConfig(gScanParams);
@@ -57,18 +59,16 @@ void InitializeRouterIPv4()
   AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
 
   // 1. Parse target file
-  if (!PathFileExists(FILE_HOST_TARGETS))
-  {
-    LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts file \"%s\"", FILE_HOST_TARGETS);
-    Sleep(1000);
-    goto END;
-  }
-
-  if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
+  if (PathFileExists(FILE_HOST_TARGETS) &&
+      ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
     LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts were defined");
     Sleep(1000);
     goto END;
+  }
+  else
+  {
+    LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts file \"%s\"", FILE_HOST_TARGETS);
   }
 
   PrintTargetSystems(gTargetSystemsList);
@@ -120,3 +120,6 @@ int UserIsAdmin()
 
   return retVal;
 }
+
+
+
