@@ -13,6 +13,11 @@
 #include "SniffAndEvaluate.h"
 
 
+// Global variables
+pcap_t *gPcapHandle;
+
+
+
 int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -48,7 +53,7 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
   }
 
   // Open interface.
-  if ((scanParamsParam->IfcReadHandle = pcap_open(adapter, 65536, PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
+  if ((gPcapHandle = pcap_open(adapter, 65536, PCAP_OPENFLAG_PROMISCUOUS, PCAP_READTIMEOUT, NULL, tempBuffer)) == NULL)
   {
     LogMsg(DBG_ERROR, "GeneralSniffer() : Unable to open the adapter \"%s\"", scanParamsParam->IfcName);
     retVal = 3;
@@ -73,14 +78,14 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
     snprintf(bpfFilter, sizeof(bpfFilter) - 1, "%s", scanParamsParam->PcapPattern);
   }
 
-  if (pcap_compile((pcap_t *)scanParamsParam->IfcReadHandle, &filterCode, bpfFilter, 1, netMask) < 0)
+  if (pcap_compile(gPcapHandle, &filterCode, bpfFilter, 1, netMask) < 0)
   {
     LogMsg(DBG_ERROR, "GeneralSniffer() : Unable to compile the packet filter");
     retVal = 4;
     goto END;
   }
 
-  if (pcap_setfilter((pcap_t *)scanParamsParam->IfcReadHandle, &filterCode) < 0)
+  if (pcap_setfilter(gPcapHandle, &filterCode) < 0)
   {
     LogMsg(DBG_ERROR, "GeneralSniffer() : Error setting the filter.");
     retVal = 5;
@@ -92,7 +97,7 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
 
   LogMsg(DBG_INFO, "GeneralSniffer() : General scanner started. Waiting for \"%s\" data on device \"%s\"", bpfFilter, adapter);
   // Start intercepting data packets.
-  pcap_loop((pcap_t *)scanParamsParam->IfcReadHandle, 0, (pcap_handler)GenericSnifferCallback, (unsigned char *)scanParamsParam);
+  pcap_loop(gPcapHandle, 0, (pcap_handler)GenericSnifferCallback, (unsigned char *)scanParamsParam);
   LogMsg(DBG_INFO, "GeneralSniffer() : General scanner stopped");
 
 END:
@@ -250,26 +255,38 @@ BOOL Sniffer_ControlHandler(DWORD pControlType)
     // Handle the CTRL-C signal. 
   case CTRL_C_EVENT:
     LogMsg(DBG_INFO, "Ctrl-C event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   case CTRL_CLOSE_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Close event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-Close event : pcap closed");
     return FALSE;
 
   case CTRL_BREAK_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Break event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-Break event : pcap closed");
     return FALSE;
 
   case CTRL_LOGOFF_EVENT:
     printf("Ctrl-Logoff event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    printf("Ctrl-Logoff event : pcap closed");
     return FALSE;
 
   case CTRL_SHUTDOWN_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Shutdown event : Exiting process");
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : pcap closed", pControlType);
     return FALSE;
 
   default:
     LogMsg(DBG_INFO, "Unknown event \"%d\" : Exiting process", pControlType);
+    pcap_breakloop(gPcapHandle);
+    LogMsg(DBG_INFO, "Unknown event \"%d\" : pcap closed", pControlType);
     return FALSE;
   }
 }
