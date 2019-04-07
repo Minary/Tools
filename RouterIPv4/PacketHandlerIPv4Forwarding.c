@@ -19,8 +19,7 @@
 // Global/external variables
 extern PSYSNODE gTargetSystemsList;
 extern PRULENODE gFwRulesList;
-extern pcap_t *gPcapHandle;
-
+extern SCANPARAMS gScanParams;
 
 
 /*
@@ -36,7 +35,6 @@ DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
   int ifcNum = 0;
   struct bpf_program ifcCode;
   unsigned int netMask = 0;
-  SCANPARAMS scanParams;
   int funcRetVal = 0;
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
@@ -46,33 +44,33 @@ DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)RouterIPv4_ControlHandler, TRUE);
 
   ZeroMemory(pcapErrorBuffer, sizeof(pcapErrorBuffer));
-  ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, lpParam, sizeof(scanParams));
+  //ZeroMemory(&gScanParams, sizeof(gScanParams));
+  //CopyMemory(&gScanParams, lpParam, sizeof(gScanParams));
 
   // Open interface.
-  if ((scanParams.InterfaceReadHandle = pcap_open_live((char *)scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
+  if ((gScanParams.InterfaceReadHandle = pcap_open_live((char *)gScanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "PacketHandlerRouterIPv4(): Unable to open the adapter");
+    LogMsg(DBG_ERROR, "PacketHandlerRouterIPv4(): Unable to open the adapter \"%s\"", gScanParams.InterfaceName);
     retVal = 5;
     goto END;
   }
 
   // MAC == LocalMAC and (IP == GWIP or IP == VictimIP
-  scanParams.InterfaceWriteHandle = scanParams.InterfaceReadHandle;
+  gScanParams.InterfaceWriteHandle = gScanParams.InterfaceReadHandle;
   ZeroMemory(&ifcCode, sizeof(ifcCode));
   ZeroMemory(filter, sizeof(filter));
 
-  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && not src host %s && not dst host %s && not port 53", scanParams.LocalMacStr, scanParams.LocalIpStr, scanParams.LocalIpStr);
+  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && not src host %s && not dst host %s && not port 53", gScanParams.LocalMacStr, gScanParams.LocalIpStr, gScanParams.LocalIpStr);
   netMask = 0xffffff; // "255.255.255.0"
 
-  if (pcap_compile((pcap_t *)scanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
+  if (pcap_compile((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
   {
     LogMsg(DBG_ERROR, "PacketHandlerRouterIPv4(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
-  if (pcap_setfilter((pcap_t *)scanParams.InterfaceWriteHandle, &ifcCode) < 0)
+  if (pcap_setfilter((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode) < 0)
   {
     LogMsg(DBG_ERROR, "PacketHandlerRouterIPv4(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
@@ -81,17 +79,17 @@ DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
 
 LogMsg(DBG_INFO, "PacketHandlerRouterIPv4(): BPF filter: %s", filter);
   LogMsg(DBG_INFO, "PacketHandlerRouterIPv4(): Enter listening/forwarding loop.");
-  while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex((pcap_t*)gScanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
-      PacketForwarding_handler((unsigned char *)&scanParams, packetHeader, packetData);
+      PacketForwarding_handler((unsigned char *)&gScanParams, packetHeader, packetData);
     }
   }
 
   if (funcRetVal < 0)
   {
-    char *errorMsg = pcap_geterr(scanParams.InterfaceWriteHandle);
+    char *errorMsg = pcap_geterr(gScanParams.InterfaceWriteHandle);
     LogMsg(DBG_ERROR, "PacketHandlerRouterIPv4(): Listener stopped unexpectedly with return value: %d, %s", funcRetVal, errorMsg);
   }
   else
@@ -290,38 +288,57 @@ BOOL RouterIPv4_ControlHandler(DWORD pControlType)
     // Handle the CTRL-C signal. 
   case CTRL_C_EVENT:
     LogMsg(DBG_INFO, "Ctrl-C event : Exiting process");
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   case CTRL_CLOSE_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Close event : Exiting process");
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   case CTRL_BREAK_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Break event : Exiting process");
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   case CTRL_LOGOFF_EVENT:
     printf("Ctrl-Logoff event : Exiting process");
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   case CTRL_SHUTDOWN_EVENT:
     LogMsg(DBG_INFO, "Ctrl-Shutdown event : Exiting process");
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
 
   default:
     LogMsg(DBG_INFO, "Unknown event \"%d\" : Exiting process", pControlType);
-    pcap_breakloop(gPcapHandle);
+    CloseAllPcapHandles();
     LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
     return FALSE;
+  }
+}
+
+
+void CloseAllPcapHandles()
+{
+  if (gScanParams.PcapFileHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.PcapFileHandle);
+  }
+
+  if (gScanParams.InterfaceWriteHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceWriteHandle);
+  }
+
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceReadHandle);
   }
 }

@@ -107,7 +107,7 @@ BOOL OpenPcapFileHandle(PSCANPARAMS scanParams)
   BOOL retVal = FALSE;
   char errbuf[PCAP_ERRBUF_SIZE];
 
-  if ((scanParams->PcapFileHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
+  if ((gScanParams.PcapFileHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
   {
     fprintf(stderr, "Unable to open the file %s.\nerror=%s\n", gScanParams.PcapFilePath, errbuf);
     retVal = FALSE;

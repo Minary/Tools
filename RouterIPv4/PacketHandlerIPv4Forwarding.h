@@ -40,3 +40,4 @@ BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessFirewalledData(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAMS scanParams);
+void CloseAllPcapHandles();

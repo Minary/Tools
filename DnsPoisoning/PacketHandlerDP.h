@@ -46,3 +46,5 @@ BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
 void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo);
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize);
 void DnsPoisoning_handler(u_char *param, const struct pcap_pkthdr *pktHeader, const u_char *data);
+BOOL DP_ControlHandler(DWORD pControlType);
+void CloseAllPcapHandles();

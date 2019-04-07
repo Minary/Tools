@@ -18,7 +18,6 @@
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;
-extern pcap_t *gPcapHandle;
 
 
 int InitializeParsePcapDumpFile()
@@ -50,16 +49,14 @@ int InitializeParsePcapDumpFile()
   AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
 
   // 1. Parse target file
-  if (!PathFileExists(FILE_HOST_TARGETS))
-  {
-    fprintf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
-    goto END;
-  }
-
-  if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
+  if (PathFileExists(FILE_HOST_TARGETS) &&
+      ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
     fprintf(stderr, "No target hosts were defined!\n");
-    goto END;
+  }
+  else
+  {
+    fprintf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
   }
 
   PrintTargetSystems(gTargetSystemsList);
@@ -83,7 +80,7 @@ int InitializeParsePcapDumpFile()
 
   // Start processing packets
   LogMsg(DBG_INFO, "CaptureIncomingPackets(): Pcap packet handling started ...");
-  while ((funcRetVal = pcap_next_ex(gPcapHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex(gScanParams.PcapFileHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
@@ -93,9 +90,9 @@ int InitializeParsePcapDumpFile()
 
 END:
 
-  if (gPcapHandle != NULL)
+  if (gScanParams.PcapFileHandle != NULL)
   {
-    pcap_close(gPcapHandle);
+    pcap_close(gScanParams.PcapFileHandle);
   }
 
   return retVal;
@@ -108,7 +105,7 @@ BOOL OpenPcapFileHandle(PSCANPARAMS scanParams)
   BOOL retVal = FALSE;
   char errbuf[PCAP_ERRBUF_SIZE];
 
-  if ((gPcapHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
+  if ((gScanParams.PcapFileHandle = pcap_open_offline(gScanParams.PcapFilePath, errbuf)) == NULL)
   {
     fprintf(stderr, "Unable to open the file %s.\nerror=%s\n", gScanParams.PcapFilePath, errbuf);
     retVal = FALSE;
@@ -140,7 +137,7 @@ BOOL OpenPcapInterfaceHandle(PSCANPARAMS scanParams)
   // Open interface.
   if ((scanParams->InterfaceReadHandle = pcap_open_live((char *)scanParams->InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "OpenPcapInterfaceHandle(): Unable to open the adapter");
+    LogMsg(DBG_ERROR, "OpenPcapInterfaceHandle(): Unable to open the adapter \"%s\"", scanParams->InterfaceName);
     retVal = FALSE;
     goto END;
   }

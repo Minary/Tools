@@ -1,22 +1,24 @@
-#include <Windows.h>
+#define HAVE_REMOTE
+
+#include <pcap.h>
 #include <stdio.h>
 #include <Shlwapi.h>
+#include <Windows.h>
 
 #include "APE.h"
 #include "ArpPoisoning.h"
 #include "LinkedListTargetSystems.h"
 #include "LinkedListFirewallRules.h"
 #include "Logging.h"
+#include "ModeArpMitm.h"
 #include "NetworkHelperFunctions.h"
 
 
+// External/global variables
 extern int gDEBUGLEVEL;
 extern RULENODE gFwRulesList;
 extern PSYSNODE gTargetSystemsList;
 extern SCANPARAMS gScanParams;
-
-DWORD gPOISONINGThreadID = 0;
-HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
 
 /*
  * All-in-one solution, target range
@@ -37,17 +39,17 @@ void InitializeArpMitm()
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
-  LogMsg(2, "InitializeArpMitm(): -x %s\n", gScanParams.InterfaceName);
-  
+  LogMsg(2, "InitializeArpMitm(): -x %s\n", gScanParams.InterfaceName);  
+
+  // Set exit function to trigger depoisoning functions and command.
+  SetConsoleCtrlHandler((PHANDLER_ROUTINE)APE_ControlHandler, TRUE);
+
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
   MacBin2String(gScanParams.LocalMacBin, gScanParams.LocalMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.LocalIpBin, gScanParams.LocalIpStr, MAX_IP_LEN);
   MacBin2String(gScanParams.GatewayMacBin, gScanParams.GatewayMacStr, MAX_MAC_LEN);
   IpBin2String(gScanParams.GatewayIpBin, gScanParams.GatewayIpStr, MAX_IP_LEN);
-
-  // Set exit function to trigger depoisoning functions and command.
-  SetConsoleCtrlHandler((PHANDLER_ROUTINE)APE_ControlHandler, TRUE);
 
   // Set GW IP static.
   SetMacStatic((char *)gScanParams.InterfaceAlias, (char *)gScanParams.GatewayIpStr, (char *)gScanParams.GatewayMacStr);
@@ -121,4 +123,73 @@ int UserIsAdmin()
   }
 
   return retVal;
+}
+
+
+
+BOOL APE_ControlHandler(DWORD pControlType)
+{
+  switch (pControlType)
+  {
+    // Handle the CTRL-C signal. 
+  case CTRL_C_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-C event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    StartUnpoisoningProcess();
+    return FALSE;
+
+  case CTRL_CLOSE_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Close event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Close event : pcap closed");
+    return FALSE;
+
+  case CTRL_BREAK_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Break event : Starting depoisoning process");
+    StartUnpoisoningProcess();
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Break event : pcap closed");
+    return FALSE;
+
+  case CTRL_LOGOFF_EVENT:
+    printf("Ctrl-Logoff event : Starting depoisoning process");
+    StartUnpoisoningProcess();
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Logoff event : pcap closed");
+    return FALSE;
+
+  case CTRL_SHUTDOWN_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : Starting depoisoning process");
+    StartUnpoisoningProcess();
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-SHutdown event : pcap closed");
+    return FALSE;
+
+  default:
+    LogMsg(DBG_INFO, "Unknown event \"%d\" : Starting depoisoning process", pControlType);
+    StartUnpoisoningProcess();
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Unknown event : pcap closed");
+    return FALSE;
+  }
+}
+
+
+void CloseAllPcapHandles()
+{
+  if (gScanParams.PcapFileHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.PcapFileHandle);
+  }
+
+  if (gScanParams.InterfaceWriteHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceWriteHandle);
+  }
+
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceReadHandle);
+  }
 }

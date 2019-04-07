@@ -13,6 +13,7 @@
 #include "NetworkHelperFunctions.h"
 
 
+// Global/external variables
 extern int gDEBUGLEVEL;
 extern PSYSNODE gTargetSystemsList;
 

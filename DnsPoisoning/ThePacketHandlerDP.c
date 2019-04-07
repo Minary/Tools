@@ -11,8 +11,9 @@
 
 #define MAX_INJECT_RETRIES 4
 
+// Global/external variables
 extern PSYSNODE gTargetSystemsList;
-
+extern SCANPARAMS gScanParams;
 
 
 /*
@@ -28,17 +29,16 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   int ifcNum = 0;
   struct bpf_program ifcCode;
   unsigned int netMask = 0;
-  SCANPARAMS scanParams;
   int funcRetVal = 0;
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
 
-  ZeroMemory(pcapErrorBuffer, sizeof(pcapErrorBuffer));
-  ZeroMemory(&scanParams, sizeof(scanParams));
-  CopyMemory(&scanParams, lpParam, sizeof(scanParams));
+
+  // Set exit function to trigger depoisoning functions and command.
+  SetConsoleCtrlHandler((PHANDLER_ROUTINE)DP_ControlHandler, TRUE);
 
   // Open interface.
-  if ((scanParams.InterfaceReadHandle = pcap_open_live((char *)scanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
+  if ((gScanParams.InterfaceReadHandle = pcap_open_live((char *)gScanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
     LogMsg(DBG_ERROR, "PacketHandler(): Unable to open the adapter");
     retVal = 5;
@@ -46,23 +46,23 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   }
 
   // MAC == LocalMAC and (IP == GWIP or IP == VictimIP
-  scanParams.InterfaceWriteHandle = scanParams.InterfaceReadHandle;
+  gScanParams.InterfaceWriteHandle = gScanParams.InterfaceReadHandle;
   ZeroMemory(&ifcCode, sizeof(ifcCode));
   ZeroMemory(filter, sizeof(filter));
 
-  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && port 53 && not src host %s && not dst host %s", scanParams.LocalMacStr, scanParams.LocalIpStr, scanParams.LocalIpStr);
+  _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && port 53 && not src host %s && not dst host %s", gScanParams.LocalMacStr, gScanParams.LocalIpStr, gScanParams.LocalIpStr);
   netMask = 0xffffff; // "255.255.255.0"
   netMask = 0xffff; // "255.255.0.0"
   LogMsg(DBG_INFO, "PacketHandler(): Filte: %s", filter);
 
-  if (pcap_compile((pcap_t *)scanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
+  if (pcap_compile((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
   {
     LogMsg(DBG_ERROR, "PacketHandler(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
-  if (pcap_setfilter((pcap_t *)scanParams.InterfaceWriteHandle, &ifcCode) < 0)
+  if (pcap_setfilter((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode) < 0)
   {
     LogMsg(DBG_ERROR, "PacketHandler(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
@@ -70,17 +70,17 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   }
 
   LogMsg(DBG_INFO, "PacketHandler(): Enter listening/forwarding loop.");
-  while ((funcRetVal = pcap_next_ex((pcap_t*)scanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
+  while ((funcRetVal = pcap_next_ex((pcap_t*)gScanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
     {
-      DnsPoisoning_handler((unsigned char *)&scanParams, packetHeader, packetData);
+      DnsPoisoning_handler((unsigned char *)&gScanParams, packetHeader, packetData);
     }
   }
 
   if (funcRetVal < 0)
   {
-    char *errorMsg = pcap_geterr(scanParams.InterfaceWriteHandle);
+    char *errorMsg = pcap_geterr(gScanParams.InterfaceWriteHandle);
     LogMsg(DBG_ERROR, "PacketHandler(): Listener stopped unexpectedly with return value: %d, %s", funcRetVal, errorMsg);
   }
   else
@@ -305,4 +305,68 @@ BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dat
   }
 
   return retVal;
+}
+
+
+
+BOOL DP_ControlHandler(DWORD pControlType)
+{
+  switch (pControlType)
+  {
+    // Handle the CTRL-C signal. 
+  case CTRL_C_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-C event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-C event : pcap closed");
+    return FALSE;
+
+  case CTRL_CLOSE_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Close event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Close event : pcap closed");
+    return FALSE;
+
+  case CTRL_BREAK_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Break event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Break event : pcap closed");
+    return FALSE;
+
+  case CTRL_LOGOFF_EVENT:
+    printf("Ctrl-Logoff event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Logoff event : pcap closed");
+    return FALSE;
+
+  case CTRL_SHUTDOWN_EVENT:
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : Starting depoisoning process");
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Ctrl-Shutdown event : pcap closed");
+    return FALSE;
+
+  default:
+    LogMsg(DBG_INFO, "Unknown event \"%d\" : Starting depoisoning process", pControlType);
+    CloseAllPcapHandles();
+    LogMsg(DBG_INFO, "Unknown event : pcap closed");
+    return FALSE;
+  }
+}
+
+
+void CloseAllPcapHandles()
+{
+  if (gScanParams.PcapFileHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.PcapFileHandle);
+  }
+
+  if (gScanParams.InterfaceWriteHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceWriteHandle);
+  }
+
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_breakloop(gScanParams.InterfaceReadHandle);
+  }
 }

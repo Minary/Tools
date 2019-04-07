@@ -38,7 +38,6 @@ typedef struct SCANPARAMS
   HANDLE PipeHandle;
   void *InterfaceReadHandle;  // HACK! because of header hell :/ Anyone?
   void *InterfaceWriteHandle; // HACK! because of header hell :/ Anyone?
-
   void *PcapFileHandle; // HACK! because of header hell :/ Anyone?
 } SCANPARAMS, *PSCANPARAMS;
 
