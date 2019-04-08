@@ -113,6 +113,33 @@
       }
     }
 
+
+    /// <summary>
+    /// Send HTTP Redirect location to the client system.
+    /// </summary>
+    /// <param name="requestObj"></param>
+    /// <param name="redirectLocation"></param>
+    public void SendRedirect2Client(RequestObj requestObj, string redirectLocation)
+    {
+      var newLine = requestObj.ClientRequestObj.RequestLine.NewlineString;
+      var dateTimeNow = String.Format("{0:r}", DateTime.Now);
+      var data = $"<html>{newLine}" +
+                 $"<head>{newLine}" +
+                 $"<title> 302 Found </title>{newLine}" +
+                 $"</head><body>{newLine}" +
+                 $"<h1> Found</ h1 >{newLine}" +
+                 $"<p> The document has moved <a href=\"{redirectLocation}\"> here </ a >.</ p >{newLine}" +
+                 $"</body></html>{newLine}";
+      var redirectCode = $"HTTP/307 Temporary Redirect{newLine}" + 
+                         $"Server: nginx{newLine}" +
+                         $"Connection: close{newLine}" +
+                         $"Content-Type: text/html{newLine}" +
+                         $"Content-Length: {data.Length}{newLine}" +
+                         $"Date: {dateTimeNow}{newLine}{newLine}";
+      requestObj.ClientRequestObj.ClientBinaryWriter.Write(Encoding.ASCII.GetBytes(redirectCode), 0, redirectCode.Length);
+
+    }
+
     #endregion
 
 

@@ -116,14 +116,26 @@
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.ProcessClientRequest(ObjectDisposedException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, odex.Message, odex.StackTrace);
           break;
         }
-        catch (SocketException sex)
+        catch (SocketException sex) when (sex.SocketErrorCode == SocketError.HostNotFound)
+        {
+          var redirectLocation = "http://www.test.ch/";
+          ClientNotificationException cnex = new ClientNotificationException();
+          cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
+          this.clientErrorHandler.SendRedirect2Client(this.requestObj, redirectLocation);
+
+          var innerException = sex.InnerException?.Message ?? "No inner exception found";
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\nHost \"{2}\" not found", innerException, sex.Message, requestObj.ClientRequestObj.Host);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, $"HttpReverseProxy.ProcessClientRequest(SocketException): Redirecting to {redirectLocation}");
+          break;
+        }
+        catch (SocketException sex) 
         {
           ClientNotificationException cnex = new ClientNotificationException();
           cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
           this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           var innerException = sex.InnerException?.Message ?? "No inner exception found";
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);          
           break;
         }
         catch (Exception ex)
