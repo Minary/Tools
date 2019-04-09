@@ -118,7 +118,7 @@
         }
         catch (SocketException sex) when (sex.SocketErrorCode == SocketError.HostNotFound)
         {
-          var redirectLocation = "http://www.test.ch/";
+          var redirectLocation = $"http://{Config.DefaultRemoteHost}/";
           ClientNotificationException cnex = new ClientNotificationException();
           cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
           this.clientErrorHandler.SendRedirect2Client(this.requestObj, redirectLocation);

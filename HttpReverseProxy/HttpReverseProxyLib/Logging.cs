@@ -37,7 +37,8 @@
 
     public void LogMessage(string requestId, ProxyProtocol proxyProtocol, Loglevel logLevel, string message, params object[] messageParams)
     {
-      if (string.IsNullOrEmpty(message) || string.IsNullOrWhiteSpace(message))
+      if (string.IsNullOrEmpty(message) || 
+          string.IsNullOrWhiteSpace(message))
       {
         return;
       }
@@ -56,7 +57,8 @@
       {
         // Prepare log message
         var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        if (messageParams != null && messageParams.Length > 0)
+        if (messageParams != null && 
+            messageParams.Length > 0)
         {
           message = string.Format(message, messageParams);
         }
