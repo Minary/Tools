@@ -28,6 +28,8 @@
 
     public static Loglevel CurrentLoglevel { get; set; } = Loglevel.Info;
 
+    public static int ClientReadTimetout { get; private set; } = 3000; // Milliseconds
+
     #endregion
 
 

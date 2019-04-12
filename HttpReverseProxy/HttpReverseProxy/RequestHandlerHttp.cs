@@ -160,7 +160,7 @@
         }
         else
         {
-          this.requestObj.ClientRequestObj.ClientBinaryReader.BaseStream.ReadTimeout = 3000;
+          this.requestObj.ClientRequestObj.ClientBinaryReader.BaseStream.ReadTimeout = Config.ClientReadTimetout;
         }
         
         // Reinitialize request object.
