@@ -118,8 +118,6 @@ DWORD ArpPoisoningLoop(PSCANPARAMS scanParamsParam)
 
 
 
-
-
 /*
  * Ethr:	LocalMAC -> VicMAC
  * ARP :	LocMAC/GW-IP -> VicMAC/VicIP
@@ -137,7 +135,8 @@ BOOL SendArpPoison(PSCANPARAMS scanParamsParam, unsigned char victimMacBinParam[
   char gatewayMacStr[MAX_BUF_SIZE + 1];
 
 
-  if (scanParamsParam == NULL || scanParamsParam->InterfaceWriteHandle == NULL)
+  if (scanParamsParam == NULL ||
+      scanParamsParam->InterfaceWriteHandle == NULL)
   {
     retVal = FALSE;
     goto END;
