@@ -67,6 +67,7 @@
     <Compile Include="DataTypes\Class\Server\ServerResponse.cs" />
     <Compile Include="DataTypes\Class\SniffedDataChunk.cs" />
     <Compile Include="Exceptions\ClientNotificationException.cs" />
+    <Compile Include="Exceptions\EmptyRequestException.cs" />
     <Compile Include="Exceptions\ProxyErrorException.cs" />
     <Compile Include="Exceptions\ProxyWarningException.cs" />
     <Compile Include="IncomingClientRequest.cs" />

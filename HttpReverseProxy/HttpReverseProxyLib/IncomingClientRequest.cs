@@ -33,14 +33,25 @@
 
     public void ReceiveClientRequestLine(RequestObj requestObj)
     {
-      // 1. Read client HTTP request line (the GET/POST/PUT/... line)
+      // Read client HTTP request line (the GET/POST/PUT/... line)
       requestObj.ClientRequestObj.RequestLine = requestObj.ClientRequestObj.ClientBinaryReader.ReadClientRequestLine(false);
+
+      // If request line was empty throw a recoverable exception
+      // https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4
+      // In the interest of robustness, servers SHOULD ignore any empty line(s) received where a Request-Line is expected. 
+      // In other words, if the server is reading the protocol stream at the beginning of a message and receives a CRLF first, it should ignore the CRLF. 
+      if (string.IsNullOrEmpty(requestObj.ClientRequestObj.RequestLine.RequestLine) == true)
+      {
+        throw new EmptyRequestException($"{requestObj.SrcIp} sent empty request (RFC2616)");
+      }
+      
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.ReceiveClientRequestHeaders() : StatusLine={0}", requestObj.ClientRequestObj?.RequestLine?.RequestLine);
       Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, "IncomingClientRequest.ReceiveClientRequestHeaders() : NewlineType={0}", requestObj.ClientRequestObj?.RequestLine?.NewlineType);
             
       // 2. Parse and verify request line parameters
       this.ParseRequestString(requestObj);
     }
+
 
     /// <summary>
     ///

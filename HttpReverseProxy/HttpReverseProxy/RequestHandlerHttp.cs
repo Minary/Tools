@@ -86,6 +86,9 @@
 
           var innerException = cnex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
+Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, $"HONK: Source:{cnex.Source}, TargetSite.Name:{cnex.TargetSite.Name}");
+
+
           break;
         }
         catch (ProxyErrorException peex)
@@ -137,6 +140,11 @@
           var innerException = sex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, sex.Message, sex.StackTrace);          
           break;
+        }
+        catch (EmptyRequestException erex)
+        {
+          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(EmptyRequestException): Regular exception: {1}", erex.Message);
+         // break;
         }
         catch (Exception ex)
         {
@@ -329,7 +337,13 @@
 
     private bool CloseClientServerConnection()
     {
-      if (this.requestObj.ServerRequestHandler.ServerSocket.Connected == false)
+
+      if (this.requestObj.ServerRequestHandler == null)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.CloseClientServerConnection(): There is no valid server connection. Do nothing.");
+        return false;
+      }
+      else if (this.requestObj.ServerRequestHandler.ServerSocket.Connected == false)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.CloseClientServerConnection(): Server closed connection. Closing connection");
         return true;
