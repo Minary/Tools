@@ -48,8 +48,8 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
   tmpNode->isTail = FALSE;
 
   // Insert new record at the beginning of the list
-  tmpNode->next = (HOSTNODE *)*listHead;
-  ((PHOSTNODE)*listHead)->prev = (HOSTNODE *)tmpNode;
+  tmpNode->next = *listHead;
+  ((PHOSTNODE)*listHead)->prev = tmpNode;
   *listHead = tmpNode;
 
   LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/A record added: %s/%s", hostNameParam, spoofedIpParam);

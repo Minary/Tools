@@ -42,7 +42,7 @@ typedef struct
 
 
 PHOSTNODE InitHostsList();
-void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *pHostName, long ttlParam, unsigned char *pSpoofedIP);
+void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *pHostName, unsigned long ttlParam, unsigned char *pSpoofedIP);
 void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHost, unsigned char *spoofedIpParam);
 PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnameParam);
 void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead);

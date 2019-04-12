@@ -43,7 +43,7 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam);
 BOOL ProcessData2Internet(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams);
 BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAMS scanParams);
-void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo);
+void PrepareDataPacketStructure(const u_char *data, PPACKET_INFO packetInfo);
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize);
 void DnsPoisoning_handler(u_char *param, const struct pcap_pkthdr *pktHeader, const u_char *data);
 BOOL DP_ControlHandler(DWORD pControlType);

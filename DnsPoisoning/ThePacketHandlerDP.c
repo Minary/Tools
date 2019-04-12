@@ -18,6 +18,7 @@
 // Global/external variables
 extern PSYSNODE gTargetSystemsList;
 extern SCANPARAMS gScanParams;
+extern PHOSTNODE gDnsSpoofingList;
 
 
 /*
@@ -134,7 +135,7 @@ void DnsPoisoning_handler(u_char *param, const struct pcap_pkthdr *pktHeader, co
   // Determine Hostname to resolve
   if ((packetInfo.dstPort == 53 || packetInfo.srcPort == 53) &&
       packetInfo.udpHdr != NULL &&
-      GetHostnameFromPcapDnsPacket(data, hostName, 512) == FALSE)
+      GetHostnameFromPcapDnsPacket((u_char *)data, hostName, 512) == FALSE)
   {
     strcpy(hostName, "UNKNOWN");
   }
@@ -214,7 +215,7 @@ BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   // When user receives DNS response, send back
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
-    (poisoningData = (PPOISONING_DATA)DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+    (poisoningData = DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
 
     LogMsg(DBG_DEBUG, "Response DNS poisoning *2C succeeded : %s/%s -> %s", poisoningData->HostnodeToSpoof->Data.HostName, poisoningData->HostnodeToSpoof->Data.HostNameWithWildcard, poisoningData->HostnodeToSpoof->Data.SpoofedIp);
@@ -230,14 +231,14 @@ BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
 
 BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
 {
-  PHOSTNODE tmpNode = NULL;
+  PPOISONING_DATA tmpNode = NULL;
 
   // When user sends DNS request to the gateway, send back
   // a spoofed answer packet.
   if (packetInfo->udpHdr != NULL &&
-      (tmpNode = (PHOSTNODE)DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
+      (tmpNode = DnsRequestPoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-    LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s/%s -> %s/%s", tmpNode->Data.HostName, tmpNode->Data.HostNameWithWildcard, tmpNode->Data.SpoofedIp, tmpNode->Data.CnameHost);
+    LogMsg(DBG_DEBUG, "Request DNS poisoning C2GW succeeded : %s/%s -> %s/%s", tmpNode->HostnodeToSpoof->Data.HostName, tmpNode->HostnodeToSpoof->Data.HostNameWithWildcard, tmpNode->HostnodeToSpoof->Data.SpoofedIp, tmpNode->HostnodeToSpoof->Data.CnameHost);
     return  DnsRequestSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, tmpNode, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
   }
 
@@ -245,16 +246,17 @@ BOOL ProcessData2GW(PPACKET_INFO packetInfo, PSCANPARAMS scanParams)
   CopyMemory(packetInfo->etherHdr->ether_shost, scanParams->LocalMacBin, BIN_MAC_LEN);
   LogMsg(DBG_INFO, packetInfo->logMsg, "GW", "OH NOOOOO!!!");
 
+  HeapFree(GetProcessHeap(), 0, tmpNode);
   return SendPacket(MAX_INJECT_RETRIES, scanParams->InterfaceWriteHandle, packetInfo->pcapData, packetInfo->pcapDataLen);
 }
 
 
 
-void PrepareDataPacketStructure(u_char *data, PPACKET_INFO packetInfo)
+void PrepareDataPacketStructure(const u_char *data, PPACKET_INFO packetInfo)
 {
   ZeroMemory(packetInfo, sizeof(PACKET_INFO));
 
-  packetInfo->pcapData = data;
+  packetInfo->pcapData = (u_char*)data;
   packetInfo->etherHdr = (PETHDR)data;
   packetInfo->ipHdr = (PIPHDR)(data + 14);
   packetInfo->ipHdrLen = (packetInfo->ipHdr->ver_ihl & 0xf) * 4;

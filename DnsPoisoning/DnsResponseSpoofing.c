@@ -174,7 +174,7 @@ void FixNetworkLayerData4Response(unsigned char * data, PRAW_DNS_DATA responseDa
 }
 
 
-PPOISONING_DATA *DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
+PPOISONING_DATA DnsResponsePoisonerGetHost2Spoof(u_char *dataParam)
 {
   PETHDR ethrHdr = (PETHDR)dataParam;
   PIPHDR ipHdr = NULL;

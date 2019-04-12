@@ -12,9 +12,11 @@
 #include "NetworkHelperFunctions.h"
 
 
+// Extern/global variables
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;
+extern PHOSTNODE gDnsSpoofingList;
 
 DWORD gPOISONINGThreadID = 0;
 HANDLE gPOISONINGThreadHandle = INVALID_HANDLE_VALUE;
