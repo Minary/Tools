@@ -51,7 +51,7 @@ void InitializeDP()
     PrintConfig(gScanParams);
   }
 
-  // 1. Parse target file
+  //  Parse target file
   if (!PathFileExists(FILE_HOST_TARGETS))
   {
     printf("No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
@@ -73,15 +73,11 @@ void InitializeDP()
   }
 
   PrintTargetSystems(gTargetSystemsList);
+  PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
 
-  // 1. Start Ethernet FORWARDING thread
+  // Start Ethernet FORWARDING thread
   PacketHandlerDP(&gScanParams);
-
-  // MARKER : CORRECT THREAD SHUTDOWN!!
-  printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");
-
-END:
-
+  
   return;
 }
 

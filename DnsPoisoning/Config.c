@@ -7,6 +7,7 @@
 #include "NetworkHelperFunctions.h"
 
 
+// External/Global variables
 extern PHOSTNODE gDnsSpoofingList;
 extern PSYSNODE gTargetSystemsList;
 

@@ -80,7 +80,8 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   snprintf(tmpBuf, sizeof(tmpBuf) - 1, "%s", asctime(newTime));
 
   // Remove trailing LF/CR
-  while (tmpBuf[strlen(tmpBuf) - 1] == '\r' || tmpBuf[strlen(tmpBuf) - 1] == '\n')
+  while (tmpBuf[strlen(tmpBuf) - 1] == '\r' || 
+         tmpBuf[strlen(tmpBuf) - 1] == '\n')
   {
     tmpBuf[strlen(tmpBuf) - 1] = '\0';
   }

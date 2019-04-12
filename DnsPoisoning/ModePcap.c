@@ -4,13 +4,14 @@
 #include <Shlwapi.h>
 #include <windows.h>
 
+#include "Config.h"
 #include "DnsPoisoning.h"
 #include "LinkedListSpoofedDnsHosts.h"
 #include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "ModePcap.h"
 #include "NetworkHelperFunctions.h"
-
+#include "PackethandlerDP.h"
 
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
@@ -63,7 +64,6 @@ int InitializeParsePcapDumpFile()
   }
 
   PrintTargetSystems(gTargetSystemsList);
-
   LogMsg(DBG_INFO, "InitializeParsePcapDumpFile(1): -f interface=%s, pcapFile=%s", gScanParams.InterfaceName, gScanParams.PcapFilePath);
 
   // Open Pcap input file

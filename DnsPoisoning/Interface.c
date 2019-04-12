@@ -10,11 +10,8 @@
 #include <stdarg.h>
 
 #include "DnsPoisoning.h"
-//#include "LinkedListTargetSystems.h"
 #include "Logging.h"
 #include "NetworkHelperFunctions.h"
-//#include "PacketProxy.h"
-
 
 
 /*

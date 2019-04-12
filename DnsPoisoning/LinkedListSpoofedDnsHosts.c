@@ -37,6 +37,7 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
   CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
   tmpNode->Data.TTL = ttlParam;
   CopyMemory(tmpNode->Data.SpoofedIp, spoofedIpParam, sizeof(tmpNode->Data.SpoofedIp) - 1);
+  
   if (tmpNode->Data.HostName[0] == '*')
   {
     FillInWildcardHostname(tmpNode);
@@ -132,7 +133,6 @@ END:
 }
 
 
-
 void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
 {
   PHOSTNODE listPos;
@@ -153,8 +153,6 @@ void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
     }
   }
 }
-
-
 
 
 void FillInWildcardHostname(PHOSTNODE tmpNode)

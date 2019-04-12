@@ -3,10 +3,14 @@
 #include <pcap.h>
 #include <stdio.h>
 
+#include "DnsHelper.h"
 #include "DnsPoisoning.h"
 #include "DnsRequestSpoofing.h"
+#include "DnsResponseSpoofing.h"
 #include "LinkedListTargetSystems.h"
 #include "Logging.h"
+#include "ModePcap.h"
+#include "NetworkHelperFunctions.h"
 #include "PacketHandlerDP.h"
 
 #define MAX_INJECT_RETRIES 4
@@ -53,7 +57,7 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && port 53 && not src host %s && not dst host %s", gScanParams.LocalMacStr, gScanParams.LocalIpStr, gScanParams.LocalIpStr);
   netMask = 0xffffff; // "255.255.255.0"
   netMask = 0xffff; // "255.255.0.0"
-  LogMsg(DBG_INFO, "PacketHandler(): Filte: %s", filter);
+  LogMsg(DBG_INFO, "PacketHandler(): Filter=%s", filter);
 
   if (pcap_compile((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
   {
