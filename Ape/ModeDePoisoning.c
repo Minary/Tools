@@ -271,6 +271,16 @@ END:
     pcap_close(interfaceHandle);
   }
 
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_close(gScanParams.InterfaceReadHandle);
+  }
+
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_close(gScanParams.InterfaceReadHandle);
+  }
+
   LogMsg(DBG_LOW, "ArpDepoisoning(): exit");
 
   return retVal;

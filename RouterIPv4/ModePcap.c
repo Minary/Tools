@@ -95,6 +95,16 @@ END:
     pcap_close(gScanParams.PcapFileHandle);
   }
 
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_close(gScanParams.InterfaceReadHandle);
+  }
+
+  if (gScanParams.InterfaceReadHandle != NULL)
+  {
+    pcap_close(gScanParams.InterfaceReadHandle);
+  }
+
   return retVal;
 }
 

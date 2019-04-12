@@ -329,16 +329,25 @@ void CloseAllPcapHandles()
 {
   if (gScanParams.PcapFileHandle != NULL)
   {
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.PcapFileHandle");
     pcap_breakloop(gScanParams.PcapFileHandle);
+    pcap_close(gScanParams.PcapFileHandle);
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.PcapFileHandle done");
   }
 
   if (gScanParams.InterfaceWriteHandle != NULL)
   {
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.InterfaceWriteHandle");
     pcap_breakloop(gScanParams.InterfaceWriteHandle);
+    pcap_close(gScanParams.InterfaceWriteHandle);
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.InterfaceWriteHandle done");
   }
 
   if (gScanParams.InterfaceReadHandle != NULL)
   {
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.InterfaceReadHandle");
     pcap_breakloop(gScanParams.InterfaceReadHandle);
+    pcap_close(gScanParams.InterfaceReadHandle);
+    LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.InterfaceReadHandle done");
   }
 }
