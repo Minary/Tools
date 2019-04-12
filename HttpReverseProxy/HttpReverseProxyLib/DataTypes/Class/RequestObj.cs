@@ -38,7 +38,6 @@
     public bool IsServerKeepAlive { get; set; }
 
 
-
     public DataTransmissionMode ProxyDataTransmissionModeS2C { get; set; }
 
     public DataTransmissionMode ProxyDataTransmissionModeC2S { get; set; }
@@ -50,6 +49,9 @@
     public string Id { get; set; }
 
     public string HttpLogData { get; set; }
+
+    // Current exception
+    public Exception CurrentException { get; set; }
 
     #endregion
 

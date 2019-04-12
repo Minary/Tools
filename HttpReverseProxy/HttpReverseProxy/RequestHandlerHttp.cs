@@ -86,9 +86,6 @@
 
           var innerException = cnex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(ClientNotificationException): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, cnex.Message, cnex.StackTrace);
-Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, $"HONK: Source:{cnex.Source}, TargetSite.Name:{cnex.TargetSite.Name}");
-
-
           break;
         }
         catch (ProxyErrorException peex)
@@ -144,7 +141,7 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
         catch (EmptyRequestException erex)
         {
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(EmptyRequestException): Regular exception: {1}", erex.Message);
-         // break;
+          this.requestObj.CurrentException = erex;
         }
         catch (Exception ex)
         {
@@ -165,7 +162,7 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
         {
           this.requestObj.ClientRequestObj.ClientBinaryReader.BaseStream.ReadTimeout = 3000;
         }
-
+        
         // Reinitialize request object.
         this.requestObj.InitRequestValues();
       }
@@ -338,10 +335,15 @@ Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, L
     private bool CloseClientServerConnection()
     {
 
-      if (this.requestObj.ServerRequestHandler == null)
+      if (this.requestObj.CurrentException?.Message != null && this.requestObj.CurrentException.Message.ToLower().Contains("sent empty request") == true)
+      {
+        Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.CloseClientServerConnection(): Last request line was empty. Do nothing.");
+        return false;
+      }
+      else if (this.requestObj.ServerRequestHandler == null)
       {
         Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Debug, "HttpReverseProxy.CloseClientServerConnection(): There is no valid server connection. Do nothing.");
-        return false;
+        return true;
       }
       else if (this.requestObj.ServerRequestHandler.ServerSocket.Connected == false)
       {
