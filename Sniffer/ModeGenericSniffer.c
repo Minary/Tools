@@ -8,6 +8,7 @@
 #include "DnsStructs.h"
 #include "Logging.h"
 #include "ModeGenericSniffer.h"
+#include "ModeMinary.h"
 #include "NetworkFunctions.h"
 #include "Sniffer.h"
 #include "SniffAndEvaluate.h"
@@ -160,7 +161,6 @@ void GenericSnifferCallback(u_char *callbackParam, const struct pcap_pkthdr *hea
 
       if (ipHdrPtr->proto == 1)
       {
-printf("ICMP\t%s  %s\n\n", srcIpStr, dstIpStr);
 
       // TCP data packet
       }
@@ -172,7 +172,6 @@ printf("ICMP\t%s  %s\n\n", srcIpStr, dstIpStr);
         tcpHdrLength = tcpHdrPtr->doff * 4;
         tcpDataLength = totalLength - ipHdrLength - tcpHdrLength;
 
-//printf("TCP\t%s:%d  %s:%d ", srcIpStr, ntohs(tcpHdrPtr->sport), dstIpStr, ntohs(tcpHdrPtr->dport));
         if (tcpDataLength > 0)
         {
           strncpy((char *)data, (char *)tcpHdrPtr + tcpHdrLength, tcpDataLength);
@@ -183,45 +182,15 @@ printf("ICMP\t%s  %s\n\n", srcIpStr, dstIpStr);
           {
             ZeroMemory(tempBuffer, sizeof(tempBuffer));
             memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-////printf("\n\t%s", tempBuffer);
           }
 
           ZeroMemory(tempBuffer, sizeof(tempBuffer));
           memcpy((char *)tempBuffer, (char *)readlDataPtr + counter, 64);
-////printf("\n\t%s|", tempBuffer);
         }
-//printf("\n");
       }
       else if (ipHdrPtr->proto == IP_PROTO_UDP)
       {
         udpHdrPtr = (PUDPHDR)((u_char*)ipHdrPtr + ipLength);
-
-
-printf("UDP\t%s:%d  %s:%d\n", srcIpStr, ntohs(udpHdrPtr->sport), dstIpStr, ntohs(udpHdrPtr->dport));
-if (ntohs(udpHdrPtr->sport) == 53)
-{
-  char hostResBuffer[1024];
-  char *hostRes[20];
-  ZeroMemory(hostRes, sizeof(hostRes));
-  ZeroMemory(hostResBuffer, sizeof(hostResBuffer));
-
-  GetHostResolution(udpHdrPtr, hostRes);
-
-  for (int i = 0; i < 20 && hostRes[i] != NULL; i++)
-  {
-    strncat(hostResBuffer, hostRes[i], sizeof(hostResBuffer)-1);
-    strcat(hostResBuffer, ",");
-    HeapFree(GetProcessHeap(), 0, hostRes[i]);
-  }
-
-  //int idx = strnlen(hostResBuffer, sizeof(hostResBuffer) - 1) - 1;
-  //int idx = strlen(hostResBuffer) - 1;
-  //hostResBuffer[idx] = NULL;
-  printf("REC: %s\n", hostResBuffer);
-}
-printf("\n");
-
-
       }
     }
 
@@ -229,21 +198,7 @@ printf("\n");
   }
   else if (htons(ethrHdrPtr->ether_type) == 0x0806)
   {
-    /*
-    ZeroMemory(lDstMAC, sizeof(lDstMAC));
-    ZeroMemory(lSrcMAC, sizeof(lSrcMAC));
-    ZeroMemory(lDstIP, sizeof(lDstIP));
-    ZeroMemory(lSrcIP, sizeof(lSrcIP));
-    lARPData = (PARPHDR) (pkt_data + 14);
 
-    MAC2string(lARPData->sha, (unsigned char *) lSrcMAC, sizeof(lSrcMAC) - 1);
-    MAC2string(lARPData->tha, (unsigned char *) lDstMAC, sizeof(lDstMAC) - 1);
-
-    snprintf(lSrcIP, sizeof(lSrcIP) - 1, "%d.%d.%d.%d", lARPData->spa[0], lARPData->spa[1], lARPData->spa[2], lARPData->spa[3]);
-    snprintf(lDstIP, sizeof(lDstIP) - 1, "%d.%d.%d.%d", lARPData->tpa[0], lARPData->tpa[1], lARPData->tpa[2], lARPData->tpa[3]);
-
-    printf("\nSRC %s/%s -> DST %s/%s - Type [%s]", lSrcMAC, lSrcIP, lDstMAC, lDstIP, (ntohs(lARPData->opcode) == ARP_REQUEST)? "ARP Request" : "ARP Reply");
-    */
   }
 }
 

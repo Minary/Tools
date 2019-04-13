@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
   gConnectionList = InitConnectionList();
 
   // Parse command line parameters
-  while ((opt = getopt(argc, argv, "lg:p:s:")) != -1)
+  while ((opt = getopt(argc, argv, "lg:p:x:")) != -1)
   {
     switch (opt)
     {
@@ -69,11 +69,11 @@ int main(int argc, char* argv[])
       case 'p':
         strncpy(gScanParams.OutputPipeName, optarg, sizeof(gScanParams.OutputPipeName) - 1);
         break;
-      case 's':
+      case 'x':
         strncpy((char *)gScanParams.IfcName, optarg, sizeof(gScanParams.IfcName));
         GetInterfaceName(optarg, (char *)gScanParams.IfcName, sizeof(gScanParams.IfcName) - 1);
         GetInterfaceDetails(optarg, &gScanParams);
-        action = 's';
+        action = 'x';
         break;
     }
   }
@@ -106,11 +106,11 @@ int main(int argc, char* argv[])
 
 
   //
-  // Start sniffer
-  // -s IFC-Name
+  // Start Minary sniffer
+  // -x IFC-Name
   //
   }
-  else if (argc >= 3 && action == 's')
+  else if (argc >= 3 && action == 'x')
   {
     ModeMinaryStart(&gScanParams);
 
@@ -219,11 +219,11 @@ void PrintUsage(char *pAppName)
   printf("--------------------\n\n");
   printf("List all interfaces               :  %s -l\n", pAppName);
   printf("Start generic sniffer             :  %s -g IFC-Name\n", pAppName);
-  printf("Start Sniffer                     :  %s -s IFC-Name [-p PIPE_NAME] \n", pAppName);
+  printf("Start Minary sniffer              :  %s -x IFC-Name [-p PIPE_NAME] \n", pAppName);
   printf("\n\n\n\nExamples\n--------\n\n");
   printf("Example : %s -l\n", pAppName);
-  printf("Example : %s -s 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n", pAppName);
-  printf("Example : %s -g 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n\n\n\n\n", pAppName);
+  printf("Example : %s -x 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n", pAppName);
+  printf("Example : %s -x 0F716AAF-D4A7-ACBA-1234-EA45A939F624\n\n\n\n\n", pAppName);
   printf("WinPcap version\n---------------\n\n");
   printf("%s\n\n", pcap_lib_version());
 }
