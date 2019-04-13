@@ -94,7 +94,11 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
   }
 
   // We dont need this list anymore.
-  pcap_freealldevs(allDevices);
+  if (counter > 0 &&
+      allDevices != NULL)
+  {
+    pcap_freealldevs(allDevices);
+  }
 
   LogMsg(DBG_INFO, "GeneralSniffer() : General scanner started. Waiting for \"%s\" data on device \"%s\"", bpfFilter, adapter);
   // Start intercepting data packets.
@@ -104,7 +108,8 @@ int ModeGenericSnifferStart(PSCANPARAMS scanParamsParam)
 END:
 
   // Release all allocated resources.
-  if (allDevices)
+  if (counter > 0 &&
+      allDevices != NULL)
   {
     pcap_freealldevs(allDevices);
   }

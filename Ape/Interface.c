@@ -305,8 +305,11 @@ int GetInterfaceName(char *interfaceNameParam, char *realInterfaceNameParam, int
 END:
 
   // Release all allocated resources.
-  if (allDevices)
+  if (counter > 0 && 
+      allDevices != NULL)
+  {
     pcap_freealldevs(allDevices);
+  }
 
   return retVal;
 }

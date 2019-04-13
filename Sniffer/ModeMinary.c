@@ -530,7 +530,8 @@ BOOL GetPcapDevice()
     }
   }
 
-  if (allDevices)
+  if (counter > 0 &&
+      allDevices != NULL)
   {
     pcap_freealldevs(allDevices);
   }

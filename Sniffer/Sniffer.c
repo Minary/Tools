@@ -113,14 +113,6 @@ int main(int argc, char* argv[])
   else if (argc >= 3 && action == 'x')
   {
     ModeMinaryStart(&gScanParams);
-
-    while (1 == 1)
-    {
-      Sleep(1000);
-      printf(".");
-    }
-
-    goto END;
   }
   else
   {

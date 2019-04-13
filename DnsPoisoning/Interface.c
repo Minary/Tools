@@ -14,10 +14,7 @@
 #include "NetworkHelperFunctions.h"
 
 
-/*
- *
- *
- */
+
 int ListInterfaceDetails()
 {
   int retVal = 0;
@@ -49,8 +46,6 @@ int ListInterfaceDetails()
     }
   }
 
-
-  //
   if ((functRetVal = GetAdaptersInfo(adapterInfoPtr, &outputBufferLength)) == NO_ERROR)
   {
     for (adapterPtr = adapterInfoPtr; adapterPtr; adapterPtr = adapterPtr->Next)
@@ -171,11 +166,6 @@ END:
 }
 
 
-
-/*
- *
- *
- */
 int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
 {
   int retVal = 0;
@@ -190,7 +180,7 @@ int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
 
   if ((adapterInfoPtr = (IP_ADAPTER_INFO *)HeapAlloc(GetProcessHeap(), 0, sizeof(IP_ADAPTER_INFO))) == NULL)
   {
-    LogMsg(DBG_ERROR, "getIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
+    LogMsg(DBG_ERROR, "GetInterfaceDetails(): Error allocating memory needed to call GetAdaptersinfo");
     retVal = 1;
     goto END;
   }
@@ -200,15 +190,12 @@ int GetInterfaceDetails(char *interfacenameParam, PSCANPARAMS scanParamsParam)
     HeapFree(GetProcessHeap(), 0, adapterInfoPtr);
     if ((adapterInfoPtr = (IP_ADAPTER_INFO *)HeapAlloc(GetProcessHeap(), 0, outputBufferLength)) == NULL)
     {
-      LogMsg(DBG_ERROR, "getIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
+      LogMsg(DBG_ERROR, "GetInterfaceDetails(): Error allocating memory needed to call GetAdaptersinfo");
       retVal = 2;
       goto END;
     }
   }
 
-  /*
-  *
-  */
   if ((funcRetVal = GetAdaptersInfo(adapterInfoPtr, &outputBufferLength)) == NO_ERROR)
   {
     for (adapterPtr = adapterInfoPtr; adapterPtr; adapterPtr = adapterPtr->Next)
@@ -260,12 +247,6 @@ END:
 }
 
 
-
-
-/*
- *
- *
- */
 int GetInterfaceName(char *interfaceNameParam, char *realInterfaceNameParam, int bufferLengthParam)
 {
   int retVal = 0;
@@ -276,20 +257,15 @@ int GetInterfaceName(char *interfaceNameParam, char *realInterfaceNameParam, int
   int counter = 0;
   int interfaceNumber = 0;
 
-  /*
-  * Open device list.
-  */
+  // Open device list.
   if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
   {
-    LogMsg(DBG_ERROR, "getIFCName(): Error in pcap_findalldevs_ex(): %s", tempBuffer);
+    LogMsg(DBG_ERROR, "GetInterfaceName(): Error in pcap_findalldevs_ex(): %s", tempBuffer);
     retVal = 1;
     goto END;
   }
 
-
   ZeroMemory(adapter, sizeof(adapter));
-  counter = 0;
-
   for (counter = 0, device = allDevices; device; device = device->next, counter++)
   {
     if (StrStrI(device->name, interfaceNameParam))
@@ -303,9 +279,11 @@ int GetInterfaceName(char *interfaceNameParam, char *realInterfaceNameParam, int
 END:
 
   // Release all allocated resources.
-  if (allDevices)
+  if (counter > 0 &&
+      allDevices != NULL)
+  {
     pcap_freealldevs(allDevices);
+  }
 
   return retVal;
 }
-

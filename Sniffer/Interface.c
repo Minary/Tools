@@ -270,7 +270,7 @@ int GetInterfaceName(char *ifcName, char *realIfcName, int bufferSize)
   // Open device list.
   if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevices, tempBuffer) == -1)
   {
-    LogMsg(DBG_ERROR, "getIFCName() : Error in pcap_findalldevs_ex() : %s", tempBuffer);
+    LogMsg(DBG_ERROR, "GetInterfaceName() : Error in pcap_findalldevs_ex() : %s", tempBuffer);
     retVal = 1;
     goto END;
   }
@@ -288,7 +288,8 @@ int GetInterfaceName(char *ifcName, char *realIfcName, int bufferSize)
 END:
 
   // Release all allocated resources.
-  if (allDevices)
+  if (counter > 0 &&
+      allDevices != NULL)
   {
     pcap_freealldevs(allDevices);
   }
