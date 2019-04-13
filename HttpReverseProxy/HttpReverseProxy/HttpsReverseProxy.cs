@@ -213,7 +213,7 @@
       try
       {
         SslStream sslStream = new SslStream(requestObj.TcpClientConnection.GetStream(), false, new RemoteCertificateValidationCallback(remoteCertificateValidation));
-        sslStream.AuthenticateAsServer(serverCertificate2, false, SslProtocols.Tls | SslProtocols.Ssl3, false);
+        sslStream.AuthenticateAsServer(serverCertificate2, false, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Ssl3, false);
 
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(requestObj.ProxyProtocol, sslStream, 8192, Encoding.UTF8, requestObj.Id);
         requestObj.ClientRequestObj.ClientBinaryWriter = new BinaryWriter(sslStream);
