@@ -73,7 +73,7 @@
       // if Host header contains illegal characters throw exception
       if (Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0], @"[^\w\d\-_\.]+").Success == true)
       {
-        ClientNotificationException exception = new ClientNotificationException();
+        ClientNotificationException exception = new ClientNotificationException("Invalid characters in host name");
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }

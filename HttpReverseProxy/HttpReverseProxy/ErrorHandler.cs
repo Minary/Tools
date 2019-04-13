@@ -16,13 +16,14 @@
 
     #region MEMBERS
 
-    private Dictionary<HttpStatusCode, HttpStatusDetails> statusDescription = new Dictionary<HttpStatusCode, HttpStatusDetails>()
+    public Dictionary<HttpStatusCode, HttpStatusDetails> statusDescription = new Dictionary<HttpStatusCode, HttpStatusDetails>()
     {
       { HttpStatusCode.BadRequest, new HttpStatusDetails(400, "Bad Request", "The server cannot handle the request due to an apparent client error.") },
       { HttpStatusCode.NotFound, new HttpStatusDetails(404, "Not Found", "The requested URL is either incomplete or could not be found.") },
       { HttpStatusCode.MethodNotAllowed, new HttpStatusDetails(405, "Method Not Allowed", "The request method is not supported for the requested resource.") },
       { HttpStatusCode.HttpVersionNotSupported, new HttpStatusDetails(505, "HTTP Version Not Supported", "The server does not support the HTTP protocol version used in the request.") },
-      { HttpStatusCode.InternalServerError, new HttpStatusDetails(500, "Internal Server Error", "Internal Server Error.") }
+      { HttpStatusCode.InternalServerError, new HttpStatusDetails(500, "Internal Server Error", "Internal Server Error.") },
+      { HttpStatusCode.OK, new HttpStatusDetails(200, "OK", string.Empty) }
     };
 
     #endregion

@@ -72,13 +72,15 @@
     }
 
 
-    private static void CreateCertificate(string certificateHost)
+    // For the sake of testability this method remains public
+    public static void CreateCertificate(string certificateHost)
     {
       HttpsReverseProxy.Server.CreateCertificate(certificateHost);
     }
 
 
-    private static void StartProxyServer()
+    // For the sake of testability this method remains public.
+    public static void StartProxyServer()
     {
       Config.LocalIp = Lib.Common.GetLocalIpAddress();
       HttpReverseProxyLib.Logging.Instance.CurrentLoggingLevel = Config.CurrentLoglevel;

@@ -80,6 +80,11 @@
 
     public override void Stop()
     {
+      if (this.tcpListener == null)
+      {
+        return;
+      }
+
       this.tcpListener.Stop();
 
       // Wait for cRemoteSocket to finish processing current connections...
