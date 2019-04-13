@@ -62,11 +62,19 @@
       // Read the client request headers
       this.ParseClientRequestHeaders(requestObj);
 
-      // Handle the Host header
+      // If Host header does not exist throw exception
       if (!requestObj.ClientRequestObj.ClientRequestHeaders.ContainsKey("Host"))
       {
         ClientNotificationException exception = new ClientNotificationException();
         exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.NotFound);
+        throw exception;
+      }
+
+      // if Host header contains illegal characters throw exception
+      if (Regex.Match(requestObj.ClientRequestObj.ClientRequestHeaders["Host"][0], @"[^\w\d\-_\.]+").Success == true)
+      {
+        ClientNotificationException exception = new ClientNotificationException();
+        exception.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
         throw exception;
       }
 

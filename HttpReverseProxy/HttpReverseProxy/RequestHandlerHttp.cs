@@ -117,16 +117,14 @@
           break;
         }
         catch (SocketException sex) when (sex.SocketErrorCode == SocketError.HostNotFound)
-        {
-          var redirectLocation = $"http://{Config.DefaultRemoteHost}/";
+        {;
           ClientNotificationException cnex = new ClientNotificationException();
           cnex.Data.Add(StatusCodeLabel.StatusCode, HttpStatusCode.BadRequest);
-          this.clientErrorHandler.SendRedirect2Client(this.requestObj, redirectLocation);
+          this.clientErrorHandler.SendErrorMessage2Client(this.requestObj, cnex);
 
           var innerException = sex.InnerException?.Message ?? "No inner exception found";
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, "HttpReverseProxy.ProcessClientRequest(SocketException): Inner exception:{0}\r\nRegular exception: {1}\r\nHost \"{2}\" not found", innerException, sex.Message, requestObj.ClientRequestObj.Host);
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Warning, $"HttpReverseProxy.ProcessClientRequest(SocketException): Redirecting to {redirectLocation}");
-          break;
+         break;
         }
         catch (SocketException sex) 
         {
@@ -146,6 +144,7 @@
         catch (Exception ex)
         {
           var innerException = ex.InnerException?.Message ?? "No inner exception found";
+          var src = ex.Source;
           Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, "HttpReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
           break;
         }
