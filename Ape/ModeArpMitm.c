@@ -58,32 +58,14 @@ void InitializeArpMitm()
     PrintConfig(gScanParams);
   }
 
-  // 0 Add default GW to the gSystemsList
+  // Add default GW to the gSystemsList
   AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
   
-  // 1. Parse target file
-  if (!PathFileExists(FILE_HOST_TARGETS))
-  {
-    fprintf(stderr, "No target hosts file \"%s\"!\n", FILE_HOST_TARGETS);
-    goto END;
-  }
-
-  if (ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
-  {
-    fprintf(stderr, "No target hosts were defined!\n");
-    goto END;
-  }
-
   PrintTargetSystems(gTargetSystemsList);
   WriteDepoisoningFile();
 
-  // 2. Start POISONING the ARP caches.
+  // Start POISONING the ARP caches.
   ArpPoisoningLoop(&gScanParams);
-
-  // MARKER : CORRECT THREAD SHUTDOWN!!
-  printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");
-
-END:
 
   return;
 }
