@@ -36,6 +36,7 @@ extern SCANPARAMS gScanParams;
 void InitializeArpMitm()
 {
   AdminCheck(gScanParams.ApplicationName);
+  ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
