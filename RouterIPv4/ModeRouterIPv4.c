@@ -63,8 +63,6 @@ void InitializeRouterIPv4()
       ParseTargetHostsConfigFile(FILE_HOST_TARGETS) <= 0)
   {
     LogMsg(DBG_ERROR, "InitializeRouterIPv4(): No target hosts were defined");
-    Sleep(1000);
-    goto END;
   }
   else
   {
