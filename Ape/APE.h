@@ -97,4 +97,5 @@ void AdminCheck(char *programNameParam);
 void PrintUsage(char *applicationNameParam);
 int ParseTargetHostsConfigFile(char *targetsFile);
 int ParseFirewallConfigFile(char *firewallRulesFile);
-
+BOOL InitTargethostObserverThread();
+DWORD WINAPI TargethostsObserver(LPVOID params);

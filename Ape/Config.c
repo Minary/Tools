@@ -59,7 +59,8 @@ int ParseTargetHostsConfigFile(char *targetsFile)
   while (fgets(tempLine, sizeof(tempLine), fileHandle) != NULL)
   {
     // Remove trailing CR/LF
-    while (tempLine[strlen(tempLine) - 1] == '\r' || tempLine[strlen(tempLine) - 1] == '\n')
+    while (tempLine[strlen(tempLine) - 1] == '\r' || 
+           tempLine[strlen(tempLine) - 1] == '\n')
     {
       tempLine[strlen(tempLine) - 1] = '\0';
     }
@@ -69,7 +70,6 @@ int ParseTargetHostsConfigFile(char *targetsFile)
     {
       MacString2Bin(macBin, macStr, strnlen((char *)macStr, sizeof(macStr) - 1));
       IpString2Bin(ipBin, ipStr, strnlen((char *)ipStr, sizeof(ipStr) - 1));
-
       AddToSystemsList(&gTargetSystemsList, macBin, (char *)ipStr, ipBin);
       retVal++;
       LogMsg(DBG_MEDIUM, "ParseTargetHostsConfigFile(): New system added :  %s/%s", macStr, ipStr);

@@ -3,6 +3,9 @@
 #include <pcap.h>
 #include <stdio.h>
 #include <Shlwapi.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 #include <Windows.h>
 
 #include "APE.h"
@@ -40,7 +43,7 @@ void InitializeArpMitm()
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
   Sleep(500);
   RemoveMacFromCache((char *)gScanParams.InterfaceName, "*");
-  LogMsg(2, "InitializeArpMitm(): -x %s\n", gScanParams.InterfaceName);  
+  LogMsg(DBG_INFO, "InitializeArpMitm(): -x %s", gScanParams.InterfaceName);  
 
   // Set exit function to trigger depoisoning functions and command.
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)APE_ControlHandler, TRUE);
@@ -60,10 +63,16 @@ void InitializeArpMitm()
   }
 
   // Add default GW to the gSystemsList
-  AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);
-  
+  AddToSystemsList(&gTargetSystemsList, gScanParams.GatewayMacBin, (char *)gScanParams.GatewayIpStr, gScanParams.GatewayIpBin);  
   PrintTargetSystems(gTargetSystemsList);
   WriteDepoisoningFile();
+
+  // Start targethosts observer file
+  if (InitTargethostObserverThread() == FALSE)
+  {
+    LogMsg(DBG_INFO, "InitializeArpMitm(): Could not start .targethosts observer thread");
+    return;
+  }
 
   // Start POISONING the ARP caches.
   ArpPoisoningLoop(&gScanParams);
@@ -107,7 +116,6 @@ int UserIsAdmin()
 
   return retVal;
 }
-
 
 
 BOOL APE_ControlHandler(DWORD pControlType)
@@ -159,7 +167,6 @@ BOOL APE_ControlHandler(DWORD pControlType)
 }
 
 
-
 void CloseAllPcapHandles()
 {
   if (gScanParams.PcapFileHandle != NULL)
@@ -184,5 +191,43 @@ void CloseAllPcapHandles()
     pcap_breakloop(gScanParams.InterfaceReadHandle);
     pcap_close(gScanParams.InterfaceReadHandle);
     LogMsg(DBG_INFO, "CloseAllPcapHandles(): Closing gScanParams.InterfaceReadHandle done");
+  }
+}
+
+
+BOOL InitTargethostObserverThread()
+{
+  HANDLE threadHandle = INVALID_HANDLE_VALUE;
+  DWORD dwThreadId = -1;
+
+  if ((threadHandle = CreateThread(NULL, 0, TargethostsObserver, NULL, 0, &dwThreadId)) == NULL)
+  {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+DWORD WINAPI TargethostsObserver(LPVOID params)
+{
+  struct _stat statbuf;
+  time_t mtime_previous;
+  int stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+  while (1 == 1)
+  {
+    mtime_previous = statbuf.st_mtime;
+    stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+    if (mtime_previous != statbuf.st_mtime)
+    {
+      LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
+      ClearSystemList(&gTargetSystemsList);
+      ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
+      PrintTargetSystems(FILE_HOST_TARGETS);
+    }
+
+    Sleep(1000);
   }
 }

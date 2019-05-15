@@ -38,7 +38,6 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 }
 
 
-
 PSYSNODE InitSystemList()
 {
   PSYSNODE listHead = NULL;
@@ -57,6 +56,33 @@ PSYSNODE InitSystemList()
 }
 
 
+void ClearSystemList(PPSYSNODE listHead)
+{
+  PSYSNODE listPos;
+
+  EnterCriticalSection(&csSystemsLL);
+
+  if (listHead == NULL ||
+      *listHead == NULL || 
+      ((PSYSNODE)*listHead)->isTail ||
+      ((PSYSNODE)*listHead)->next == NULL)
+  {
+    return;
+  }
+
+  PSYSNODE nextListPos = NULL; // ((PSYSNODE)*listHead)->next;
+  listPos = ((PSYSNODE)*listHead)->next;
+  while (listPos != NULL &&
+         listPos->isTail == FALSE)
+  {
+    nextListPos = listPos->next;
+    HeapFree(GetProcessHeap(), NULL, listPos);
+    listPos = nextListPos;
+  }
+
+  LeaveCriticalSection(&csSystemsLL);
+}
+
 
 void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
 {
@@ -67,7 +93,10 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   time_t clock;
 
   EnterCriticalSection(&csSystemsLL);
-  if (listHead == NULL || *listHead == NULL || sysMacParam == NULL || sysIpParam == NULL)
+  if (listHead == NULL || 
+      *listHead == NULL || 
+      sysMacParam == NULL || 
+      sysIpParam == NULL)
   {
     goto END;
   }
@@ -78,7 +107,8 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   snprintf(tmpBuf, sizeof(tmpBuf) - 1, "%s", asctime(newTime));
 
   // Remove trailing LF/CR
-  while (tmpBuf[strlen(tmpBuf) - 1] == '\r' || tmpBuf[strlen(tmpBuf) - 1] == '\n')
+  while (tmpBuf[strlen(tmpBuf) - 1] == '\r' || 
+         tmpBuf[strlen(tmpBuf) - 1] == '\n')
   {
     tmpBuf[strlen(tmpBuf) - 1] = '\0';
   }
@@ -117,7 +147,6 @@ END:
 }
 
 
-
 PSYSNODE GetNodeByIp(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -154,7 +183,6 @@ END:
 
   return retVal;
 }
-
 
 
 PSYSNODE GetNodeByMac(PSYSNODE listHead, unsigned char macParam[BIN_MAC_LEN])
