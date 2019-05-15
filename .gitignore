@@ -58,3 +58,8 @@ ipch/
 **/Release/
 **/x64/
 BUILDS/
+
+
+# Ignore custom files
+**/.targethosts
+**/.UNPOISON
