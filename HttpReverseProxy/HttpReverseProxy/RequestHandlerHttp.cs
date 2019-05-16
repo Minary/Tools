@@ -144,8 +144,12 @@
         catch (Exception ex)
         {
           var innerException = ex.InnerException?.Message ?? "No inner exception found";
-          var src = ex.Source;
-          Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, "HttpReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
+var src = ex.Source;
+var targetSiteName = ex.TargetSite.Name;
+var targetSiteModule = ex.TargetSite.Module;
+Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, "HttpReverseProxy.ProcessClientRequest(Exception): Inner exception:{0}\r\nRegular exception: {1}\r\n{2}", innerException, ex.Message, ex.StackTrace);
+Logging.Instance.LogMessage(this.requestObj.Id, this.requestObj.ProxyProtocol, Loglevel.Error, $"HONK: {src}, SiteName:{targetSiteName}, SiteModule:{targetSiteModule}");
+
           break;
         }
 
