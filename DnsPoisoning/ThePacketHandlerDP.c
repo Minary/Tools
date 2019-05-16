@@ -42,8 +42,7 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   // Determine and print current working directory
   GetCurrentDirectory(sizeof(cwd)-1, cwd);
   LogMsg(DBG_INFO, "PacketHandlerDP(): Working directory: \"%s\"", cwd);
-
-
+  
   // Set exit function to trigger depoisoning functions and command.
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)DP_ControlHandler, TRUE);
 

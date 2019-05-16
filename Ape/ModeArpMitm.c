@@ -16,7 +16,6 @@
 #include "ModeArpMitm.h"
 #include "NetworkHelperFunctions.h"
 
-
 // External/global variables
 extern int gDEBUGLEVEL;
 extern RULENODE gFwRulesList;
