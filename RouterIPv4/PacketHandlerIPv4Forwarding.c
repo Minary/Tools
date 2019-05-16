@@ -28,6 +28,7 @@ extern SCANPARAMS gScanParams;
  */
 DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
 {
+  char cwd[MAX_BUF_SIZE + 1];
   char filter[MAX_BUF_SIZE + 1];
   DWORD retVal = 0;
   char pcapErrorBuffer[PCAP_ERRBUF_SIZE];
@@ -38,7 +39,10 @@ DWORD PacketHandlerRouterIPv4(PSCANPARAMS lpParam)
   int funcRetVal = 0;
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
-
+  
+  // Determine and print current working directory
+  GetCurrentDirectory(sizeof(cwd) - 1, cwd);
+  LogMsg(DBG_INFO, "PacketHandlerDP(): Working directory: \"%s\"", cwd);
 
   // Set exit function to trigger depoisoning functions and command.
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)RouterIPv4_ControlHandler, TRUE);

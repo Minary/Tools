@@ -1,6 +1,7 @@
 #pragma once
 
-void InitializeArpMitm();
+void InitializeRouterIPv4();
 void AdminCheck(char *programNameParam);
 int UserIsAdmin();
-void InitializeRouterIPv4();
+BOOL InitTargethostObserverThread();
+DWORD WINAPI TargethostsObserver(LPVOID params);

@@ -6,7 +6,7 @@
 #include "LinkedListTargetSystems.h"
 #include "Logging.h"
 
-
+// External global variables
 extern CRITICAL_SECTION csSystemsLL;
 
 
@@ -38,7 +38,6 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 }
 
 
-
 PSYSNODE InitSystemList()
 {
   PSYSNODE listHead = NULL;
@@ -56,6 +55,38 @@ PSYSNODE InitSystemList()
   return listHead;
 }
 
+
+void ClearSystemList(PPSYSNODE listHead)
+{
+  PSYSNODE listPos;
+
+  EnterCriticalSection(&csSystemsLL);
+
+  // Verify preconditions
+  if (listHead == NULL ||
+    *listHead == NULL ||
+    ((PSYSNODE)*listHead)->isTail ||
+    ((PSYSNODE)*listHead)->next == NULL)
+  {
+    return;
+  }
+
+  // Free all allocated resources
+  PSYSNODE nextListPos = NULL; // ((PSYSNODE)*listHead)->next;
+  listPos = (PSYSNODE)*listHead;
+  while (listPos != NULL &&
+    listPos->isTail == FALSE)
+  {
+    nextListPos = listPos->next;
+    HeapFree(GetProcessHeap(), NULL, listPos);
+    listPos = nextListPos;
+  }
+
+  // Set new list head
+  *listHead = listPos;
+
+  LeaveCriticalSection(&csSystemsLL);
+}
 
 
 void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
@@ -117,7 +148,6 @@ END:
 }
 
 
-
 PSYSNODE GetNodeByIp(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -154,7 +184,6 @@ END:
 
   return retVal;
 }
-
 
 
 PSYSNODE GetNodeByMac(PSYSNODE listHead, unsigned char macParam[BIN_MAC_LEN])

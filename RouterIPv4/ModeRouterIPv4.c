@@ -3,6 +3,9 @@
 #include <pcap.h>
 #include <stdio.h>
 #include <Shlwapi.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 #include <Windows.h>
 
 #include "Config.h"
@@ -37,11 +40,10 @@ HANDLE gRESENDThreadHandle = INVALID_HANDLE_VALUE;
  *
  */
 
-
 void InitializeRouterIPv4()
 {
   AdminCheck(gScanParams.ApplicationName);
-  LogMsg(2, "InitializeArpMitm(): -x %s", gScanParams.InterfaceName);
+  LogMsg(2, "InitializeRouterIPv4(): -x %s", gScanParams.InterfaceName);
 
   // Initialisation. Parse parameters (Ifc, start IP, stop IP) and
   // pack them in the scan configuration struct.
@@ -71,11 +73,15 @@ void InitializeRouterIPv4()
 
   PrintTargetSystems(gTargetSystemsList);
 
+  // Start targethosts observer file
+  if (InitTargethostObserverThread() == FALSE)
+  {
+    LogMsg(DBG_INFO, "InitializeRouterIPv4(): Could not start .targethosts observer thread");
+    return;
+  }
+
   // 1. Start IPv4 router
   PacketHandlerRouterIPv4(&gScanParams);
-
-  // MARKER : CORRECT THREAD SHUTDOWN!!
-  printf("OOPS!! MAKE SURE THE THREAD GETS SHUT DOWN CORRECTLY!!\n");
 
 END:
 
@@ -120,4 +126,40 @@ int UserIsAdmin()
 }
 
 
+BOOL InitTargethostObserverThread()
+{
+  HANDLE threadHandle = INVALID_HANDLE_VALUE;
+  DWORD dwThreadId = -1;
+
+  if ((threadHandle = CreateThread(NULL, 0, TargethostsObserver, NULL, 0, &dwThreadId)) == NULL)
+  {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+DWORD WINAPI TargethostsObserver(LPVOID params)
+{
+  struct _stat statbuf;
+  time_t mtime_previous;
+  int stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+  while (1 == 1)
+  {
+    mtime_previous = statbuf.st_mtime;
+    stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+    if (mtime_previous != statbuf.st_mtime)
+    {
+      LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
+      ClearSystemList(&gTargetSystemsList);
+      ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
+      PrintTargetSystems(FILE_HOST_TARGETS);
+    }
+
+    Sleep(1000);
+  }
+}
 
