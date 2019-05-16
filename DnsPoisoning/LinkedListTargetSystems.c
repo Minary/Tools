@@ -6,7 +6,7 @@
 #include "LinkedListTargetSystems.h"
 #include "Logging.h"
 
-
+// External global variables
 extern CRITICAL_SECTION csSystemsLL;
 
 
@@ -38,7 +38,6 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 }
 
 
-
 PSYSNODE InitSystemList()
 {
   PSYSNODE listHead = NULL;
@@ -54,6 +53,39 @@ PSYSNODE InitSystemList()
   LeaveCriticalSection(&csSystemsLL);
 
   return listHead;
+}
+
+
+void ClearSystemList(PPSYSNODE listHead)
+{
+  PSYSNODE listPos;
+
+  EnterCriticalSection(&csSystemsLL);
+
+  // Verify preconditions
+  if (listHead == NULL ||
+      *listHead == NULL ||
+      ((PSYSNODE)*listHead)->isTail ||
+      ((PSYSNODE)*listHead)->next == NULL)
+  {
+    return;
+  }
+
+  // Free all allocated resources
+  PSYSNODE nextListPos = NULL; // ((PSYSNODE)*listHead)->next;
+  listPos = (PSYSNODE)*listHead;
+  while (listPos != NULL &&
+         listPos->isTail == FALSE)
+  {
+    nextListPos = listPos->next;
+    HeapFree(GetProcessHeap(), NULL, listPos);
+    listPos = nextListPos;
+  }
+
+  // Set new list head
+  *listHead = listPos;
+
+  LeaveCriticalSection(&csSystemsLL);
 }
 
 
@@ -120,7 +152,6 @@ END:
 }
 
 
-
 PSYSNODE GetNodeByIp(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -157,7 +188,6 @@ END:
 
   return retVal;
 }
-
 
 
 PSYSNODE GetNodeByMac(PSYSNODE listHead, unsigned char macParam[BIN_MAC_LEN])
@@ -201,10 +231,13 @@ void PrintTargetSystems(PSYSNODE listHead)
 {
   PSYSNODE listPos;
 
+  EnterCriticalSection(&csSystemsLL);
   for (listPos = listHead; listPos != NULL && listPos->isTail == FALSE; listPos = listPos->next)
   {
     LogMsg(DBG_DEBUG, "PrintTargetSystems(): Target system: %s / %02x-%02x-%02x-%02x-%02x-%02x", listPos->data.sysIpStr,
       listPos->data.sysMacBin[0], listPos->data.sysMacBin[1], listPos->data.sysMacBin[2],
       listPos->data.sysMacBin[3], listPos->data.sysMacBin[4], listPos->data.sysMacBin[5]);
   }
+
+  LeaveCriticalSection(&csSystemsLL);
 }

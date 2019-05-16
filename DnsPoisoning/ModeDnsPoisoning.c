@@ -1,5 +1,8 @@
 #include <Windows.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 #include <Shlwapi.h>
 
 #include "PacketHandlerDP.h"
@@ -77,6 +80,13 @@ void InitializeDP()
   PrintTargetSystems(gTargetSystemsList);
   PrintDnsSpoofingRulesNodes(gDnsSpoofingList);
 
+  // Start targethosts observer file
+  if (InitTargethostObserverThread() == FALSE)
+  {
+    LogMsg(DBG_INFO, "InitializeDP(): Could not start .targethosts observer thread");
+    return;
+  }
+
   // Start Ethernet FORWARDING thread
   PacketHandlerDP(&gScanParams);
   
@@ -118,4 +128,42 @@ int UserIsAdmin()
   }
 
   return retVal;
+}
+
+
+BOOL InitTargethostObserverThread()
+{
+  HANDLE threadHandle = INVALID_HANDLE_VALUE;
+  DWORD dwThreadId = -1;
+
+  if ((threadHandle = CreateThread(NULL, 0, TargethostsObserver, NULL, 0, &dwThreadId)) == NULL)
+  {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+DWORD WINAPI TargethostsObserver(LPVOID params)
+{
+  struct _stat statbuf;
+  time_t mtime_previous;
+  int stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+  while (1 == 1)
+  {
+    mtime_previous = statbuf.st_mtime;
+    stat = _stat(FILE_HOST_TARGETS, &statbuf);
+
+    if (mtime_previous != statbuf.st_mtime)
+    {
+      LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
+      ClearSystemList(&gTargetSystemsList);
+      ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
+      PrintTargetSystems(FILE_HOST_TARGETS);
+    }
+
+    Sleep(1000);
+  }
 }

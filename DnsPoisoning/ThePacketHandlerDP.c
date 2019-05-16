@@ -27,6 +27,7 @@ extern PHOSTNODE gDnsSpoofingList;
  */
 DWORD PacketHandlerDP(PSCANPARAMS lpParam)
 {
+  char cwd[MAX_BUF_SIZE + 1];
   char filter[MAX_BUF_SIZE + 1];
   DWORD retVal = 0;
   char pcapErrorBuffer[PCAP_ERRBUF_SIZE];
@@ -38,6 +39,10 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   struct pcap_pkthdr *packetHeader = NULL;
   unsigned char *packetData = NULL;
 
+  // Determine and print current working directory
+  GetCurrentDirectory(sizeof(cwd)-1, cwd);
+  LogMsg(DBG_INFO, "PacketHandlerDP(): Working directory: \"%s\"", cwd);
+
 
   // Set exit function to trigger depoisoning functions and command.
   SetConsoleCtrlHandler((PHANDLER_ROUTINE)DP_ControlHandler, TRUE);
@@ -45,7 +50,7 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   // Open interface.
   if ((gScanParams.InterfaceReadHandle = pcap_open_live((char *)gScanParams.InterfaceName, 65536, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, PCAP_READTIMEOUT, pcapErrorBuffer)) == NULL)
   {
-    LogMsg(DBG_ERROR, "PacketHandler(): Unable to open the adapter");
+    LogMsg(DBG_ERROR, "PacketHandlerDP(): Unable to open the adapter");
     retVal = 5;
     goto END;
   }
@@ -58,23 +63,23 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   _snprintf(filter, sizeof(filter) - 1, "ip && ether dst %s && port 53 && not src host %s && not dst host %s", gScanParams.LocalMacStr, gScanParams.LocalIpStr, gScanParams.LocalIpStr);
   netMask = 0xffffff; // "255.255.255.0"
   netMask = 0xffff; // "255.255.0.0"
-  LogMsg(DBG_INFO, "PacketHandler(): Filter=%s", filter);
+  LogMsg(DBG_INFO, "PacketHandlerDP(): Filter=%s", filter);
 
   if (pcap_compile((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode, (const char *)filter, 1, netMask) < 0)
   {
-    LogMsg(DBG_ERROR, "PacketHandler(): Unable to compile the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "PacketHandlerDP(): Unable to compile the BPF filter \"%s\"", filter);
     retVal = 6;
     goto END;
   }
 
   if (pcap_setfilter((pcap_t *)gScanParams.InterfaceWriteHandle, &ifcCode) < 0)
   {
-    LogMsg(DBG_ERROR, "PacketHandler(): Unable to set the BPF filter \"%s\"", filter);
+    LogMsg(DBG_ERROR, "PacketHandlerDP(): Unable to set the BPF filter \"%s\"", filter);
     retVal = 7;
     goto END;
   }
 
-  LogMsg(DBG_INFO, "PacketHandler(): Enter listening/forwarding loop.");
+  LogMsg(DBG_INFO, "PacketHandlerDP(): Enter listening/forwarding loop.");
   while ((funcRetVal = pcap_next_ex((pcap_t*)gScanParams.InterfaceWriteHandle, (struct pcap_pkthdr **) &packetHeader, (const u_char **)&packetData)) >= 0)
   {
     if (funcRetVal == 1)
@@ -86,16 +91,16 @@ DWORD PacketHandlerDP(PSCANPARAMS lpParam)
   if (funcRetVal < 0)
   {
     char *errorMsg = pcap_geterr(gScanParams.InterfaceWriteHandle);
-    LogMsg(DBG_ERROR, "PacketHandler(): Listener stopped unexpectedly with return value: %d, %s", funcRetVal, errorMsg);
+    LogMsg(DBG_ERROR, "PacketHandlerDP(): Listener stopped unexpectedly with return value: %d, %s", funcRetVal, errorMsg);
   }
   else
   {
-    LogMsg(DBG_INFO, "PacketHandler(): Listener stopped regularly with return value: %d", funcRetVal);
+    LogMsg(DBG_INFO, "PacketHandlerDP(): Listener stopped regularly with return value: %d", funcRetVal);
   }
 
 END:
 
-  LogMsg(DBG_INFO, "PacketHandler(): Exit");
+  LogMsg(DBG_INFO, "PacketHandlerDP(): Exit");
 
   return retVal;
 }
