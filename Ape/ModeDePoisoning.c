@@ -12,7 +12,8 @@
 #include "ModeDePoisoning.h"
 #include "NetworkHelperFunctions.h"
 
-
+// External global variables
+extern CRITICAL_SECTION csSystemsLL;
 extern int gDEBUGLEVEL;
 extern SCANPARAMS gScanParams;
 extern PSYSNODE gTargetSystemsList;
@@ -64,6 +65,8 @@ void WriteDepoisoningFile(void)
   char srcMacStr[MAX_BUF_SIZE + 1];
   PSYSNODE systemListPtr = NULL;
 
+
+  EnterCriticalSection(&csSystemsLL);
   // Get a copy of all systems found in the network.
   for (systemListPtr = gTargetSystemsList;  systemListPtr != NULL; systemListPtr = systemListPtr->next)
   {

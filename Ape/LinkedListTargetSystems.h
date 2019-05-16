@@ -23,6 +23,7 @@ typedef struct SYSNODE
 
 PSYSNODE InitSystemList();
 int GetListCopy(PSYSNODE pNodes, PSYSTEMNODE pSysArray);
+void ClearSystemList(PPSYSNODE listHead);
 void AddToSystemsList(PPSYSNODE pSysNodes, unsigned char pSysMAC[BIN_MAC_LEN], char *pSysIP, unsigned char pSysIPBin[BIN_IP_LEN]);
 PSYSNODE GetNodeByIp(PSYSNODE pSysNodes, unsigned char pIPBin[BIN_IP_LEN]);
 PSYSNODE GetNodeByMac(PSYSNODE pSysNodes, unsigned char pMAC[BIN_MAC_LEN]);
