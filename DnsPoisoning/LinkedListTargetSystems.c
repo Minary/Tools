@@ -153,6 +153,44 @@ END:
 }
 
 
+PSYSNODE GetNodeByIpUnsafe(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
+{
+  PSYSNODE retVal = NULL;
+  PSYSNODE tmpSys;
+  int count = 0;
+
+  EnterCriticalSection(&csSystemsLL);
+  if ((tmpSys = listHead) == NULL)
+  {
+    goto END;
+  }
+
+  // Go to the end of the list
+  for (count = 0; count < MAX_SYSTEMS_COUNT; count++)
+  {
+    if (tmpSys != NULL)
+    {
+      // System found.
+      if (!memcmp(tmpSys->data.sysIpBin, ipBinParam, BIN_IP_LEN))
+      {
+        retVal = tmpSys;
+        break;
+      }
+    }
+
+    if ((tmpSys = tmpSys->next) == NULL)
+    {
+      break;
+    }
+  }
+
+END:
+  LeaveCriticalSection(&csSystemsLL);
+
+  return retVal;
+}
+
+
 PSYSNODE GetNodeByIp(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;

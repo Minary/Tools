@@ -157,16 +157,14 @@ DWORD WINAPI TargethostsObserver(LPVOID params)
     mtime_previous = statbuf.st_mtime;
     stat = _stat(FILE_HOST_TARGETS, &statbuf);
 
-    LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
-
     if (mtime_previous != statbuf.st_mtime)
     {
+      total_systems = 0;
       LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
       ClearSystemList(&gTargetSystemsList);
       total_systems = ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
-      LogMsg(DBG_INFO, "TargethostsObserver(0.1): %d systems added to .targethosts.", total_systems);
       PrintTargetSystems(FILE_HOST_TARGETS);
-      LogMsg(DBG_INFO, "TargethostsObserver(0.2): %d systems added to .targethosts.", total_systems);
+      LogMsg(DBG_INFO, "TargethostsObserver(): %d systems added to .targethosts.", total_systems);
     }
 
     Sleep(1000);
