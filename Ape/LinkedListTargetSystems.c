@@ -15,7 +15,9 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
   int counter = 0;
   char srcMac[MAX_BUF_SIZE + 1];
 
+LogMsg(DBG_LOW, "GetListCopy(0.0): ...");
   EnterCriticalSection(&csSystemsLL);
+LogMsg(DBG_LOW, "GetListCopy(0.1): ...");
   while (nodesParam != NULL)
   {
     ZeroMemory(srcMac, sizeof(srcMac));
@@ -33,6 +35,7 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
   }
 
   LeaveCriticalSection(&csSystemsLL);
+LogMsg(DBG_LOW, "GetListCopy(1): Total systems: %d", counter);
 
   return counter;
 }
@@ -60,7 +63,9 @@ void ClearSystemList(PPSYSNODE listHead)
 {
   PSYSNODE listPos;
 
+LogMsg(DBG_LOW, "ClearSystemList(0.0): ");
   EnterCriticalSection(&csSystemsLL);
+LogMsg(DBG_LOW, "ClearSystemList(0.1): ");
 
   // Verify preconditions
   if (listHead == NULL ||
@@ -68,7 +73,7 @@ void ClearSystemList(PPSYSNODE listHead)
       ((PSYSNODE)*listHead)->isTail ||
       ((PSYSNODE)*listHead)->next == NULL)
   {
-    return;
+    goto END;
   }
 
   // Free all allocated resources
@@ -84,8 +89,11 @@ void ClearSystemList(PPSYSNODE listHead)
 
   // Set new list head
   *listHead = listPos;
-
+  
+END:
+LogMsg(DBG_LOW, "ClearSystemList(1.0): ");
   LeaveCriticalSection(&csSystemsLL);
+LogMsg(DBG_LOW, "ClearSystemList(1.1): ");
 }
 
 
@@ -122,7 +130,7 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   snprintf(srcMac, sizeof(srcMac) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", sysMacParam[0], sysMacParam[1], sysMacParam[2], sysMacParam[3], sysMacParam[4], sysMacParam[5]);
 
   // Entry already exists. Update IP and timestamp.
-  if ((tmpNode = GetNodeByIp(*listHead, sysIpBinParam)) != NULL)
+  if ((tmpNode = GetNodeByIpUnsafe(*listHead, sysIpBinParam)) != NULL)
   {
     CopyMemory(tmpNode->data.TimeStamp, tmpBuf, sizeof(tmpBuf));
     CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);
@@ -149,6 +157,42 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
 
 END:
   LeaveCriticalSection(&csSystemsLL);
+}
+
+
+PSYSNODE GetNodeByIpUnsafe(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
+{
+  PSYSNODE retVal = NULL;
+  PSYSNODE tmpSys;
+  int count = 0;
+
+  if ((tmpSys = listHead) == NULL)
+  {
+    goto END;
+  }
+
+  // Go to the end of the list
+  for (count = 0; count < MAX_SYSTEMS_COUNT; count++)
+  {
+    if (tmpSys != NULL)
+    {
+      // System found.
+      if (!memcmp(tmpSys->data.sysIpBin, ipBinParam, BIN_IP_LEN))
+      {
+        retVal = tmpSys;
+        break;
+      }
+    }
+
+    if ((tmpSys = tmpSys->next) == NULL)
+    {
+      break;
+    }
+  }
+
+END:
+
+  return retVal;
 }
 
 

@@ -65,7 +65,6 @@ void WriteDepoisoningFile(void)
   char srcMacStr[MAX_BUF_SIZE + 1];
   PSYSNODE systemListPtr = NULL;
 
-
   EnterCriticalSection(&csSystemsLL);
   // Get a copy of all systems found in the network.
   for (systemListPtr = gTargetSystemsList;  systemListPtr != NULL; systemListPtr = systemListPtr->next)
@@ -114,6 +113,8 @@ END:
   {
     fclose(fileHandle);
   }
+  
+  LeaveCriticalSection(&csSystemsLL);
 
 }
 

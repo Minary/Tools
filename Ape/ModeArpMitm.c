@@ -213,6 +213,7 @@ DWORD WINAPI TargethostsObserver(LPVOID params)
   struct _stat statbuf;
   time_t mtime_previous;
   int stat = _stat(FILE_HOST_TARGETS, &statbuf);
+  int total_systems = 0;
 
   while (1 == 1)
   {
@@ -221,10 +222,12 @@ DWORD WINAPI TargethostsObserver(LPVOID params)
 
     if (mtime_previous != statbuf.st_mtime)
     {
+      total_systems = 0;
       LogMsg(DBG_INFO, "TargethostsObserver(): .targethosts changed. Reloading .targethost records.");
       ClearSystemList(&gTargetSystemsList);
-      ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
+      total_systems = ParseTargetHostsConfigFile(FILE_HOST_TARGETS);
       PrintTargetSystems(FILE_HOST_TARGETS);
+      LogMsg(DBG_INFO, "TargethostsObserver(): %d systems added to .targethosts.", total_systems);
     }
 
     Sleep(1000);

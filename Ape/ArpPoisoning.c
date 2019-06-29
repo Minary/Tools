@@ -107,7 +107,10 @@ DWORD ArpPoisoningLoop(PSCANPARAMS scanParamsParam)
         }
       }
     }
-
+    else
+    {
+      LogMsg(DBG_LOW, "ArpPoisoningLoop(): No targets available for poisoning");
+    }
     Sleep(SLEEP_BETWEEN_REPOISONING);
   }
   
