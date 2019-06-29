@@ -15,9 +15,7 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
   int counter = 0;
   char srcMac[MAX_BUF_SIZE + 1];
 
-LogMsg(DBG_LOW, "GetListCopy(0.0): ...");
   EnterCriticalSection(&csSystemsLL);
-LogMsg(DBG_LOW, "GetListCopy(0.1): ...");
   while (nodesParam != NULL)
   {
     ZeroMemory(srcMac, sizeof(srcMac));
@@ -35,7 +33,6 @@ LogMsg(DBG_LOW, "GetListCopy(0.1): ...");
   }
 
   LeaveCriticalSection(&csSystemsLL);
-LogMsg(DBG_LOW, "GetListCopy(1): Total systems: %d", counter);
 
   return counter;
 }
@@ -63,9 +60,7 @@ void ClearSystemList(PPSYSNODE listHead)
 {
   PSYSNODE listPos;
 
-LogMsg(DBG_LOW, "ClearSystemList(0.0): ");
   EnterCriticalSection(&csSystemsLL);
-LogMsg(DBG_LOW, "ClearSystemList(0.1): ");
 
   // Verify preconditions
   if (listHead == NULL ||
@@ -91,9 +86,7 @@ LogMsg(DBG_LOW, "ClearSystemList(0.1): ");
   *listHead = listPos;
   
 END:
-LogMsg(DBG_LOW, "ClearSystemList(1.0): ");
   LeaveCriticalSection(&csSystemsLL);
-LogMsg(DBG_LOW, "ClearSystemList(1.1): ");
 }
 
 
