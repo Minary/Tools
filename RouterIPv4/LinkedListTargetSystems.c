@@ -68,7 +68,7 @@ void ClearSystemList(PPSYSNODE listHead)
     ((PSYSNODE)*listHead)->isTail ||
     ((PSYSNODE)*listHead)->next == NULL)
   {
-    return;
+    goto END;
   }
 
   // Free all allocated resources
@@ -85,6 +85,7 @@ void ClearSystemList(PPSYSNODE listHead)
   // Set new list head
   *listHead = listPos;
 
+END:
   LeaveCriticalSection(&csSystemsLL);
 }
 
