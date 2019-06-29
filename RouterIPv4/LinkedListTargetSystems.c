@@ -119,7 +119,7 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   snprintf(srcMac, sizeof(srcMac) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", sysMacParam[0], sysMacParam[1], sysMacParam[2], sysMacParam[3], sysMacParam[4], sysMacParam[5]);
 
   // Entry already exists. Update IP and timestamp.
-  if ((tmpNode = GetNodeByIp(*listHead, sysIpBinParam)) != NULL)
+  if ((tmpNode = GetNodeByIpUnsafe(*listHead, sysIpBinParam)) != NULL)
   {
     CopyMemory(tmpNode->data.TimeStamp, tmpBuf, sizeof(tmpBuf));
     CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);
@@ -146,6 +146,44 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
 
 END:
   LeaveCriticalSection(&csSystemsLL);
+}
+
+
+PSYSNODE GetNodeByIpUnsafe(PSYSNODE listHead, unsigned char ipBinParam[BIN_IP_LEN])
+{
+  PSYSNODE retVal = NULL;
+  PSYSNODE tmpSys;
+  int count = 0;
+
+  EnterCriticalSection(&csSystemsLL);
+  if ((tmpSys = listHead) == NULL)
+  {
+    goto END;
+  }
+
+  // Go to the end of the list
+  for (count = 0; count < MAX_SYSTEMS_COUNT; count++)
+  {
+    if (tmpSys != NULL)
+    {
+      // System found.
+      if (!memcmp(tmpSys->data.sysIpBin, ipBinParam, BIN_IP_LEN))
+      {
+        retVal = tmpSys;
+        break;
+      }
+    }
+
+    if ((tmpSys = tmpSys->next) == NULL)
+    {
+      break;
+    }
+  }
+
+END:
+  LeaveCriticalSection(&csSystemsLL);
+
+  return retVal;
 }
 
 

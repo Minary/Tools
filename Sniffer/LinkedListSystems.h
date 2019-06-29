@@ -36,6 +36,7 @@ PSYSNODE InitSystemList();
 int GetListCopy(PSYSNODE pNodes, PSYSTEMNODE pSysArray);
 void AddToSystemsList(PPSYSNODE pSysNodes, unsigned char pSysMAC[BIN_MAC_LEN], char *pSysIP, unsigned char pSysIPBin[BIN_IP_LEN]);
 PSYSNODE GetNodeByIp(PSYSNODE pSysNodes, unsigned char pIPBin[BIN_IP_LEN]);
+PSYSNODE GetNodeByIpUnsafe(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN]);
 PSYSNODE GetNodeByMac(PSYSNODE pSysNodes, unsigned char pMAC[BIN_MAC_LEN]);
 int CountNodes(PSYSNODE pSysNodes);
 

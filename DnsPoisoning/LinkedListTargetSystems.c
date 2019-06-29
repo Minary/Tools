@@ -123,7 +123,7 @@ void AddToSystemsList(PPSYSNODE listHead, unsigned char sysMacParam[BIN_MAC_LEN]
   snprintf(srcMac, sizeof(srcMac) - 1, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX", sysMacParam[0], sysMacParam[1], sysMacParam[2], sysMacParam[3], sysMacParam[4], sysMacParam[5]);
 
   // Entry already exists. Update IP and timestamp.
-  if ((tmpNode = GetNodeByIp(*listHead, sysIpBinParam)) != NULL)
+  if ((tmpNode = GetNodeByIpUnsafe(*listHead, sysIpBinParam)) != NULL)
   {
     CopyMemory(tmpNode->data.TimeStamp, tmpBuf, sizeof(tmpBuf));
     CopyMemory(tmpNode->data.sysIpStr, sysIpParam, MAX_IP_LEN);

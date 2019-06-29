@@ -9,15 +9,10 @@
 extern CRITICAL_SECTION csSystemsLL;
 
 
-/*
- *
- *
- */
 int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 {
   int counter = 0;
   char srcMacStr[MAX_BUF_SIZE + 1];
-
 
   EnterCriticalSection(&csSystemsLL);
 
@@ -43,10 +38,6 @@ int GetListCopy(PSYSNODE nodesParam, PSYSTEMNODE sysArrayParam)
 }
 
 
-/*
- *
- *
- */
 PSYSNODE InitSystemList()
 {
   PSYSNODE firstSysNode = NULL;
@@ -66,10 +57,6 @@ PSYSNODE InitSystemList()
 }
 
 
-/*
- *
- *
- */
 void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC_LEN], char *sysIpParam, unsigned char sysIpBinParam[BIN_IP_LEN])
 {
   PSYSNODE tempNode = NULL;
@@ -126,11 +113,42 @@ void AddToSystemsList(PPSYSNODE sysNodesParam, unsigned char sysMacParam[BIN_MAC
 }
 
 
+PSYSNODE GetNodeByIpUnsafe(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN])
+{
+  PSYSNODE retVal = NULL;
+  PSYSNODE tempSys;
+  int counter = 0;
 
-/*
- *
- *
- */
+  EnterCriticalSection(&csSystemsLL);
+
+  if ((tempSys = sysNodesParam) != NULL)
+  {
+    // Go to the end of the list
+    for (counter = 0; counter < MAX_SYSTEMS_COUNT; counter++)
+    {
+      if (tempSys != NULL)
+      {
+        // System found.
+        if (!memcmp(tempSys->data.sysIpBin, ipBinParam, BIN_IP_LEN))
+        {
+          retVal = tempSys;
+          break;
+        }
+      }
+
+      if ((tempSys = tempSys->next) == NULL)
+      {
+        break;
+      }
+    }
+  }
+
+  LeaveCriticalSection(&csSystemsLL);
+
+  return retVal;
+}
+
+
 PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -167,13 +185,6 @@ PSYSNODE GetNodeByIp(PSYSNODE sysNodesParam, unsigned char ipBinParam[BIN_IP_LEN
 }
 
 
-
-
-
-/*
- *
- *
- */
 PSYSNODE GetNodeByMac(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
 {
   PSYSNODE retVal = NULL;
@@ -213,10 +224,6 @@ PSYSNODE GetNodeByMac(PSYSNODE sysNodesParam, unsigned char pMAC[BIN_MAC_LEN])
 }
 
 
-/*
- *
- *
- */
 int CountNodes(PSYSNODE sysNodesParam)
 {
   int retVal = 0;
