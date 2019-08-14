@@ -106,6 +106,6 @@ void Mac2String(unsigned char pMAC[BIN_MAC_LEN], unsigned char* pOutput, int pOu
 int SendArpPacket(void* pIFCHandle, PARPPacket pARPPacket);
 int SendArpWhoHas(PSCANPARAMS pScanParams, unsigned long lIPAddress);
 DWORD WINAPI CaptureArpReplies(LPVOID pScanParams);
-
+void ListInterfaceDetails();
 
 #endif

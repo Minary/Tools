@@ -71,7 +71,15 @@ int main(int argc, char** argv)
   _snprintf(filter, sizeof(filter) - 1, "arp and arp[6:2] = 2");
   //netMask = 0xffffff; // "255.255.255.0"
 
-    // Initialisation
+
+  if (argc >= 1 &&
+      strcmpi(argv[1], "-l", 2) == 0)
+  {
+    ListInterfaceDetails();
+    return(0);
+  }
+
+  // Initialisation
   InitializeCriticalSectionAndSpinCount(&gWriteLog, 0x00000400);
   InitializeCriticalSectionAndSpinCount(&gCSSystemsLL, 0x00000400);
 
@@ -107,7 +115,8 @@ int main(int argc, char** argv)
   // We dont need this list anymore.
   pcap_freealldevs(allDevs);
 
-  if (adapter == NULL || strnlen(adapter, sizeof(adapter) - 1) <= 0)
+  if (adapter == NULL || 
+      strnlen(adapter, sizeof(adapter) - 1) <= 0)
   {
     retVal = 3;
     goto END;
@@ -133,7 +142,7 @@ int main(int argc, char** argv)
     goto END;
   }
 
-  //        if (pcap_compile((pcap_t *) lScanParams.IfcWriteHandle, &lFCode, (const char *) lFilter, 1, lNetMask) >= 0)
+  // if (pcap_compile((pcap_t *) lScanParams.IfcWriteHandle, &lFCode, (const char *) lFilter, 1, lNetMask) >= 0)
   if (pcap_compile((pcap_t*)scanParams.IfcWriteHandle, &fCode, (const char*)filter, 1, NULL) < 0)
   {
     retVal = 6;
@@ -466,4 +475,156 @@ void LogMsg(char* msg, ...)
   //fflush(stderr);
 
   LeaveCriticalSection(&gWriteLog);
+}
+
+void ListInterfaceDetails()
+{
+  int retVal = 0;
+  PIP_ADAPTER_INFO adapterInfoPtr = NULL;
+  PIP_ADAPTER_INFO adapterPtr = NULL;
+  DWORD functRetVal = 0;
+  UINT counter;
+  struct tm timestamp;
+  char tempBuffer[MAX_BUF_SIZE + 1];
+  errno_t error;
+  ULONG outputBufferLength = sizeof(IP_ADAPTER_INFO);
+
+  if ((adapterInfoPtr = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, sizeof(IP_ADAPTER_INFO))) == NULL)
+  {
+    fprintf(2, "listIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
+    retVal = 1;
+    goto END;
+  }
+
+  if (GetAdaptersInfo(adapterInfoPtr, &outputBufferLength) == ERROR_BUFFER_OVERFLOW)
+  {
+    HeapFree(GetProcessHeap(), 0, adapterInfoPtr);
+    if ((adapterInfoPtr = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, outputBufferLength)) == NULL)
+    {
+      fprintf(2, "listIFCDetails(): Error allocating memory needed to call GetAdaptersinfo");
+      retVal = 2;
+
+      goto END;
+    }
+  }
+
+
+  //
+  if ((functRetVal = GetAdaptersInfo(adapterInfoPtr, &outputBufferLength)) == NO_ERROR)
+  {
+    for (adapterPtr = adapterInfoPtr; adapterPtr; adapterPtr = adapterPtr->Next)
+    {
+      printf("\n\nIfc no : %d\n", adapterPtr->ComboIndex);
+      printf("\tAdapter Name: \t%s\n", adapterPtr->AdapterName);
+      printf("\tAdapter Desc: \t%s\n", adapterPtr->Description);
+      printf("\tAdapter Addr: \t");
+
+      for (counter = 0; counter < adapterPtr->AddressLength; counter++)
+      {
+        if (counter == (adapterPtr->AddressLength - 1))
+        {
+          printf("%.2X\n", (int)adapterPtr->Address[counter]);
+        }
+        else
+        {
+          printf("%.2X-", (int)adapterPtr->Address[counter]);
+        }
+      }
+
+      printf("\tIndex: \t%d\n", adapterPtr->Index);
+      printf("\tType: \t");
+
+      switch (adapterPtr->Type)
+      {
+      case MIB_IF_TYPE_OTHER:
+        printf("Other\n");
+        break;
+      case MIB_IF_TYPE_ETHERNET:
+        printf("Ethernet\n");
+        break;
+      case MIB_IF_TYPE_TOKENRING:
+        printf("Token Ring\n");
+        break;
+      case MIB_IF_TYPE_FDDI:
+        printf("FDDI\n");
+        break;
+      case MIB_IF_TYPE_PPP:
+        printf("PPP\n");
+        break;
+      case MIB_IF_TYPE_LOOPBACK:
+        printf("Lookback\n");
+        break;
+      case MIB_IF_TYPE_SLIP:
+        printf("Slip\n");
+        break;
+      default:
+        printf("Unknown type %ld\n", adapterPtr->Type);
+        break;
+      }
+
+      printf("\tIP Address: \t%s\n", adapterPtr->IpAddressList.IpAddress.String);
+      printf("\tIP Mask: \t%s\n", adapterPtr->IpAddressList.IpMask.String);
+      printf("\tGateway: \t%s\n", adapterPtr->GatewayList.IpAddress.String);
+
+      if (adapterPtr->DhcpEnabled)
+      {
+        printf("\tDHCP Enabled: Yes\n");
+        printf("\t  DHCP Server: \t%s\n", adapterPtr->DhcpServer.IpAddress.String);
+        printf("\t  Lease Obtained: ");
+
+        if (error = _localtime32_s(&timestamp, (__time32_t*)& adapterPtr->LeaseObtained))
+        {
+          printf("Invalid Argument to _localtime32_s\n");
+        }
+        else  if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
+        {
+          printf("Invalid Argument to asctime_s\n");
+        }
+        else
+        {
+          printf("%s", tempBuffer);
+        }
+
+        printf("\t  Lease Expires:  ");
+
+        if (error = _localtime32_s(&timestamp, (__time32_t*)& adapterPtr->LeaseExpires))
+        {
+          printf("Invalid Argument to _localtime32_s\n");
+        }
+        else if (error = asctime_s(tempBuffer, sizeof(tempBuffer), &timestamp))
+        {
+          printf("Invalid Argument to asctime_s\n");
+        }
+        else
+        {
+          printf("%s", tempBuffer);
+        }
+      }
+      else
+      {
+        printf("\tDHCP Enabled: No\n");
+      }
+
+      if (adapterPtr->HaveWins)
+      {
+        printf("\tHave Wins: Yes\n");
+        printf("\t  Primary Wins Server:    %s\n", adapterPtr->PrimaryWinsServer.IpAddress.String);
+        printf("\t  Secondary Wins Server:  %s\n", adapterPtr->SecondaryWinsServer.IpAddress.String);
+      }
+      else
+      {
+        printf("\tHave Wins: No\n");
+      }
+    }
+  }
+  else
+  {
+  fprintf(2, "listIFCDetails(): GetAdaptersInfo failed with error: %d\n", functRetVal);
+  }
+
+END:
+  if (adapterInfoPtr)
+    HeapFree(GetProcessHeap(), 0, adapterInfoPtr);
+
+  return retVal;
 }
