@@ -27,6 +27,9 @@
 CRITICAL_SECTION gWriteLog;
 CRITICAL_SECTION gCSSystemsLL;
 PSYSTEMNODE gSystemsList = NULL;
+BOOL gVerbose = FALSE;
+BOOL gXml = FALSE;
+
 
 
 /*
@@ -41,14 +44,10 @@ int main(int argc, char** argv)
   SCANPARAMS scanParams;
   unsigned long ipCounter = 0;
   unsigned long ipCounterHostOrder = 0;
-  unsigned long startIP = 0;
-  unsigned long stopIP = 0;
   unsigned long dstIP = 0;
   HANDLE threadHandle = INVALID_HANDLE_VALUE;
   DWORD threadId = 0;
   int counter = 0;
-  pcap_if_t* allDevs = NULL;
-  pcap_if_t* device = NULL;
   char temp[PCAP_ERRBUF_SIZE];
 
   HANDLE icmpFile = INVALID_HANDLE_VALUE;
@@ -61,108 +60,33 @@ int main(int argc, char** argv)
   struct sockaddr_in peerIp;
   char peerIpStr[MAX_BUF_SIZE + 1];
   char adapter[MAX_BUF_SIZE + 1];
-  char filter[1024];
-  bpf_u_int32 netMask;
-  struct bpf_program fCode;
-
-  ZeroMemory(&fCode, sizeof(fCode));
-  ZeroMemory(filter, sizeof(filter));
-
-  _snprintf(filter, sizeof(filter) - 1, "arp and arp[6:2] = 2");
-  //netMask = 0xffffff; // "255.255.255.0"
 
 
-  if (argc >= 1 &&
-      strcmpi(argv[1], "-l", 2) == 0)
-  {
-    ListInterfaceDetails();
-    return(0);
-  }
-
+  ZeroMemory(adapter, sizeof(adapter));
+  ZeroMemory(&scanParams, sizeof(scanParams));
+  ZeroMemory(&arpPacket, sizeof(arpPacket));
+   
   // Initialisation
   InitializeCriticalSectionAndSpinCount(&gWriteLog, 0x00000400);
   InitializeCriticalSectionAndSpinCount(&gCSSystemsLL, 0x00000400);
 
+  ParseInputParams(argc, argv);
   gSystemsList = InitSystemList();
-
-  if (argc < 4)
-  {
-    retVal = 1;
-    goto END;
-  }
-
-  /*
-   * Open device list
-   */
-  if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevs, temp) == -1)
-  {
-    retVal = 2;
-    goto END;
-  }
-
-  ZeroMemory(adapter, sizeof(adapter));
-  counter = 0;
-
-  for (counter = 0, device = allDevs; device; device = device->next, counter++)
-  {
-    if (StrStrI(device->name, argv[1]))
-    {
-      strcpy(adapter, device->name);
-      break;
-    }
-  }
-
-  // We dont need this list anymore.
-  pcap_freealldevs(allDevs);
-
-  if (adapter == NULL || 
-      strnlen(adapter, sizeof(adapter) - 1) <= 0)
-  {
-    retVal = 3;
-    goto END;
-  }
-
-  ZeroMemory(&scanParams, sizeof(scanParams));
-  ZeroMemory(&arpPacket, sizeof(arpPacket));
+  PreparePcapDevice(argv[1], adapter);
   GetIfcDetails(adapter, &scanParams);
+
   strncpy(scanParams.IFCstring, adapter, sizeof(scanParams.IFCstring) - 1);
-  startIP = ntohl(inet_addr(argv[2]));
-  stopIP = ntohl(inet_addr(argv[3]));
+  scanParams.StartIPNum = ntohl(inet_addr(argv[2]));
+  scanParams.StopIPNum = ntohl(inet_addr(argv[3]));
 
-  if (startIP > stopIP)
-  {
-    retVal = 4;
-    goto END;
-  }
-
-  // Start ARP Reply listener thread
-  if ((scanParams.IfcWriteHandle = pcap_open(adapter, 48, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, 1, NULL, temp)) == NULL)
-  {
-    retVal = 5;
-    goto END;
-  }
-
-  // if (pcap_compile((pcap_t *) lScanParams.IfcWriteHandle, &lFCode, (const char *) lFilter, 1, lNetMask) >= 0)
-  if (pcap_compile((pcap_t*)scanParams.IfcWriteHandle, &fCode, (const char*)filter, 1, NULL) < 0)
-  {
-    retVal = 6;
-    goto END;
-  }
-
-  // Set the filter
-  if (pcap_setfilter((pcap_t*)scanParams.IfcWriteHandle, &fCode) < 0)
-  {
-    retVal = 7;
-    goto END;
-  }
+  ParseScanParams(&scanParams, adapter);
 
   if ((arpReplyThreadHandle = CreateThread(NULL, 0, CaptureArpReplies, &scanParams, 0, &arpReplyThreadID)) == NULL)
   {
-    retVal = 8;
-    goto END;
+    exit(8);
   }
 
-  for (ipCounter = startIP; ipCounter <= stopIP; ipCounter++)
+  for (ipCounter = scanParams.StartIPNum; ipCounter <= scanParams.StopIPNum; ipCounter++)
   {
     if (memcmp(scanParams.LocalIP, &ipCounter, BIN_IP_LEN) &&
         memcmp(scanParams.GWIP, &ipCounter, BIN_IP_LEN))
@@ -171,6 +95,18 @@ int main(int argc, char** argv)
       SendArpWhoHas(&scanParams, ipCounter);
       peerIp.sin_addr.s_addr = htonl(ipCounter);
       strncpy(peerIpStr, inet_ntoa(peerIp.sin_addr), sizeof(peerIpStr) - 1);
+
+
+      if (gVerbose == TRUE)
+      {
+        ZeroMemory(temp, sizeof(temp));
+        if (gXml == TRUE)
+          _snprintf(temp, sizeof(temp) - 1, "<arp>\n  <type>request</type>\n  <ip>%s</ip>\n  <mac></mac>\n</arp>", peerIpStr);
+        else
+          _snprintf(temp, sizeof(temp) - 1, "request;%s;", peerIpStr);
+
+        LogMsg(temp);
+      }
 
       Sleep(SLEEP_BETWEEN_ARPS);
     }
@@ -194,10 +130,6 @@ END:
 
 
 
-/*
- *
- *
- */
 DWORD WINAPI CaptureArpReplies(LPVOID pScanParams)
 {
   pcap_t* ifcHandle = NULL;
@@ -255,7 +187,11 @@ DWORD WINAPI CaptureArpReplies(LPVOID pScanParams)
           AddToList(&gSystemsList, arpPHdr->spa, arpPHdr->sha);
 
           ZeroMemory(temp, sizeof(temp));
+          if (gXml == TRUE)
           _snprintf(temp, sizeof(temp) - 1, "<arp>\n  <type>reply</type>\n  <ip>%s</ip>\n  <mac>%s</mac>\n</arp>", arpIpSrcStr, ethSrcStr);
+          else
+            _snprintf(temp, sizeof(temp) - 1, "reply;%s;%s", arpIpSrcStr, ethSrcStr);
+
           LogMsg(temp);
         }
       }
@@ -302,10 +238,6 @@ int SendArpWhoHas(PSCANPARAMS pScanParams, unsigned long lIPAddress)
 }
 
 
-/*
- *
- *
- */
 int SendArpPacket(void* pIFCHandle, PARPPacket pARPPacket)
 {
   int retVal = NOK;
@@ -344,10 +276,6 @@ int SendArpPacket(void* pIFCHandle, PARPPacket pARPPacket)
 }
 
 
-/*
- *
- *
- */
 void Mac2String(unsigned char mac[BIN_MAC_LEN], unsigned char* output, int outputLen)
 {
   if (output && outputLen > 0)
@@ -355,10 +283,6 @@ void Mac2String(unsigned char mac[BIN_MAC_LEN], unsigned char* output, int outpu
 }
 
 
-/*
- *
- *
- */
 void Ip2string(unsigned char ip[BIN_IP_LEN], unsigned char* output, int outputLen)
 {
   if (output && outputLen > 0)
@@ -366,10 +290,6 @@ void Ip2string(unsigned char ip[BIN_IP_LEN], unsigned char* output, int outputLe
 }
 
 
-/*
- *
- *
- */
 int GetIfcDetails(char* ifcName, PSCANPARAMS scanParams)
 {
   int retVal = 0;
@@ -445,10 +365,6 @@ END:
 }
 
 
-/*
- *
- *
- */
 void LogMsg(char* msg, ...)
 {
   HANDLE fileHandle = INVALID_HANDLE_VALUE;
@@ -476,6 +392,20 @@ void LogMsg(char* msg, ...)
 
   LeaveCriticalSection(&gWriteLog);
 }
+
+
+void PrintUsage(char* pAppName)
+{
+  system("cls");
+  printf("List all interfaces               :  %s -l\n", pAppName);
+  printf("Print help                        :  %s (-h|-?)\n", pAppName);
+  printf("Scan network                      :  %s IFC-ID Start-IP Stop-IP\n", pAppName);
+  printf("Print verbose scan output         :  %s IFC-ID Start-IP Stop-IP -v\n", pAppName);
+  printf("Print scan output in XML          :  %s IFC-ID Start-IP Stop-IP -x\n", pAppName);
+  printf("\n\n\n\nExamples\n--------\n\n");
+  printf("Example : %s 0F716AAF-D4A7-ACBA-1234-EA45A939F624 192.168.0.1 192.168.0.255\n", pAppName);
+}
+
 
 void ListInterfaceDetails()
 {
@@ -627,4 +557,129 @@ END:
     HeapFree(GetProcessHeap(), 0, adapterInfoPtr);
 
   return retVal;
+}
+
+
+BOOL IsFlagSet(int argc, char** argv, char* flag)
+{
+  BOOL retVal = FALSE;
+
+  if (flag == NULL ||
+    strnlen(flag, 3) != 2)
+  {
+    printf("IsFlagSet(): 0\r\n");
+    return FALSE;
+  }
+
+  if (argc < 2)
+  {
+    printf("IsFlagSet(): 1\r\n");
+    return FALSE;
+  }
+
+  for (int i = 1; i < argc; i++)
+  {
+    if (strcmpi(argv[i], flag, 2) == 0)
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+
+void ParseInputParams(int argc, char** argv)
+{
+  if (IsFlagSet(argc, argv, "-l") == TRUE)
+  {
+    ListInterfaceDetails();
+    exit(0);
+  }
+  else if (IsFlagSet(argc, argv, "-h") == TRUE ||
+    IsFlagSet(argc, argv, "-?") == TRUE)
+  {
+    PrintUsage(argv[0]);
+    exit(0);
+  }
+
+  if (argc < 4)
+  {
+    PrintUsage(argv[0]);
+    exit(0);
+  }
+
+  gXml = IsFlagSet(argc, argv, "-x");
+  gVerbose = IsFlagSet(argc, argv, "-v");
+}
+
+
+void ParseScanParams(PSCANPARAMS scanParams, char *adapter)
+{
+  char filter[1024];
+  bpf_u_int32 netMask;
+  struct bpf_program fCode;
+  char temp[PCAP_ERRBUF_SIZE];
+
+  ZeroMemory(&fCode, sizeof(fCode));
+  ZeroMemory(filter, sizeof(filter));
+
+  _snprintf(filter, sizeof(filter) - 1, "arp and arp[6:2] = 2");
+  //netMask = 0xffffff; // "255.255.255.0"
+
+  if (scanParams->StartIPNum > scanParams->StopIPNum)
+  {
+    exit(4);
+  }
+
+  // Start ARP Reply listener thread
+  if ((scanParams->IfcWriteHandle = pcap_open(adapter, 48, PCAP_OPENFLAG_NOCAPTURE_LOCAL | PCAP_OPENFLAG_MAX_RESPONSIVENESS, 1, NULL, temp)) == NULL)
+  {
+    printf("adapter: %s\n", adapter);
+    exit(5);
+  }
+
+  // if (pcap_compile((pcap_t *) lScanParams.IfcWriteHandle, &lFCode, (const char *) lFilter, 1, lNetMask) >= 0)
+  if (pcap_compile((pcap_t*)scanParams->IfcWriteHandle, &fCode, (const char*)filter, 1, NULL) < 0)
+  {
+    exit(6);
+  }
+
+  // Set the filter
+  if (pcap_setfilter((pcap_t*)scanParams->IfcWriteHandle, &fCode) < 0)
+  {
+    exit(7);
+  }
+}
+
+
+void PreparePcapDevice(char *ifcName, char *adapter)
+{
+  int counter = 0;
+  char temp[PCAP_ERRBUF_SIZE];
+  pcap_if_t* allDevs = NULL;
+  pcap_if_t* device = NULL;
+
+  if (pcap_findalldevs_ex(PCAP_SRC_IF_STRING, NULL, &allDevs, temp) == -1)
+  {
+    exit(2);
+  }
+
+  for (counter = 0, device = allDevs; device; device = device->next, counter++)
+  {
+    if (StrStrI(device->name, ifcName))
+    {
+      strcpy(adapter, device->name);
+      break;
+    }
+  }
+
+  // We dont need this list anymore.
+  pcap_freealldevs(allDevs);
+
+  if (adapter == NULL ||
+      strnlen(adapter, sizeof(adapter) - 1) <= 0)
+  {
+    exit(3);
+  }
 }

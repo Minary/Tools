@@ -107,5 +107,10 @@ int SendArpPacket(void* pIFCHandle, PARPPacket pARPPacket);
 int SendArpWhoHas(PSCANPARAMS pScanParams, unsigned long lIPAddress);
 DWORD WINAPI CaptureArpReplies(LPVOID pScanParams);
 void ListInterfaceDetails();
+void PrintUsage(char* pAppName);
+BOOL IsFlagSet(int argc, char** argv, char* flag);
+void ParseInputParams(int argc, char** argv);
+void ParseScanParams(PSCANPARAMS scanParams, char* adapter);
+void PreparePcapDevice(char* ifcName, char* adapter);
 
 #endif
