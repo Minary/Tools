@@ -113,7 +113,7 @@ int main(int argc, char** argv)
   }
 
   // Wait for all ARP replies and terminate thread.
-  Sleep(5000);
+  Sleep(1000);
   TerminateThread(arpReplyThreadHandle, 0);
   CloseHandle(arpReplyThreadHandle);
 
