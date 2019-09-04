@@ -19,7 +19,7 @@
     /// <param name="args"></param>
     public static void Main(string[] args)
     {
-      string certificateHost = string.Empty;
+      var certificateHost = string.Empty;
       var parser = new FluentCommandLineParser();
       parser.IsCaseSensitive = false;
 
@@ -59,7 +59,7 @@
       else if (!string.IsNullOrEmpty(certificateHost) && 
                !string.IsNullOrWhiteSpace(certificateHost))
       {
-        CreateCertificate(certificateHost);
+        Lib.CertificateHandler.Inst.CreateCertificate(certificateHost);
       }
       else if (string.IsNullOrEmpty(Config.CertificatePath))
       {
@@ -69,13 +69,6 @@
       {
         StartProxyServer();
       }
-    }
-
-
-    // For the sake of testability this method remains public
-    public static void CreateCertificate(string certificateHost)
-    {
-      HttpsReverseProxy.Server.CreateCertificate(certificateHost);
     }
 
 
@@ -120,12 +113,12 @@
       {
         if (HttpReverseProxy.Server.Start(Config.LocalHttpServerPort) == false)
         {
-          throw new Exception("HTTP reverse proxy server could be started");
+          throw new Exception("HTTP reverse proxy server could not be started");
         }
 
         if (HttpsReverseProxy.Server.Start(Config.LocalHttpsServerPort, Config.CertificatePath) == false)
         {
-          throw new Exception("HTTPS reverse proxy server could be started");
+          throw new Exception("HTTPS reverse proxy server could nor be started");
         }
 
         Console.WriteLine("Press enter to exit");

@@ -65,6 +65,7 @@
     <Compile Include="ErrorHandler.cs" />
     <Compile Include="HttpReverseProxy.cs" />
     <Compile Include="HttpsReverseProxy.cs" />
+    <Compile Include="Lib\CertificateHandler.cs" />
     <Compile Include="Lib\Common.cs" />
     <Compile Include="Lib\PluginCalls.cs" />
     <Compile Include="ToClient\Header\Redirect.cs" />

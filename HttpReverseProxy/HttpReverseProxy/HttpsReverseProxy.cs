@@ -59,7 +59,11 @@
       serverCertificate2 = new X509Certificate2(certificateFilePath, string.Empty);
       this.tcpListener = new TcpListener(this.ListeningIpInterface, localServerPort);
 
-      Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Info, "HTTPS reverse proxy server started on port {0}", localServerPort, Path.GetFileName(certificateFilePath));
+      Console.WriteLine("Thumbprint:" + serverCertificate2.Thumbprint);
+      Console.WriteLine("Subject:" + serverCertificate2.Subject);
+      Console.WriteLine("FriendlyName:" + serverCertificate2.FriendlyName);
+
+      Logging.Instance.LogMessage("TcpListener", ProxyProtocol.Undefined, Loglevel.Info, "HTTPS reverse proxy server started on port {0} with certificate file {1}. Certificate subject: {2}, issuer:{3}", localServerPort, Path.GetFileName(certificateFilePath), serverCertificate2.Subject, serverCertificate2.Issuer);
 
       try
       {
@@ -177,9 +181,9 @@
     private static void InitiateHttpsClientRequestProcessing(object clientTcpObj)
     {
       TcpClient tcpClient = (TcpClient)clientTcpObj;
-      string clientIp = string.Empty;
-      string clientPort = string.Empty;
-      string clientMac = string.Empty;
+      var clientIp = string.Empty;
+      var clientPort = string.Empty;
+      var clientMac = string.Empty;
       RequestObj requestObj = new RequestObj(Config.DefaultRemoteHost, ProxyProtocol.Https);
 
       // Determine tcpClient IP and MAC address.
@@ -212,7 +216,7 @@
       // Open tcpClient system's data clientStream
       try
       {
-        SslStream sslStream = new SslStream(requestObj.TcpClientConnection.GetStream(), false, new RemoteCertificateValidationCallback(remoteCertificateValidation));
+        var sslStream = new SslStream(requestObj.TcpClientConnection.GetStream(), false, new RemoteCertificateValidationCallback(remoteCertificateValidation));
         sslStream.AuthenticateAsServer(serverCertificate2, false, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12 | SslProtocols.Ssl3, false);
 
         requestObj.ClientRequestObj.ClientBinaryReader = new MyBinaryReader(requestObj.ProxyProtocol, sslStream, 8192, Encoding.UTF8, requestObj.Id);
@@ -223,10 +227,10 @@
       }
       catch (Exception ex)
       {
-        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, $"ProxyServer.InitiateHttpsClientRequestProcessing(EXCEPTION): {ex.Message}\r\n{ex.GetType().ToString()}");
+        Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Error, $"ProxyServer.InitiateHttpsClientRequestProcessing(EXCEPTION): {ex.Message}\r\n{ex.GetType().ToString()}");
         if (ex.InnerException is Exception)
         {
-          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Debug, $"ProxyServer.InitiateHttpsClientRequestProcessing(INNEREXCEPTION): {ex.InnerException.Message}, {ex.GetType().ToString()}");
+          Logging.Instance.LogMessage(requestObj.Id, requestObj.ProxyProtocol, Loglevel.Error, $"ProxyServer.InitiateHttpsClientRequestProcessing(INNEREXCEPTION): {ex.InnerException.Message}, {ex.GetType().ToString()}");
         }
       }
       finally
