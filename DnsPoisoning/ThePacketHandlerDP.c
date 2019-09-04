@@ -303,15 +303,15 @@ void PrepareDataPacketStructure(const u_char *data, PPACKET_INFO packetInfo)
 BOOL SendPacket(int maxTries, LPVOID writeHandle, u_char *data, unsigned int dataSize)
 {
   BOOL retVal = FALSE;
-  int counter = 0;
 
-  for (; counter < maxTries; counter++)
+  for (int counter = 0; counter < maxTries; counter++)
   {
     if (pcap_sendpacket(writeHandle, data, dataSize) == 0)
     {
       retVal = TRUE;
       break;
     }
+fprintf(stderr, "\nError sending the packet: %s\n", pcap_geterr(writeHandle));
   }
 
   return retVal;
