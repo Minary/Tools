@@ -110,11 +110,9 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
       break;
     }
 
-    // Break if current hostname matches the wildcard leading
-    // host in the list
+    // Break if current hostname matches the pattern (with wildcards: * ?)
     if (tmpSys != NULL &&
-        tmpSys->Data.HostNameWithWildcard[0] == '*' &&
-        StrStrIA((char *)hostnameParam, (char *)(tmpSys->Data.HostNameWithWildcard + 1)) != NULL)
+        WildcardCompare(tmpSys->Data.HostNameWithWildcard, (char*)hostnameParam))
     {
       retVal = tmpSys;
       break;
@@ -168,4 +166,19 @@ void FillInWildcardHostname(PHOSTNODE tmpNode)
   strncpy(tmpBuf, &tmpNode->Data.HostName[1], sizeof(tmpBuf) - 1);
   strncpy(tmpNode->Data.HostName, tmpBuf, sizeof(tmpNode->Data.HostName) - 1);
   tmpNode->Data.IsWildcard = TRUE;
+}
+
+
+BOOL WildcardCompare(const char* pattern, const char* string)
+{
+  if (*pattern == '\0' && *string == '\0')		// Check if string is at end or not.
+    return TRUE;
+
+  if (*pattern == '?' || *pattern == *string)		//Check for single character missing or match
+    return WildcardCompare(pattern + 1, string + 1);
+
+  if (*pattern == '*')
+    return WildcardCompare(pattern + 1, string) || WildcardCompare(pattern, string + 1);		// Check for multiple character missing
+
+  return FALSE;
 }

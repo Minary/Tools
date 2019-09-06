@@ -47,3 +47,4 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, lo
 PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnameParam);
 void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead);
 void FillInWildcardHostname(PHOSTNODE tmpNode);
+BOOL WildcardCompare(const char* pattern, const char* string);

@@ -221,7 +221,6 @@ BOOL ProcessData2Victim(PPACKET_INFO packetInfo, PSYSNODE realDstSys, PSCANPARAM
   if (packetInfo->udpHdr != NULL &&
     (poisoningData = DnsResponsePoisonerGetHost2Spoof(packetInfo->pcapData)) != NULL)
   {
-
     LogMsg(DBG_DEBUG, "Response DNS poisoning *2C succeeded : %s/%s -> %s", poisoningData->HostnodeToSpoof->Data.HostName, poisoningData->HostnodeToSpoof->Data.HostNameWithWildcard, poisoningData->HostnodeToSpoof->Data.SpoofedIp);
     retVal = DnsResponseSpoofing(packetInfo->pcapData, (pcap_t *)scanParams->InterfaceWriteHandle, poisoningData, (char *)packetInfo->srcIp, (char *)packetInfo->dstIp);
     HeapFree(GetProcessHeap(), 0, poisoningData);
