@@ -15,7 +15,6 @@
     #region MEMBERS
     
     private string theSslStripTagPattern = @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>";
-    private Regex searchPatternRegex;
 
     #endregion
 
@@ -30,7 +29,9 @@
 
     public static string ConfigFileName { get; private set; } = "plugin.config";
 
-    public static Dictionary<string, Regex> SearchPatterns { get; private set; } = new Dictionary<string, Regex>();
+//public static Dictionary<string, Regex> SearchPatterns { get; private set; } = new Dictionary<string, Regex>();
+
+    public static Dictionary<string, List<Regex>> PatternsPerMimetypeHost { get; set; } = new Dictionary<string, List<Regex>>();
 
     #endregion
 
@@ -53,8 +54,8 @@
         throw new ProxyWarningException("Config file does not exist");
       }
 
-      string[] configFileLines = File.ReadAllLines(configFilePath);
 
+      string[] configFileLines = File.ReadAllLines(configFilePath);
       foreach (string tmpLine in configFileLines)
       {
         SslStripConfigRecord configRecord = null;
@@ -73,9 +74,28 @@
           continue;
         }
 
+        // Create MIME type key
+        if (Config.PatternsPerMimetypeHost.ContainsKey(configRecord.ContentType) == false)
+        {
+          Config.PatternsPerMimetypeHost.Add(configRecord.ContentType, new List<Regex>());
+        }
+
+        // Replace * ? wildcard by regex equivalents
+        if (configRecord.Host.Contains("*") == true)
+        {
+          configRecord.Host = configRecord.Host.Replace("*", "ASTERISK");
+        }
+
         var realPattern = string.Format(this.theSslStripTagPattern, Regex.Escape(configRecord.Host));
-        this.searchPatternRegex = new Regex(this.theSslStripTagPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        SearchPatterns[configRecord.ContentType] = this.searchPatternRegex;
+        if (realPattern.Contains("ASTERISK") == true)
+        {
+          realPattern = realPattern.Replace("ASTERISK", ".*");
+        }
+
+        Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"SslStrip.VerifyRecordParameters(): REGEX:{0}", realPattern);
+        // Add new Pattern to Regex Dictionary/List
+        var tmp = new Regex(this.theSslStripTagPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        Config.PatternsPerMimetypeHost[configRecord.ContentType].Add(tmp);
       }
     }
 
@@ -86,8 +106,6 @@
 
     protected SslStripConfigRecord VerifyRecordParameters(string configFileLine)
     {
-      var host = string.Empty;
-      var contentType = string.Empty;
       char[] delimiter = { ':' };
 
       if (string.IsNullOrEmpty(configFileLine))
@@ -101,21 +119,23 @@
         throw new ProxyWarningException("Configuration is invalid");
       }
 
-      host = splitter[0];
-      contentType = splitter[1];
+      var hostPattern = splitter[0];
+      var contentType = splitter[1];
 
       // Parse parameters
-      if (string.IsNullOrEmpty(host) || string.IsNullOrWhiteSpace(host))
+      if (string.IsNullOrEmpty(hostPattern) ||
+          string.IsNullOrWhiteSpace(hostPattern))
       {
         throw new ProxyWarningException("Host parameter is invalid: {splitter[0]}");
       }
 
-      if (string.IsNullOrEmpty(contentType) || string.IsNullOrWhiteSpace(contentType))
+      if (string.IsNullOrEmpty(contentType) || 
+          string.IsNullOrWhiteSpace(contentType))
       {
         throw new ProxyWarningException($"MIME-Type parameter is invalid: {splitter[1]}");
       }
 
-      return new SslStripConfigRecord(host, contentType);
+      return new SslStripConfigRecord(hostPattern, contentType);
     }
 
     #endregion

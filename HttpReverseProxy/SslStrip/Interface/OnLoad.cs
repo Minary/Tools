@@ -29,9 +29,12 @@
       try
       {
         this.PluginConfig.ParseConfigurationFile(this.configurationFileFullPath);
-        this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Loaded {0} content type(s)", Plugin.SslStrip.Config.SearchPatterns.Count);
+        foreach (var mimeType in Plugin.SslStrip.Config.PatternsPerMimetypeHost.Keys)
+        {
+          this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): MimeType {0} has {1} records", mimeType, Plugin.SslStrip.Config.PatternsPerMimetypeHost[mimeType].Count);
+        }
       }
-      catch (System.IO.FileNotFoundException)
+      catch (FileNotFoundException)
       {
         string tmpConfigFile = Path.GetFileName(this.configurationFileFullPath);
         this.pluginProperties.PluginHost.LoggingInst.LogMessage("SslStrip", ProxyProtocol.Undefined, Loglevel.Info, "SslStrip.OnLoad(): Config file \"...{0}\" does not exist", tmpConfigFile);

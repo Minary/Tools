@@ -35,7 +35,7 @@
         throw new ProxyWarningException("The server response content type is invalid");
       }
 
-      if (Plugin.SslStrip.Config.SearchPatterns.ContainsKey(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType) == false)
+      if (Plugin.SslStrip.Config.PatternsPerMimetypeHost.ContainsKey(requestObj.ServerResponseObj.ContentTypeEncoding.ContentType) == false)
       {
         return;
       }
@@ -44,9 +44,9 @@
       // 1. The content type is right.
       // Iterate through all configured tags and locate
       // them in the server data
-      ConcurrentDictionary<string, string> foundHttpsTags = new ConcurrentDictionary<string, string>();
-      ConcurrentDictionary<string, string> cacheUrlMapping = new ConcurrentDictionary<string, string>();
-      string strippedData = string.Empty;
+      var foundHttpsTags = new ConcurrentDictionary<string, string>();
+      var cacheUrlMapping = new ConcurrentDictionary<string, string>();
+      var strippedData = string.Empty;
 
       this.SslStrippedData = dataChunk.DataEncoding.GetString(dataChunk.ContentData, 0, dataChunk.ContentDataLength);
 
@@ -57,10 +57,11 @@
         return;
       }
 
-      this.LocateAllTags(this.SslStrippedData, Plugin.SslStrip.Config.SearchPatterns[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
+      this.LocateAllTags(this.SslStrippedData, Plugin.SslStrip.Config.PatternsPerMimetypeHost[requestObj.ServerResponseObj.ContentTypeEncoding.ContentType], foundHttpsTags, cacheUrlMapping);
 
       // If there were no relevant tags found return.
-      if (foundHttpsTags == null || foundHttpsTags.Count <= 0)
+      if (foundHttpsTags == null ||
+          foundHttpsTags.Count <= 0)
       {
         return;
       }

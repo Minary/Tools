@@ -267,17 +267,17 @@
     /// 
     /// </summary>
     /// <param name="inputData"></param>
-    /// <param name="theTagStripRegex"></param>
+    /// <param name="tagStripRegexList"></param>
     /// <param name="foundHttpsTags"></param>
     /// <param name="cacheRecords"></param>
-    private void LocateAllTags(string inputData, Regex theTagStripRegex, ConcurrentDictionary<string, string> foundHttpsTags, ConcurrentDictionary<string, string> cacheRecords)
+    private void LocateAllTags(string inputData, List<Regex> tagStripRegexList, ConcurrentDictionary<string, string> foundHttpsTags, ConcurrentDictionary<string, string> cacheRecords)
     {
       if (inputData == null)
       {
         throw new Exception("Input data is invalid");
       }
 
-      if (theTagStripRegex == null)
+      if (tagStripRegexList == null)
       {
         throw new Exception("Search regex catalog is invalid");
       }
@@ -287,24 +287,27 @@
         throw new Exception("Tag cache is invalid");
       }
 
-      Match matches = theTagStripRegex.Match(inputData);
+      foreach (var tmpRegex in tagStripRegexList)
+      { 
+      var matches = tmpRegex.Match(inputData);
+        while (matches.Success)
+        {
+          string matchedHost = matches.Groups[1].Value;
+          string matchedPath = matches.Groups[2].Value;
 
-      while (matches.Success)
-      {
-        string matchedHost = matches.Groups[1].Value;
-        string matchedPath = matches.Groups[2].Value;
+          // Process tag and cache the http/https records
+          string newTag = Regex.Replace(matches.Groups[0].Value, "https://", "http://");
+          foundHttpsTags.TryAdd(matches.Groups[0].Value, newTag);
 
-        // Process tag and cache the http/https records
-        string newTag = Regex.Replace(matches.Groups[0].Value, "https://", "http://");
-        foundHttpsTags.TryAdd(matches.Groups[0].Value, newTag);
+          // Keep a copy of both URLs in the cache
+          var tmpMatchedHost = matchedHost.Replace("https://", "http://");
+          cacheRecords.TryAdd($"{tmpMatchedHost}{matchedPath}", $"{matchedHost}{matchedPath}");
 
-        // Keep a copy of both URLs in the cache
-        var tmpMatchedHost = matchedHost.Replace("https://", "http://");
-        cacheRecords.TryAdd($"{tmpMatchedHost}{matchedPath}", $"{matchedHost}{matchedPath}");
-
-        // Find next match
-        matches = matches.NextMatch();
+          // Find next match
+          matches = matches.NextMatch();
+        }
       }
+      
     }
 
     #endregion

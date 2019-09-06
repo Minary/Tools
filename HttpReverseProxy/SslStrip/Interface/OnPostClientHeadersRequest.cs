@@ -20,7 +20,7 @@
     /// <returns></returns>
     public PluginInstruction OnPostClientHeadersRequest(RequestObj requestObj)
     {
-      PluginInstruction instruction = new PluginInstruction();
+      var instruction = new PluginInstruction();
       instruction.Instruction = Instruction.DoNothing;
       if (requestObj == null)
       {
