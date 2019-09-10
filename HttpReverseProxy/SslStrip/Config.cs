@@ -13,8 +13,13 @@
   {
 
     #region MEMBERS
-    
-    private string theSslStripTagPattern = @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>";
+
+    //    private string theSslStripTagPattern = @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>";
+    private Dictionary<string, string> theSslStripTagPattern = new Dictionary<string, string> {
+      { "text/html", @"<\s*(?:a|base|link|script|img|frame|iframe|form)\s+[^>]*(?:href|src|action)\s*=\s*""(https://{0})([^""]*)""[^>]*>" },
+      { "text/javascript", "(https://{0})" },
+      { "application/javascript", "(https://{0})" }
+    };
 
     #endregion
 
@@ -86,16 +91,17 @@
           configRecord.Host = configRecord.Host.Replace("*", "ASTERISK");
         }
 
-        var realPattern = string.Format(this.theSslStripTagPattern, Regex.Escape(configRecord.Host));
+        var mimeType = configRecord.ContentType.ToLower().Trim();
+        var realPattern = string.Format(this.theSslStripTagPattern[mimeType], Regex.Escape(configRecord.Host));
         if (realPattern.Contains("ASTERISK") == true)
         {
           realPattern = realPattern.Replace("ASTERISK", ".*");
         }
 
-        Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"SslStrip.VerifyRecordParameters(): REGEX:{0}", realPattern);
+        Logging.Instance.LogMessage("CONFIG", ProxyProtocol.Undefined, Loglevel.Debug, @"SslStrip.VerifyRecordParameters(): ContentType:{0} REGEX:{1}", configRecord.ContentType, realPattern);
         // Add new Pattern to Regex Dictionary/List
-        var tmp = new Regex(this.theSslStripTagPattern, RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        Config.PatternsPerMimetypeHost[configRecord.ContentType].Add(tmp);
+        var tmpRegex = new Regex(this.theSslStripTagPattern[mimeType], RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        Config.PatternsPerMimetypeHost[configRecord.ContentType].Add(tmpRegex);
       }
     }
 

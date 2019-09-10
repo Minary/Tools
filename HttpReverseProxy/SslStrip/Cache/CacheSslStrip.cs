@@ -34,7 +34,7 @@
         throw new Exception("Key Uri is not well formed");
       }
 
-      Uri tmpUriKey = new Uri(keyLocation);
+      var tmpUriKey = new Uri(keyLocation);
       if (tmpUriKey == null || !Regex.Match(tmpUriKey.Scheme, @"^https?$").Success)
       {
         throw new Exception("Key Uri is not well formed");
@@ -46,7 +46,7 @@
         throw new Exception("Value Uri is not well formed");
       }
 
-      Uri tmpUriValue = new Uri(valueLocation);
+      var tmpUriValue = new Uri(valueLocation);
       if (tmpUriValue == null || !Regex.Match(tmpUriValue.Scheme, @"^https?$").Success)
       {
         throw new Exception("Value Uri is not well formed");
@@ -58,7 +58,7 @@
       }
 
       Logging.Instance.LogMessage(id, ProxyProtocol.Undefined, Loglevel.Debug, "CacheSslStrip.Cache.AddElement(): {0} => {1}", keyLocation, valueLocation);
-      HostRecord tmpHost = new HostRecord("GET", ProxyProtocol.Https, tmpUriValue.Host, tmpUriValue.PathAndQuery);
+      var tmpHost = new HostRecord("GET", ProxyProtocol.Https, tmpUriValue.Host, tmpUriValue.PathAndQuery);
       this.SslStripCache.Add(keyLocation, tmpHost);
     }
 
