@@ -20,6 +20,7 @@ typedef struct
   unsigned char SpoofedIp[MAX_IP_LEN + 1];
   unsigned char CnameHost[MAX_BUF_SIZE + 1];
   unsigned long TTL;
+  BOOL DoesMatch;
   BOOL IsWildcard;
   DNS_RESPONSE_TYPE Type;
 } HOSTDATA;
@@ -42,8 +43,8 @@ typedef struct
 
 
 PHOSTNODE InitHostsList();
-void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *pHostName, unsigned long ttlParam, unsigned char *pSpoofedIP);
-void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHost, unsigned char *spoofedIpParam);
+void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char* doesMatch, unsigned char *pHostName, unsigned long ttlParam, unsigned char *pSpoofedIP);
+void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char* doesMatch, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHost, unsigned char *spoofedIpParam);
 PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnameParam);
 void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead);
 void FillInWildcardHostname(PHOSTNODE tmpNode);

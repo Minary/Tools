@@ -25,13 +25,30 @@ PHOSTNODE InitHostsList()
 }
 
 
-void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsigned long ttlParam, unsigned char *spoofedIpParam)
+void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char* mustMatchParam, unsigned char *hostNameParam, unsigned long ttlParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
   if ((tmpNode = (PHOSTNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HOSTNODE))) == NULL)
   {
     return;
+  }
+
+  char* mustMatchStr = "y";
+  tmpNode->Data.DoesMatch = TRUE;
+  if (strcmp(mustMatchParam, "n") == 0 || 
+      strcmp(mustMatchParam, "N") == 0)
+  {
+    tmpNode->Data.DoesMatch = FALSE;
+    mustMatchStr = "n";
+  }
+
+  char* isPatternStr = "n";
+  tmpNode->Data.IsWildcard = FALSE;
+  if (strstr(hostNameParam, '*') != NULL)
+  {
+    tmpNode->Data.IsWildcard = TRUE;
+    isPatternStr = "y";
   }
 
   CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
@@ -52,17 +69,34 @@ void AddSpoofedIpToList(PPHOSTNODE listHead, unsigned char *hostNameParam, unsig
   ((PHOSTNODE)*listHead)->prev = tmpNode;
   *listHead = tmpNode;
 
-  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/A record added: %s/%s", hostNameParam, spoofedIpParam);
+  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/A record added: %s/%s, mustMatch:%s/%s, isPattern:%s", hostNameParam, spoofedIpParam, mustMatchParam, mustMatchStr, isPatternStr);
 }
 
 
-void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHostParam, unsigned char *spoofedIpParam)
+void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *mustMatchParam, unsigned char *hostNameParam, long ttlParam, unsigned char *cnameHostParam, unsigned char *spoofedIpParam)
 {
   PHOSTNODE tmpNode = NULL;
 
   if ((tmpNode = (PHOSTNODE)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(HOSTNODE))) == NULL)
   {
     return;
+  }
+  
+  char* mustMatchStr = "y";
+  tmpNode->Data.DoesMatch = TRUE;
+  if (strcmp(mustMatchParam, "n") == 0 ||
+    strcmp(mustMatchParam, "N") == 0)
+  {
+    tmpNode->Data.DoesMatch = FALSE;
+    mustMatchStr = "n";
+  }
+
+  char* isPatternStr = "n";
+  tmpNode->Data.IsWildcard = FALSE;
+  if (strchr(hostNameParam, '*') != NULL)
+  {
+    tmpNode->Data.IsWildcard = TRUE;
+    isPatternStr = "y";
   }
 
   CopyMemory(tmpNode->Data.HostName, hostNameParam, sizeof(tmpNode->Data.HostName) - 1);
@@ -84,7 +118,7 @@ void AddSpoofedCnameToList(PPHOSTNODE listHead, unsigned char *hostNameParam, lo
   tmpNode->next = (HOSTNODE *)*listHead;
   ((PHOSTNODE)*listHead)->prev = (HOSTNODE *)tmpNode;
   *listHead = tmpNode;
-  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/CNAME record added: %s/%s/%s", hostNameParam, cnameHostParam, spoofedIpParam);
+  LogMsg(DBG_INFO, "AddSpoofedIpToList(): Spoofed DNS/CNAME record added: %s/%s/%s, mustMatch:%s/%s, isPattern:%s", hostNameParam, cnameHostParam, spoofedIpParam, mustMatchParam, mustMatchStr, isPatternStr);
 }
 
 
@@ -102,21 +136,64 @@ PHOSTNODE GetNodeByHostname(PHOSTNODE sysNodesParam, unsigned char *hostnamePara
   // Go to the end of the list
   for (count = 0; count < MAX_NODE_COUNT; count++)
   {
-    // Break if current hostname equals the hostname in the list
-    if (tmpSys != NULL &&
-       !strncmp((char *)tmpSys->Data.HostName, (char *)hostnameParam, sizeof(tmpSys->Data.HostName) - 1))
+    if (tmpSys == NULL)
     {
+      continue;
+    }
+
+    // Break if 
+    // - record is NO pattern
+    // - hostname in the list equals the requested hostname
+    // - hostnames MUST match
+    if (tmpSys->Data.IsWildcard == FALSE &&
+        strncmp((char *)tmpSys->Data.HostName, (char *)hostnameParam, sizeof(tmpSys->Data.HostName) == 0) &&
+        tmpSys->Data.DoesMatch == TRUE)
+    {
+      printf("WHOOP(0): hostnameParam:%s\n", hostnameParam);
       retVal = tmpSys;
       break;
     }
 
-    // Break if current hostname matches the pattern (with wildcards: * ?)
-    if (tmpSys != NULL &&
-        WildcardCompare(tmpSys->Data.HostNameWithWildcard, (char*)hostnameParam))
+    // Break if 
+    // - record IS pattern
+    // - current hostname equals the pattern (with wildcards: * ?)
+    // - hostname pattern MUST match
+    if (tmpSys->Data.IsWildcard == TRUE && 
+        WildcardCompare(tmpSys->Data.HostNameWithWildcard, (char*)hostnameParam)  == TRUE &&
+        tmpSys->Data.DoesMatch == TRUE)
     {
+      printf("WHOOP(1): hostnameParam:%s\n", hostnameParam);
       retVal = tmpSys;
       break;
     }
+
+    // Break if 
+    // - record is NO pattern
+    // - hostname in the list equals the requested hostname
+    // - hostnames MUST NOT match
+    if (tmpSys->Data.IsWildcard == FALSE &&
+        strncmp((char*)tmpSys->Data.HostName, (char*)hostnameParam, sizeof(tmpSys->Data.HostName) - 1) != 0 &&
+        tmpSys->Data.DoesMatch == FALSE)
+    {
+      printf("WHOOP(2): hostnameParam:%s\n", hostnameParam);
+      retVal = tmpSys;
+      break;
+    }
+
+    // Break if 
+    // - record IS pattern
+    // - current hostname equals the pattern (with wildcards: * ?)
+    // - hostname pattern MUST NOT match
+    if (tmpSys->Data.IsWildcard == TRUE &&
+        WildcardCompare(tmpSys->Data.HostNameWithWildcard, (char*)hostnameParam) == FALSE &&
+        tmpSys->Data.DoesMatch == FALSE)
+    {
+      printf("WHOOP(3): hostnameParam:%s\n", hostnameParam);
+      retVal = tmpSys;
+      break;
+    }
+
+
 
 
     if ((tmpSys = (PHOSTNODE)tmpSys->next) == NULL)
@@ -139,11 +216,11 @@ void PrintDnsSpoofingRulesNodes(PHOSTNODE listHead)
   {
     if (listPos->Data.Type == RESP_A)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s/%s -> %s, ttl=%lu", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.SpoofedIp, listPos->Data.TTL);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:A\t%s/%s -> %s, ttl=%lu, must match:%s", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.SpoofedIp, listPos->Data.TTL, listPos->Data.DoesMatch?"y":"n");
     }
     else if (listPos->Data.Type == RESP_CNAME)
     {
-      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s/%s -> %s/%s, ttl=%lu", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.CnameHost, listPos->Data.SpoofedIp, listPos->Data.TTL);
+      LogMsg(DBG_DEBUG, "PrintDnsSpoofingRulesNodes(): Type:CNAME\t%s/%s -> %s/%s, ttl=%lu, must match:%s", listPos->Data.HostName, listPos->Data.HostNameWithWildcard, listPos->Data.CnameHost, listPos->Data.SpoofedIp, listPos->Data.TTL, listPos->Data.DoesMatch ? "y" : "n");
     }
     else
     {

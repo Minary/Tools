@@ -12,7 +12,6 @@ extern PHOSTNODE gDnsSpoofingList;
 extern PSYSNODE gTargetSystemsList;
 
 
-
 int ParseTargetHostsConfigFile(char *targetsFile)
 {
   int retVal = 0;
@@ -103,11 +102,11 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   unsigned char hostname[MAX_BUF_SIZE + 1];
   unsigned char ttlStr[MAX_BUF_SIZE + 1];
   unsigned long ttlLong;
+  unsigned char mustMatch[MAX_BUF_SIZE + 1];
   unsigned char responseType[MAX_BUF_SIZE + 1];
   unsigned char spoofedIpAddr[MAX_BUF_SIZE + 1];
   unsigned char cnameHost[MAX_BUF_SIZE + 1];
   unsigned char cwd[MAX_BUF_SIZE + 1];
-
 
   if (configFileParam == NULL)
   {
@@ -130,6 +129,7 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
   ZeroMemory(tmpLine, sizeof(tmpLine));
   ZeroMemory(hostname, sizeof(hostname));
   ZeroMemory(ttlStr, sizeof(ttlStr));
+  ZeroMemory(mustMatch, sizeof(mustMatch));
   ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
   ZeroMemory(responseType, sizeof(responseType));
   ZeroMemory(cnameHost, sizeof(cnameHost));
@@ -144,19 +144,19 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
     }
 
     // Parse values and add them to the list.
-    if (sscanf(tmpLine, "%[^,],%[^,],%[^,],%s", hostname, responseType, ttlStr, spoofedIpAddr) == 4)
+    if (sscanf(tmpLine, "%[^,],%[^,],%[^,],%[^,],%s", mustMatch, hostname, responseType, ttlStr, spoofedIpAddr) == 5)
     {
       ttlLong = atol(ttlStr);
       if (StrCmpI(responseType, "A") == 0)
       {
-        AddSpoofedIpToList(&gDnsSpoofingList, hostname, ttlLong, spoofedIpAddr);
+        AddSpoofedIpToList(&gDnsSpoofingList, mustMatch, hostname, ttlLong, spoofedIpAddr);
       }
       else if (StrCmpI(responseType, "CNAME") == 0 &&
                StrChr(spoofedIpAddr, ',') != NULL)
       {
         strncpy(tmpLine, spoofedIpAddr, sizeof(tmpLine) - 1);
         sscanf(tmpLine, "%[^,],%s", cnameHost, spoofedIpAddr);
-        AddSpoofedCnameToList(&gDnsSpoofingList, hostname, ttlLong, cnameHost, spoofedIpAddr);
+        AddSpoofedCnameToList(&gDnsSpoofingList, mustMatch, hostname, ttlLong, cnameHost, spoofedIpAddr);
       }
 
       retVal++;
@@ -164,6 +164,7 @@ int ParseDnsPoisoningConfigFile(char *configFileParam)
 
     ZeroMemory(tmpLine, sizeof(tmpLine));
     ZeroMemory(hostname, sizeof(hostname));
+    ZeroMemory(mustMatch, sizeof(mustMatch));
     ZeroMemory(spoofedIpAddr, sizeof(spoofedIpAddr));
     ZeroMemory(responseType, sizeof(responseType));
     ZeroMemory(cnameHost, sizeof(cnameHost));
